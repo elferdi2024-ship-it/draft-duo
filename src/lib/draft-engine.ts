@@ -198,6 +198,39 @@ export class CompetitiveBrain {
         counterSum += singleCounter;
       });
       counter = Math.round(counterSum / validEnemyPicks.length);
+
+      // Adaptive Composition Counter modifiers based on enemy comp
+      const enemyComp = this.analyzeComp(enemyTeamPicks);
+      if (enemyComp) {
+        if (enemyComp.type === "dive") {
+          // Boost peelers/disengage against dive
+          if (champ.role === "Support" && (champ.tags?.includes("Peel") || ["lulu", "renata", "braum"].includes(champ.id))) {
+            counter = Math.min(100, counter + 20);
+          }
+          // Boost safe ADCs against dive
+          if (champ.id === "ezreal") {
+            counter = Math.min(100, counter + 15);
+          }
+          // Penalize immobile ADCs against dive
+          if (champ.role === "ADC" && ["jinx", "ashe"].includes(champ.id)) {
+            counter = Math.max(0, counter - 15);
+          }
+        } else if (enemyComp.type === "poke") {
+          // Boost engage/dive supports to lock down poke
+          if (champ.role === "Support" && (champ.tags?.includes("Engage") || ["nautilus", "pyke"].includes(champ.id))) {
+            counter = Math.min(100, counter + 20);
+          }
+          // Boost healers/sustain to survive poke
+          if (champ.id === "nami") {
+            counter = Math.min(100, counter + 15);
+          }
+        } else if (enemyComp.type === "scaling") {
+          // Boost early game aggressive lane bullies to shut down scaling
+          if (champ.id === "lucian" || champ.id === "tristana" || champ.id === "caitlyn") {
+            counter = Math.min(100, counter + 15);
+          }
+        }
+      }
     }
 
     // 5. Comp Score (Cohesion)
@@ -416,10 +449,8 @@ export class CompetitiveBrain {
     
     // Evaluate current phase label
     let phaseLabel: BrainAnalysis["phase"] = "ban1";
-    if (stepIndex <= 5) phaseLabel = "ban1";
-    else if (stepIndex <= 11) phaseLabel = "pick1";
-    else if (stepIndex <= 15) phaseLabel = "ban2";
-    else phaseLabel = "pick2";
+    if (stepIndex <= 9) phaseLabel = "ban1"; // Steps 0-9 are bans (Phase 1)
+    else phaseLabel = "pick1";               // Steps 10-19 are picks (Phase 2)
 
     // Recommendations
     const recommendations = currentStep.type === "ban" 

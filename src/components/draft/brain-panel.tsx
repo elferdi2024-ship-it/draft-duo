@@ -121,7 +121,7 @@ export default function BrainPanel() {
       </div>
 
       {/* Main Content Scrollable */}
-      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 max-h-[500px] md:max-h-[680px]">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 max-h-[600px] md:max-h-[825px]">
         {/* Active turn indicator banner */}
         {phase !== "complete" && (
           <div 

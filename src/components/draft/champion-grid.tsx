@@ -113,7 +113,7 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
       </div>
 
       {/* Grid Container */}
-      <div className="flex-1 overflow-y-auto max-h-[350px] md:max-h-[500px] border border-[#eadecd] bg-[#fdfbf7] p-2">
+      <div className="flex-1 overflow-y-auto max-h-[450px] md:max-h-[630px] border border-[#eadecd] bg-[#fdfbf7] p-2">
         {filteredChampions.length === 0 ? (
           <div className="text-center text-xs text-[#5e6b77] py-12">
             No se encontraron campeones coincidentes.

@@ -132,28 +132,27 @@ export interface DraftPhaseStep {
   label: string;
 }
 
-/** The 20-step draft order used in standard LoL ranked */
+/** The 20-step draft order used in Solo Queue (5 bans per team first, then picks) */
 export const DRAFT_ORDER: DraftPhaseStep[] = [
-  // Ban Phase 1
+  // Ban Phase: 10 bans first (5 per team, alternating)
   { team: 'blue', type: 'ban', index: 0, label: 'Ban Azul 1' },
   { team: 'red', type: 'ban', index: 0, label: 'Ban Rojo 1' },
   { team: 'blue', type: 'ban', index: 1, label: 'Ban Azul 2' },
   { team: 'red', type: 'ban', index: 1, label: 'Ban Rojo 2' },
   { team: 'blue', type: 'ban', index: 2, label: 'Ban Azul 3' },
   { team: 'red', type: 'ban', index: 2, label: 'Ban Rojo 3' },
-  // Pick Phase 1
+  { team: 'blue', type: 'ban', index: 3, label: 'Ban Azul 4' },
+  { team: 'red', type: 'ban', index: 3, label: 'Ban Rojo 4' },
+  { team: 'blue', type: 'ban', index: 4, label: 'Ban Azul 5' },
+  { team: 'red', type: 'ban', index: 4, label: 'Ban Rojo 5' },
+  
+  // Pick Phase: 10 picks follow (standard snake sequence)
   { team: 'blue', type: 'pick', index: 0, label: 'Pick Azul 1' },
   { team: 'red', type: 'pick', index: 0, label: 'Pick Rojo 1' },
   { team: 'red', type: 'pick', index: 1, label: 'Pick Rojo 2' },
   { team: 'blue', type: 'pick', index: 1, label: 'Pick Azul 2' },
   { team: 'blue', type: 'pick', index: 2, label: 'Pick Azul 3' },
   { team: 'red', type: 'pick', index: 2, label: 'Pick Rojo 3' },
-  // Ban Phase 2
-  { team: 'blue', type: 'ban', index: 3, label: 'Ban Azul 4' },
-  { team: 'red', type: 'ban', index: 3, label: 'Ban Rojo 4' },
-  { team: 'blue', type: 'ban', index: 4, label: 'Ban Azul 5' },
-  { team: 'red', type: 'ban', index: 4, label: 'Ban Rojo 5' },
-  // Pick Phase 2
   { team: 'red', type: 'pick', index: 3, label: 'Pick Rojo 4' },
   { team: 'blue', type: 'pick', index: 3, label: 'Pick Azul 4' },
   { team: 'blue', type: 'pick', index: 4, label: 'Pick Azul 5' },

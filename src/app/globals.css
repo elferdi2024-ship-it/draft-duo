@@ -71,13 +71,25 @@ body {
 }
 
 @keyframes pulse-gold {
-  0%, 100% { box-shadow: 0 0 4px rgba(200, 170, 110, 0.3); }
-  50% { box-shadow: 0 0 16px rgba(200, 170, 110, 0.8); }
+  0%, 100% { 
+    box-shadow: 0 0 6px rgba(200, 170, 110, 0.25); 
+    border-color: rgba(200, 170, 110, 0.6);
+  }
+  50% { 
+    box-shadow: 0 0 22px rgba(200, 170, 110, 0.85), inset 0 0 10px rgba(200, 170, 110, 0.4); 
+    border-color: rgba(200, 170, 110, 1);
+  }
 }
 
 @keyframes pulse-cyan {
-  0%, 100% { box-shadow: 0 0 4px rgba(3, 151, 171, 0.3); }
-  50% { box-shadow: 0 0 16px rgba(3, 151, 171, 0.8); }
+  0%, 100% { 
+    box-shadow: 0 0 6px rgba(3, 151, 171, 0.25); 
+    border-color: rgba(3, 151, 171, 0.6);
+  }
+  50% { 
+    box-shadow: 0 0 22px rgba(3, 151, 171, 0.85), inset 0 0 10px rgba(3, 151, 171, 0.4); 
+    border-color: rgba(3, 151, 171, 1);
+  }
 }
 
 /* Custom premium components */

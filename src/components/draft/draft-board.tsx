@@ -29,6 +29,7 @@ export default function DraftBoard() {
   const [version, setVersion] = useState("15.11.1");
   const [selectedSide, setSelectedSide] = useState<"blue" | "red">("blue");
   const [slotsConfig, setSlotsConfig] = useState<[number, number]>([3, 4]); // Default to Pick 4 & 5
+  const [mobileSubTab, setMobileSubTab] = useState<"picks" | "grid">("grid");
 
   useEffect(() => {
     loadChampions();
@@ -153,15 +154,15 @@ export default function DraftBoard() {
   const step = currentStepIndex < DRAFT_ORDER.length ? DRAFT_ORDER[currentStepIndex] : null;
 
   return (
-    <div className="flex flex-col gap-4 w-full h-full bg-[#f3ebd7]/30">
+    <div className="flex flex-col gap-5 w-full h-full">
       {/* Draft Header: Ban display */}
-      <div className="lol-panel p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="lol-panel p-5 flex flex-col md:flex-row items-center justify-between gap-5 bg-[#fdfcf9]">
         {/* Blue Bans (5 slots) */}
-        <div className="flex items-center gap-1.5 flex-1">
-          <span className="text-[9px] uppercase font-black text-sky-700 tracking-wider w-8">
+        <div className="flex items-center gap-2.5 flex-1">
+          <span className="text-xs uppercase font-extrabold text-[#0397ab] tracking-wider w-16 shrink-0">
             Bans Azul
           </span>
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {blueBans.map((id, index) => {
               const champ = getChampionById(id);
               const isActive =
@@ -170,8 +171,8 @@ export default function DraftBoard() {
               return (
                 <div
                   key={index}
-                  className={`w-7 h-7 border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center ${
-                    isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4]"
+                  className={`w-[40px] h-[40px] md:w-[46px] md:h-[46px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
+                    isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
                   }`}
                 >
                   {champ ? (
@@ -179,13 +180,13 @@ export default function DraftBoard() {
                       src={getChampionIconUrl(version, champ.ddragonKey)}
                       alt={champ.name}
                       fill
-                      className="object-cover grayscale filter opacity-75"
-                      sizes="28px"
+                      className="object-cover grayscale filter opacity-75 hover:opacity-100 transition-opacity"
+                      sizes="46px"
                     />
                   ) : isActive ? (
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0397ab] animate-ping" />
+                    <div className="w-2 h-2 rounded-full bg-[#0397ab] animate-ping" />
                   ) : (
-                    <span className="text-[7px] text-[#5e6b77]">{index + 1}</span>
+                    <span className="text-xs text-[#5e6b77] font-bold">{index + 1}</span>
                   )}
                 </div>
               );
@@ -194,15 +195,15 @@ export default function DraftBoard() {
         </div>
 
         {/* Phase Indicator */}
-        <div className="text-center shrink-0 flex items-center gap-2 bg-[#0a1428] px-5 py-2 border border-[#c8aa6e]">
-          <span className="font-serif font-black text-xs md:text-sm text-[#f0e6d3] tracking-widest uppercase">
-            {step ? step.label : "Fase de Picks Completada"}
+        <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-7 py-3 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[200px]">
+          <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
+            {step ? step.label : "Fase Completada"}
           </span>
         </div>
 
         {/* Red Bans (5 slots) */}
-        <div className="flex items-center gap-1.5 flex-1 justify-end">
-          <div className="flex gap-1">
+        <div className="flex items-center gap-2.5 flex-1 justify-end">
+          <div className="flex gap-1.5">
             {redBans.map((id, index) => {
               const champ = getChampionById(id);
               const isActive =
@@ -211,8 +212,8 @@ export default function DraftBoard() {
               return (
                 <div
                   key={index}
-                  className={`w-7 h-7 border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center ${
-                    isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4]"
+                  className={`w-[40px] h-[40px] md:w-[46px] md:h-[46px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
+                    isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
                   }`}
                 >
                   {champ ? (
@@ -220,29 +221,59 @@ export default function DraftBoard() {
                       src={getChampionIconUrl(version, champ.ddragonKey)}
                       alt={champ.name}
                       fill
-                      className="object-cover grayscale filter opacity-75"
-                      sizes="28px"
+                      className="object-cover grayscale filter opacity-75 hover:opacity-100 transition-opacity"
+                      sizes="46px"
                     />
                   ) : isActive ? (
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0397ab] animate-ping" />
+                    <div className="w-2 h-2 rounded-full bg-[#0397ab] animate-ping" />
                   ) : (
-                    <span className="text-[7px] text-[#5e6b77]">{index + 1}</span>
+                    <span className="text-xs text-[#5e6b77] font-bold">{index + 1}</span>
                   )}
                 </div>
               );
             })}
           </div>
-          <span className="text-[9px] uppercase font-black text-rose-700 tracking-wider w-8 text-right">
+          <span className="text-xs uppercase font-extrabold text-rose-600 tracking-wider w-16 text-right shrink-0">
             Bans Rojo
           </span>
         </div>
       </div>
 
+      {/* Mobile Sub-Tab Switcher */}
+      <div className="flex lg:hidden border border-[#c8aa6e] bg-[#fdfcf9] rounded p-1 gap-1 shadow-sm mt-1">
+        <button
+          onClick={() => setMobileSubTab("grid")}
+          className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
+            mobileSubTab === "grid"
+              ? "bg-[#0a1428] text-[#f0e6d3] shadow-sm"
+              : "text-[#785a28] hover:bg-[#eadecd]/30"
+          }`}
+        >
+          🔍 Selección (Grid)
+        </button>
+        <button
+          onClick={() => setMobileSubTab("picks")}
+          className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
+            mobileSubTab === "picks"
+              ? "bg-[#0a1428] text-[#f0e6d3] shadow-sm"
+              : "text-[#785a28] hover:bg-[#eadecd]/30"
+          }`}
+        >
+          ⚔️ Ver Picks (Bot)
+        </button>
+      </div>
+
       {/* Board Layout: Side picks + Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className={`grid gap-5 items-stretch ${
+        mobileSubTab === "picks" ? "grid-cols-2 lg:grid-cols-12" : "grid-cols-1 lg:grid-cols-12"
+      }`}>
         {/* Left Side (Blue picks) */}
-        <div className="lg:col-span-3 flex flex-col gap-2">
-          <div className="bg-sky-900/10 border border-sky-600/30 text-sky-800 text-[10px] uppercase tracking-widest font-black py-1.5 px-3 rounded-sm text-center">
+        <div className={
+          mobileSubTab === "picks" 
+            ? "col-span-1 lg:col-span-3 flex flex-col gap-3" 
+            : "hidden lg:flex lg:col-span-3 flex-col gap-3"
+        }>
+          <div className="bg-[#0397ab]/10 border border-[#0397ab]/30 text-[#005a82] text-xs uppercase tracking-widest font-extrabold py-2 px-4 rounded-sm text-center shadow-sm">
             Equipo Azul
           </div>
           {bluePicks.map((id, index) => {
@@ -267,7 +298,11 @@ export default function DraftBoard() {
         </div>
 
         {/* Center Champion Selection Grid */}
-        <div className="lg:col-span-6 flex flex-col w-full h-full">
+        <div className={
+          mobileSubTab === "grid" 
+            ? "col-span-1 lg:col-span-6 flex flex-col w-full h-full" 
+            : "hidden lg:flex lg:col-span-6 flex-col w-full h-full"
+        }>
           <ChampionGrid
             onSelectChampion={setChampion}
             disabled={isComplete}
@@ -275,8 +310,12 @@ export default function DraftBoard() {
         </div>
 
         {/* Right Side (Red picks) */}
-        <div className="lg:col-span-3 flex flex-col gap-2">
-          <div className="bg-rose-950/10 border border-rose-800/30 text-rose-800 text-[10px] uppercase tracking-widest font-black py-1.5 px-3 rounded-sm text-center">
+        <div className={
+          mobileSubTab === "picks" 
+            ? "col-span-1 lg:col-span-3 flex flex-col gap-3" 
+            : "hidden lg:flex lg:col-span-3 flex-col gap-3"
+        }>
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-800 text-xs uppercase tracking-widest font-extrabold py-2 px-4 rounded-sm text-center shadow-sm">
             Equipo Rojo
           </div>
           {redPicks.map((id, index) => {

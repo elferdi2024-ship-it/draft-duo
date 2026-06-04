@@ -1,15 +1,14 @@
 // filepath: src/app/page.tsx
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ownChampions } from "@/data/champions";
 import { duos } from "@/data/duos";
 import { useDraftStore } from "@/store/draft-store";
 import ChampionAvatar from "@/components/champion-avatar";
 import { Sparkles, Trophy, Compass, Heart, Shield, User, ShieldAlert, Award } from "lucide-react";
-
-import { useState } from "react";
 
 export default function Home() {
   const { userRole, setUserRole, loadChampions } = useDraftStore();
@@ -31,8 +30,14 @@ export default function Home() {
     return (
       <div className="w-full max-w-4xl mx-auto px-4 py-12 flex flex-col items-center justify-center gap-10 min-h-[80vh]">
         <div className="text-center">
-          <div className="w-14 h-14 rounded-full border-2 border-[#c8aa6e] flex items-center justify-center bg-gradient-to-b from-[#1e232a] to-[#12161a] mx-auto mb-4 shadow-md">
-            <span className="text-[#c8aa6e] font-serif font-bold text-2xl select-none">Δ</span>
+          <div className="relative w-20 h-20 rounded border-2 border-[#c8aa6e] overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#12161a] mx-auto mb-5 shadow-lg flex items-center justify-center">
+            <Image
+              src="/logo-draft.png"
+              alt="DUO DRAFT"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
           </div>
           <h1 className="font-serif text-4xl md:text-5xl font-black tracking-widest text-[#0f1923] uppercase shimmer-text">
             DUO DRAFT

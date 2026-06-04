@@ -3,6 +3,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { duos } from "@/data/duos";
 import { useDraftStore } from "@/store/draft-store";
 import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
 import { 
@@ -13,7 +15,8 @@ import {
   Compass, 
   CheckCircle,
   HelpCircle,
-  Plus
+  Plus,
+  Trophy
 } from "lucide-react";
 import type { BrainRecommendation, ChampionScore } from "@/lib/types";
 
@@ -47,7 +50,11 @@ export default function BrainPanel() {
     currentStepIndex, 
     side, 
     allChampions,
-    setChampion
+    setChampion,
+    bluePicks,
+    redPicks,
+    myPickSlots,
+    isComplete,
   } = useDraftStore();
   const [version, setVersion] = useState("15.11.1");
 
@@ -73,6 +80,16 @@ export default function BrainPanel() {
     winConditions,
     phase,
   } = brainAnalysis;
+
+  // Resolve matching clinical meta duo when complete
+  const ourPicks = side === "blue" ? bluePicks : redPicks;
+  const adcPickId = ourPicks[myPickSlots[0]];
+  const supPickId = ourPicks[myPickSlots[1]];
+  const matchingDuo = duos.find(
+    (d) => 
+      (d.adcId === adcPickId && d.supId === supPickId) ||
+      (d.adcId === supPickId && d.supId === adcPickId)
+  );
 
   // Retrieve recommendation card badge styles
   const getBadgeStyle = (tag: BrainRecommendation["tag"]) => {
@@ -122,6 +139,56 @@ export default function BrainPanel() {
 
       {/* Main Content Scrollable */}
       <div className="flex-1 overflow-y-auto p-5 md:p-6 flex flex-col gap-5 max-h-[650px] md:max-h-[960px]">
+        {/* Evaluation of final draft synergy */}
+        {phase === "complete" && (
+          <div className="flex flex-col gap-4">
+            {matchingDuo ? (
+              <div className="p-5 border-2 border-[#c8aa6e] bg-[#0a1428] rounded shadow-[0_4px_12px_rgba(200,170,110,0.2)] flex flex-col gap-3">
+                <div className="flex items-center gap-2 border-b border-[#c8aa6e]/40 pb-2 text-[#f0e6d3]">
+                  <Trophy className="w-5 h-5 text-amber-500 animate-pulse" />
+                  <h4 className="font-serif font-black text-sm uppercase tracking-widest text-[#c8aa6e]">
+                    Sinergia Clínica Detectada
+                  </h4>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="font-serif font-black text-lg md:text-xl text-[#f0e6d3] uppercase">
+                    {matchingDuo.name}
+                  </span>
+                  <span className="text-[10px] md:text-xs text-amber-500 uppercase tracking-widest font-black">
+                    Pilar: {matchingDuo.pillar}
+                  </span>
+                </div>
+                <p className="text-xs md:text-sm text-[#a0a8b0] italic leading-relaxed">
+                  "{matchingDuo.philosophy}"
+                </p>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {matchingDuo.tags.map(tag => (
+                    <span key={tag} className="text-[9px] font-black uppercase text-[#0a1428] bg-[#c8aa6e] px-2 py-0.5 rounded-sm">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <Link
+                  href={`/duos/${matchingDuo.id}`}
+                  className="mt-2 w-full py-2.5 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3]/20 rounded-sm font-serif font-black text-[10px] tracking-widest text-center uppercase transition-all shadow cursor-pointer"
+                >
+                  Abrir Guía Minuto a Minuto →
+                </Link>
+              </div>
+            ) : (
+              <div className="p-5 border border-dashed border-[#c8aa6e]/40 bg-[#eadecd]/20 rounded flex flex-col gap-2.5 text-center">
+                <ShieldAlert className="w-8 h-8 text-[#785a28] mx-auto opacity-75 animate-bounce" />
+                <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-[#785a28]">
+                  Combo No Sincronizado
+                </h4>
+                <p className="text-xs text-[#5e6b77] leading-relaxed">
+                  Los campeones elegidos no coinciden con ninguno de los 15 Dúos Clínicos recomendados. Se aconseja estudiar las sinergias meta en la sección de Dúos Maestros.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Active turn indicator banner */}
         {phase !== "complete" && (
           <div 
@@ -146,7 +213,7 @@ export default function BrainPanel() {
           <div className="flex flex-col gap-3">
             {recommendations.length === 0 ? (
               <div className="text-center text-xs md:text-sm text-[#5e6b77] py-8 border border-[#eadecd] bg-[#fcf9f2]/50">
-                Ninguna recomendación disponible.
+                {!isComplete ? "Ninguna recomendación disponible." : "Draft finalizado."}
               </div>
             ) : (
               recommendations.map((rec) => {

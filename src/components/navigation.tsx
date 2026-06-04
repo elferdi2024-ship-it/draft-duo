@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Sparkles, Trophy, User, ArrowLeftRight, HelpCircle } from "lucide-react";
 import { useDraftStore } from "@/store/draft-store";
@@ -35,8 +36,14 @@ export default function Navigation() {
     <header className="sticky top-0 z-50 w-full bg-[#0a1428] border-b border-[#c8aa6e] px-4 md:px-8 py-3 flex items-center justify-between shadow-lg">
       {/* Brand Logo */}
       <Link href="/" className="flex items-center gap-3 group">
-        <div className="w-8 h-8 rounded-full border border-[#c8aa6e] flex items-center justify-center bg-gradient-to-b from-[#1e232a] to-[#12161a] group-hover:scale-105 transition-transform">
-          <span className="text-[#c8aa6e] font-serif font-bold text-lg select-none">Δ</span>
+        <div className="relative w-9 h-9 rounded border border-[#c8aa6e]/40 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#12161a] group-hover:scale-105 transition-transform flex items-center justify-center">
+          <Image
+            src="/logo-draft.png"
+            alt="DUO DRAFT"
+            width={32}
+            height={32}
+            className="object-contain"
+          />
         </div>
         <div className="flex flex-col">
           <span className="text-[#f0e6d3] font-serif font-bold tracking-widest text-sm md:text-base leading-none shimmer-text-light">

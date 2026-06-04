@@ -77,30 +77,30 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
     });
 
   return (
-    <div className="v-stack gap-4 bg-[#fcf9f2] border border-[#c8aa6e] p-4 shadow-md w-full h-full flex-1">
+    <div className="v-stack gap-5 bg-[#fcf9f2] border border-[#c8aa6e] p-6 shadow-md w-full h-full flex-1">
       {/* Header filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-2.5 w-4 h-4 text-[#785a28]" />
+          <Search className="absolute left-3 top-3 w-4 h-4 text-[#785a28]" />
           <input
             type="text"
             placeholder="Buscar campeón..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             disabled={disabled}
-            className="w-full bg-[#f3ebd7] border border-[#c8aa6e] rounded pl-9 pr-4 py-1.5 text-xs text-[#0f1923] placeholder-[#785a28]/60 focus:outline-none focus:ring-1 focus:ring-[#0397ab] focus:border-[#0397ab]"
+            className="w-full bg-[#f3ebd7] border border-[#c8aa6e] rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#0f1923] placeholder-[#785a28]/60 focus:outline-none focus:ring-1 focus:ring-[#0397ab] focus:border-[#0397ab]"
           />
         </div>
 
         {/* Role Filters */}
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1.5">
           {ROLES.map((role) => (
             <button
               key={role.value}
               onClick={() => setRoleFilter(role.value)}
               disabled={disabled}
-              className={`px-3 py-1 rounded text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+              className={`px-4 py-2 rounded text-xs md:text-sm font-extrabold uppercase tracking-wider transition-all duration-200 ${
                 activeRoleFilter === role.value
                   ? "bg-[#0a1428] text-[#f0e6d3] border border-[#0a1428]"
                   : "bg-[#eadecd] text-[#785a28] border border-[#d8ccb4] hover:bg-[#e7dbbf]"
@@ -113,13 +113,13 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
       </div>
 
       {/* Grid Container */}
-      <div className="flex-1 overflow-y-auto max-h-[450px] md:max-h-[630px] border border-[#eadecd] bg-[#fdfbf7] p-2">
+      <div className="flex-1 overflow-y-auto max-h-[500px] md:max-h-[780px] border border-[#eadecd] bg-[#fdfbf7] p-3">
         {filteredChampions.length === 0 ? (
           <div className="text-center text-xs text-[#5e6b77] py-12">
             No se encontraron campeones coincidentes.
           </div>
         ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-7 gap-3">
             {filteredChampions.map((champ) => {
               const isUnavailable = pickedBannedIds.has(champ.id);
               const iconUrl = getChampionIconUrl(ddragonVersion, champ.ddragonKey);

@@ -154,15 +154,15 @@ export default function DraftBoard() {
   const step = currentStepIndex < DRAFT_ORDER.length ? DRAFT_ORDER[currentStepIndex] : null;
 
   return (
-    <div className="flex flex-col gap-5 w-full h-full">
+    <div className="flex flex-col gap-6 md:gap-8 w-full h-full">
       {/* Draft Header: Ban display */}
-      <div className="lol-panel p-5 flex flex-col md:flex-row items-center justify-between gap-5 bg-[#fdfcf9]">
+      <div className="lol-panel p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-[#fdfcf9]">
         {/* Blue Bans (5 slots) */}
-        <div className="flex items-center gap-2.5 flex-1">
-          <span className="text-xs uppercase font-extrabold text-[#0397ab] tracking-wider w-16 shrink-0">
+        <div className="flex items-center gap-4 flex-1">
+          <span className="text-xs md:text-sm uppercase font-extrabold text-[#0397ab] tracking-widest w-20 shrink-0">
             Bans Azul
           </span>
-          <div className="flex gap-1.5">
+          <div className="flex gap-2">
             {blueBans.map((id, index) => {
               const champ = getChampionById(id);
               const isActive =
@@ -171,7 +171,7 @@ export default function DraftBoard() {
               return (
                 <div
                   key={index}
-                  className={`w-[40px] h-[40px] md:w-[46px] md:h-[46px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
+                  className={`w-[44px] h-[44px] md:w-[58px] md:h-[58px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
                     isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
                   }`}
                 >
@@ -181,12 +181,12 @@ export default function DraftBoard() {
                       alt={champ.name}
                       fill
                       className="object-cover grayscale filter opacity-75 hover:opacity-100 transition-opacity"
-                      sizes="46px"
+                      sizes="58px"
                     />
                   ) : isActive ? (
-                    <div className="w-2 h-2 rounded-full bg-[#0397ab] animate-ping" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#0397ab] animate-ping" />
                   ) : (
-                    <span className="text-xs text-[#5e6b77] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm text-[#5e6b77] font-bold">{index + 1}</span>
                   )}
                 </div>
               );
@@ -195,15 +195,15 @@ export default function DraftBoard() {
         </div>
 
         {/* Phase Indicator */}
-        <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-7 py-3 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[200px]">
-          <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
+        <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-9 py-4 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[240px]">
+          <span className="font-serif font-black text-base md:text-lg text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
             {step ? step.label : "Fase Completada"}
           </span>
         </div>
 
         {/* Red Bans (5 slots) */}
-        <div className="flex items-center gap-2.5 flex-1 justify-end">
-          <div className="flex gap-1.5">
+        <div className="flex items-center gap-4 flex-1 justify-end">
+          <div className="flex gap-2">
             {redBans.map((id, index) => {
               const champ = getChampionById(id);
               const isActive =
@@ -212,7 +212,7 @@ export default function DraftBoard() {
               return (
                 <div
                   key={index}
-                  className={`w-[40px] h-[40px] md:w-[46px] md:h-[46px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
+                  className={`w-[44px] h-[44px] md:w-[58px] md:h-[58px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
                     isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
                   }`}
                 >
@@ -222,28 +222,28 @@ export default function DraftBoard() {
                       alt={champ.name}
                       fill
                       className="object-cover grayscale filter opacity-75 hover:opacity-100 transition-opacity"
-                      sizes="46px"
+                      sizes="58px"
                     />
                   ) : isActive ? (
-                    <div className="w-2 h-2 rounded-full bg-[#0397ab] animate-ping" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#0397ab] animate-ping" />
                   ) : (
-                    <span className="text-xs text-[#5e6b77] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm text-[#5e6b77] font-bold">{index + 1}</span>
                   )}
                 </div>
               );
             })}
           </div>
-          <span className="text-xs uppercase font-extrabold text-rose-600 tracking-wider w-16 text-right shrink-0">
+          <span className="text-xs md:text-sm uppercase font-extrabold text-rose-600 tracking-widest w-20 text-right shrink-0">
             Bans Rojo
           </span>
         </div>
       </div>
 
       {/* Mobile Sub-Tab Switcher */}
-      <div className="flex lg:hidden border border-[#c8aa6e] bg-[#fdfcf9] rounded p-1 gap-1 shadow-sm mt-1">
+      <div className="flex lg:hidden border border-[#c8aa6e] bg-[#fdfcf9] rounded p-1.5 gap-1 shadow-sm mt-1">
         <button
           onClick={() => setMobileSubTab("grid")}
-          className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
+          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
             mobileSubTab === "grid"
               ? "bg-[#0a1428] text-[#f0e6d3] shadow-sm"
               : "text-[#785a28] hover:bg-[#eadecd]/30"
@@ -253,7 +253,7 @@ export default function DraftBoard() {
         </button>
         <button
           onClick={() => setMobileSubTab("picks")}
-          className={`flex-1 py-2 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
+          className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
             mobileSubTab === "picks"
               ? "bg-[#0a1428] text-[#f0e6d3] shadow-sm"
               : "text-[#785a28] hover:bg-[#eadecd]/30"
@@ -264,16 +264,16 @@ export default function DraftBoard() {
       </div>
 
       {/* Board Layout: Side picks + Grid */}
-      <div className={`grid gap-5 items-stretch ${
+      <div className={`grid gap-6 md:gap-8 items-stretch ${
         mobileSubTab === "picks" ? "grid-cols-2 lg:grid-cols-12" : "grid-cols-1 lg:grid-cols-12"
       }`}>
         {/* Left Side (Blue picks) */}
         <div className={
           mobileSubTab === "picks" 
-            ? "col-span-1 lg:col-span-3 flex flex-col gap-3" 
-            : "hidden lg:flex lg:col-span-3 flex-col gap-3"
+            ? "col-span-1 lg:col-span-3 flex flex-col gap-4" 
+            : "hidden lg:flex lg:col-span-3 flex-col gap-4"
         }>
-          <div className="bg-[#0397ab]/10 border border-[#0397ab]/30 text-[#005a82] text-xs uppercase tracking-widest font-extrabold py-2 px-4 rounded-sm text-center shadow-sm">
+          <div className="bg-[#0397ab]/10 border border-[#0397ab]/30 text-[#005a82] text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
             Equipo Azul
           </div>
           {bluePicks.map((id, index) => {
@@ -312,10 +312,10 @@ export default function DraftBoard() {
         {/* Right Side (Red picks) */}
         <div className={
           mobileSubTab === "picks" 
-            ? "col-span-1 lg:col-span-3 flex flex-col gap-3" 
-            : "hidden lg:flex lg:col-span-3 flex-col gap-3"
+            ? "col-span-1 lg:col-span-3 flex flex-col gap-4" 
+            : "hidden lg:flex lg:col-span-3 flex-col gap-4"
         }>
-          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-800 text-xs uppercase tracking-widest font-extrabold py-2 px-4 rounded-sm text-center shadow-sm">
+          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-800 text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
             Equipo Rojo
           </div>
           {redPicks.map((id, index) => {

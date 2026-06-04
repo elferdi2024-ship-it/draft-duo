@@ -96,41 +96,41 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 md:px-8 py-6 flex flex-col gap-10">
+    <div className="w-full max-w-[1850px] mx-auto px-4 md:px-12 py-8 flex flex-col gap-12">
       {/* Hero Welcome Banner */}
-      <div className="lol-panel-dark p-6 md:p-10 relative overflow-hidden flex flex-col items-center text-center shadow-lg">
+      <div className="lol-panel-dark p-8 md:p-16 relative overflow-hidden flex flex-col items-center text-center shadow-lg">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(200,170,110,0.08),transparent_60%)] pointer-events-none" />
 
-        <div className="flex items-center gap-2 mb-3 bg-[#c8aa6e]/10 border border-[#c8aa6e]/40 px-3 py-1 rounded-sm text-[10px] text-[#c8aa6e] font-mono">
+        <div className="flex items-center gap-2.5 mb-4 bg-[#c8aa6e]/10 border border-[#c8aa6e]/40 px-4 py-1.5 rounded-sm text-xs text-[#c8aa6e] font-mono">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          SESIÓN ACTIVA: {userRole === "fer" ? "FER (ADC)" : "RALPH (SUPORT)"}
+          SESIÓN ACTIVA: {userRole === "fer" ? "FER (ADC)" : "RALPH (SOPORTE)"}
         </div>
 
-        <h1 className="font-serif text-3xl md:text-5xl font-black tracking-widest text-[#f0e6d3] uppercase drop-shadow-md shimmer-text-light">
+        <h1 className="font-serif text-4xl md:text-6xl font-black tracking-widest text-[#f0e6d3] uppercase drop-shadow-md shimmer-text-light">
           DUO DRAFT
         </h1>
-        <p className="text-xs md:text-sm text-[#c8aa6e] uppercase tracking-widest font-black mt-2">
+        <p className="text-xs md:text-base text-[#c8aa6e] uppercase tracking-widest font-black mt-3">
           Competitive Botlane Draft Intelligence • Patch 26.11
         </p>
 
         {/* Personalized welcome quote */}
-        <p className="max-w-2xl text-xs md:text-sm text-[#a0a8b0] mt-4 leading-relaxed italic">
+        <p className="max-w-3xl text-sm md:text-lg text-[#a0a8b0] mt-6 leading-relaxed italic font-medium">
           {userRole === "fer"
             ? "\"Fer, tu rol es dictar el ritmo de la oleada y asegurar el daño core. El pokeo perpendicular de Ashe y la letalidad de Varus son tus herramientas. Posicionamiento impecable = Victoria.\""
             : "\"Ralph, tu rol es gobernar el mapa desde la niebla profunda. Wards en el pixel bush, linternas salvavidas y desenganches perfectos son tus armas. La supervivencia de Fer es tu prioridad.\""}
         </p>
 
-        <div className="flex flex-wrap gap-4 justify-center mt-8">
+        <div className="flex flex-wrap gap-6 justify-center mt-10">
           <Link
             href="/draft"
-            className="px-6 py-3 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md flex items-center gap-2 group"
+            className="px-8 py-4 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md flex items-center gap-3 group"
           >
-            <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
             Iniciar Simulador en Vivo
           </Link>
           <button
             onClick={() => setUserRole(null)}
-            className="lol-button hover:bg-transparent"
+            className="px-6 py-3 border border-[#c8aa6e]/60 bg-transparent text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#0a1428] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md cursor-pointer"
           >
             Cambiar de Perfil
           </button>
@@ -138,59 +138,59 @@ export default function Home() {
       </div>
 
       {/* Main Grid content */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
         {/* Left column: Duos and guides */}
-        <div className="xl:col-span-8 flex flex-col gap-4">
-          <div className="flex items-center justify-between border-b border-[#c8aa6e]/40 pb-2">
-            <h2 className="lol-title font-bold text-base text-[#0f1923] flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-[#c8aa6e]" />
+        <div className="xl:col-span-8 flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-[#c8aa6e]/40 pb-3">
+            <h2 className="lol-title font-bold text-lg md:text-xl text-[#0f1923] flex items-center gap-2.5">
+              <Trophy className="w-6 h-6 text-[#c8aa6e]" />
               Dúos Clínicos del Meta (Total 15)
             </h2>
             <Link
               href="/duos"
-              className="text-xs uppercase tracking-wider font-extrabold text-[#785a28] hover:text-[#c8aa6e] flex items-center gap-1"
+              className="text-xs md:text-sm uppercase tracking-widest font-extrabold text-[#785a28] hover:text-[#c8aa6e] flex items-center gap-1.5"
             >
-              Ver los 15 Dúos <Compass className="w-3.5 h-3.5" />
+              Ver los 15 Dúos <Compass className="w-4 h-4" />
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {bestDuos.map((duo) => (
               <Link
                 key={duo.id}
                 href={`/duos/${duo.id}`}
-                className="lol-panel lol-panel-interactive p-4 bg-[#fcf9f2] border border-[#c8aa6e] flex gap-4 group"
+                className="lol-panel lol-panel-interactive p-5 md:p-6 bg-[#fcf9f2] border border-[#c8aa6e] flex gap-5 group shadow-sm hover:shadow-md"
               >
-                <div className="flex gap-1 shrink-0 items-center justify-center">
+                <div className="flex gap-2 shrink-0 items-center justify-center bg-[#0a1428]/5 p-2 rounded-sm border border-[#eadecd]">
                   <ChampionAvatar
                     ddragonKey={duo.adcDdragonKey}
                     name={duo.adcId}
-                    size="sm"
+                    size="md"
                     isComfort
                   />
-                  <span className="text-[#c8aa6e] font-serif font-black text-xs px-1 select-none">
+                  <span className="text-[#c8aa6e] font-serif font-black text-sm px-1.5 select-none">
                     +
                   </span>
                   <ChampionAvatar
                     ddragonKey={duo.supDdragonKey}
                     name={duo.supId}
-                    size="sm"
+                    size="md"
                     isComfort
                   />
                 </div>
-                <div className="flex flex-col justify-center min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-serif font-bold text-sm text-[#0f1923] group-hover:text-[#785a28] transition-colors truncate">
+                <div className="flex flex-col justify-center min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif font-black text-base md:text-lg text-[#0f1923] group-hover:text-[#785a28] transition-colors truncate">
                       {duo.name}
                     </span>
-                    <span className="bg-amber-500 text-[#0a1428] text-[9px] font-extrabold uppercase px-1 rounded-sm">
+                    <span className="bg-amber-500 text-[#0a1428] text-[10px] md:text-xs font-black uppercase px-2 py-0.5 rounded-sm">
                       {duo.tier}
                     </span>
                   </div>
-                  <span className="text-[10px] text-[#785a28] uppercase font-bold tracking-wider mt-0.5 truncate">
+                  <span className="text-xs text-[#785a28] uppercase font-bold tracking-widest mt-1 truncate">
                     {duo.pillar}
                   </span>
-                  <p className="text-[10px] text-[#5e6b77] italic mt-1 line-clamp-1">
+                  <p className="text-xs md:text-sm text-[#5e6b77] italic mt-2 line-clamp-2 leading-relaxed">
                     "{duo.philosophy}"
                   </p>
                 </div>
@@ -200,34 +200,34 @@ export default function Home() {
         </div>
 
         {/* Right column: Personalized pool view */}
-        <div className="xl:col-span-4 flex flex-col gap-4">
-          <div className="flex items-center justify-between border-b border-[#c8aa6e]/40 pb-2">
-            <h2 className="lol-title font-bold text-base text-[#0f1923] flex items-center gap-2">
-              <Heart className="w-5 h-5 text-rose-700" />
+        <div className="xl:col-span-4 flex flex-col gap-6">
+          <div className="flex items-center justify-between border-b border-[#c8aa6e]/40 pb-3">
+            <h2 className="lol-title font-bold text-lg md:text-xl text-[#0f1923] flex items-center gap-2.5">
+              <Heart className="w-6 h-6 text-rose-700" />
               {userRole === "fer" ? "Tus ADC Confort (Fer)" : "Tus Soportes Confort (Ralph)"}
             </h2>
           </div>
 
-          <div className="lol-panel p-4 bg-[#fcf9f2] border border-[#c8aa6e] flex flex-col gap-4">
+          <div className="lol-panel p-5 md:p-6 bg-[#fcf9f2] border border-[#c8aa6e] flex flex-col gap-5 shadow-sm">
             {/* Show list according to role */}
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#785a28] border-b border-[#eadecd] pb-1">
+            <div className="flex flex-col gap-3.5">
+              <span className="text-xs uppercase font-black tracking-widest text-[#785a28] border-b border-[#eadecd] pb-2">
                 {userRole === "fer" ? "Tiradores Core de Fer" : "Protectores Core de Ralph"}
               </span>
-              <div className="flex flex-wrap gap-2.5">
+              <div className="flex flex-wrap gap-3.5">
                 {(userRole === "fer" ? adcs : supports).map((champ) => (
                   <Link
                     key={champ.id}
                     href={`/champions/${champ.id}`}
-                    className="flex flex-col items-center gap-1 group"
+                    className="flex flex-col items-center gap-1.5 group"
                   >
                     <ChampionAvatar
                       ddragonKey={champ.ddragonKey}
                       name={champ.name}
                       tier={champ.tier}
-                      size="sm"
+                      size="md"
                     />
-                    <span className="text-[8px] font-extrabold uppercase text-[#5e6b77] group-hover:text-[#785a28] transition-colors">
+                    <span className="text-[10px] md:text-xs font-bold uppercase text-[#5e6b77] group-hover:text-[#785a28] transition-colors">
                       {champ.name}
                     </span>
                   </Link>
@@ -236,24 +236,24 @@ export default function Home() {
             </div>
 
             {/* Other teammate pool for reference */}
-            <div className="flex flex-col gap-3">
-              <span className="text-[10px] uppercase font-extrabold tracking-wider text-[#5e6b77] border-b border-[#eadecd] pb-1">
+            <div className="flex flex-col gap-3.5 mt-2">
+              <span className="text-xs uppercase font-black tracking-widest text-[#5e6b77] border-b border-[#eadecd] pb-2">
                 {userRole === "fer" ? "Soportes Asociados de Ralph" : "Tiradores Asociados de Fer"}
               </span>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {(userRole === "fer" ? supports : adcs).map((champ) => (
                   <Link
                     key={champ.id}
                     href={`/champions/${champ.id}`}
-                    className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition-opacity"
+                    className="flex flex-col items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity"
                   >
                     <ChampionAvatar
                       ddragonKey={champ.ddragonKey}
                       name={champ.name}
                       tier={champ.tier}
-                      size="sm"
+                      size="md"
                     />
-                    <span className="text-[8px] font-extrabold uppercase text-[#5e6b77]">
+                    <span className="text-[10px] md:text-xs font-bold uppercase text-[#5e6b77]">
                       {champ.name}
                     </span>
                   </Link>
@@ -262,8 +262,8 @@ export default function Home() {
             </div>
 
             {/* Micro banner directives */}
-            <div className="p-3 border border-[#c8aa6e]/20 bg-[#eadecd]/30 flex gap-2 rounded-sm text-[10px] text-[#785a28] items-start mt-2">
-              <Shield className="w-4 h-4 text-[#c8aa6e] shrink-0" />
+            <div className="p-4 border border-[#c8aa6e]/20 bg-[#eadecd]/30 flex gap-3 rounded-sm text-xs md:text-sm text-[#785a28] items-start mt-3 leading-relaxed">
+              <Shield className="w-5 h-5 text-[#c8aa6e] shrink-0 mt-0.5" />
               <span>
                 {userRole === "fer"
                   ? "Fer: Recuerda comprar Edge of Night en Varus contra iniciaciones duras y Manru Emblem en Ashe para el spike crítico global."

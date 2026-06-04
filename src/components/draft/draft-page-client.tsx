@@ -35,7 +35,7 @@ export default function DraftPageClient() {
       </div>
 
       {/* Interactive layout grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
         {/* Main interactive draft board */}
         <div className={activeTab === "draft" ? "block xl:block xl:col-span-8" : "hidden xl:block xl:col-span-8"}>
           <DraftBoard />

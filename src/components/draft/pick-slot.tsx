@@ -35,7 +35,7 @@ export default function PickSlot({
 
   return (
     <div
-      className={`relative w-full h-[105px] md:h-[125px] border transition-all duration-300 overflow-hidden flex items-center ${
+      className={`relative w-full h-[120px] md:h-[155px] border transition-all duration-300 overflow-hidden flex items-center ${
         isActive
           ? "lol-slot-active bg-[#0a1428]/45 border-[#0397ab]"
           : isOurs
@@ -66,34 +66,36 @@ export default function PickSlot({
 
       {/* Content wrapper */}
       <div
-        className={`w-full h-full flex items-center justify-between px-5 z-20 ${
+        className={`w-full h-full flex items-center justify-between px-6 md:px-8 z-20 ${
           team === "red" ? "flex-row-reverse text-right" : "flex-row"
         }`}
       >
         {/* Champion Name & Role */}
-        <div className="flex flex-col justify-center">
-          <span className="text-xs uppercase font-bold tracking-wider text-[#785a28] mb-0.5">
+        <div className="flex flex-col justify-center gap-1">
+          <span className="text-xs md:text-sm uppercase font-extrabold tracking-widest text-[#785a28]">
             {roleLabel}
           </span>
-          <span
-            className={`font-serif font-black text-base md:text-2xl tracking-widest uppercase ${
-              champion ? "text-[#f0e6d3] drop-shadow-md" : "text-[#5e6b77]"
-            }`}
-          >
-            {champion ? champion.name : "Seleccionando..."}
-          </span>
+          {champion ? (
+            <span className="font-serif font-black text-lg md:text-3xl tracking-widest uppercase text-[#f0e6d3] drop-shadow-md truncate max-w-[140px] md:max-w-[280px]">
+              {champion.name}
+            </span>
+          ) : (
+            <span className="font-sans font-extrabold text-xs md:text-sm tracking-widest text-[#785a28]/60 uppercase animate-pulse">
+              Seleccionando
+            </span>
+          )}
         </div>
 
         {/* Comfort/Role tag for our slots */}
         {isOurs && (
           <div
-            className={`flex items-center gap-1.5 px-3 py-1 rounded border text-[10px] font-black tracking-wider uppercase ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 md:px-5 md:py-2.5 rounded border text-[10px] md:text-xs font-black tracking-widest uppercase ${
               champion
-                ? "bg-[#c8aa6e]/95 text-[#0a1428] border-[#f0e6d3]"
+                ? "bg-[#c8aa6e]/95 text-[#0a1428] border-[#f0e6d3] shadow-sm"
                 : "bg-transparent text-[#785a28] border-[#c8aa6e]"
             }`}
           >
-            <User className="w-3 h-3" />
+            <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
             {mounted && userRole === "ralph"
               ? myRoleName === "SUPPORT"
                 ? "Tú (SUP)"
@@ -106,7 +108,7 @@ export default function PickSlot({
 
         {/* Active picking glow label */}
         {isActive && !champion && (
-          <span className="text-xs uppercase tracking-widest font-black text-[#0397ab] animate-pulse">
+          <span className="text-xs md:text-sm uppercase tracking-widest font-black text-[#0397ab] animate-pulse">
             ELEGIR
           </span>
         )}

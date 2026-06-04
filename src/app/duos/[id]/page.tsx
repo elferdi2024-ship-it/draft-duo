@@ -13,6 +13,12 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+export async function generateStaticParams() {
+  return duos.map((duo) => ({
+    id: duo.id,
+  }));
+}
+
 export default async function DuoDetailPage({ params }: PageProps) {
   const { id } = await params;
 

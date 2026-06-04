@@ -1,0 +1,18 @@
+// filepath: public/manifest.json
+{
+  "name": "DraftLab Pro — League Draft Simulator",
+  "short_name": "DraftLab Pro",
+  "description": "Offline competitive botlane draft intelligence, setups and decision trees.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a1428",
+  "theme_color": "#0a1428",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://ddragon.leagueoflegends.com/cdn/15.11.1/img/champion/Ashe.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }
+  ]
+}

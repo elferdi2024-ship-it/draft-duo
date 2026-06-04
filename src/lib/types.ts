@@ -132,21 +132,8 @@ export interface DraftPhaseStep {
   label: string;
 }
 
-/** The 20-step draft order used in Solo Queue (5 bans per team first, then picks) */
+/** The 10-step pick sequence used in draft simulation (Bans are selected simultaneously beforehand) */
 export const DRAFT_ORDER: DraftPhaseStep[] = [
-  // Ban Phase: 10 bans first (5 per team, alternating)
-  { team: 'blue', type: 'ban', index: 0, label: 'Ban Azul 1' },
-  { team: 'red', type: 'ban', index: 0, label: 'Ban Rojo 1' },
-  { team: 'blue', type: 'ban', index: 1, label: 'Ban Azul 2' },
-  { team: 'red', type: 'ban', index: 1, label: 'Ban Rojo 2' },
-  { team: 'blue', type: 'ban', index: 2, label: 'Ban Azul 3' },
-  { team: 'red', type: 'ban', index: 2, label: 'Ban Rojo 3' },
-  { team: 'blue', type: 'ban', index: 3, label: 'Ban Azul 4' },
-  { team: 'red', type: 'ban', index: 3, label: 'Ban Rojo 4' },
-  { team: 'blue', type: 'ban', index: 4, label: 'Ban Azul 5' },
-  { team: 'red', type: 'ban', index: 4, label: 'Ban Rojo 5' },
-  
-  // Pick Phase: 10 picks follow (standard snake sequence)
   { team: 'blue', type: 'pick', index: 0, label: 'Pick Azul 1' },
   { team: 'red', type: 'pick', index: 0, label: 'Pick Rojo 1' },
   { team: 'red', type: 'pick', index: 1, label: 'Pick Rojo 2' },

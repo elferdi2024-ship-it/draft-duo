@@ -24,6 +24,7 @@ interface DraftStore {
   searchQuery: string;
   activeRoleFilter: string; // 'All' | 'Top' | 'Jungle' | 'Mid' | 'ADC' | 'Support'
   userRole: UserRole | null;
+  selectedBanSlot: { team: "blue" | "red"; index: number } | null;
 
   // Actions
   loadChampions: () => Promise<void>;
@@ -34,6 +35,8 @@ interface DraftStore {
   setSearchQuery: (query: string) => void;
   setRoleFilter: (role: string) => void;
   setUserRole: (role: UserRole | null) => void;
+  setSelectedBanSlot: (slot: { team: "blue" | "red"; index: number } | null) => void;
+  autoFillBans: () => void;
   recalculateBrain: () => void;
 }
 
@@ -51,6 +54,7 @@ const initialDraftState = {
   searchQuery: "",
   activeRoleFilter: "All",
   userRole: null,
+  selectedBanSlot: null,
 };
 
 export const useDraftStore = create<DraftStore>((set, get) => ({
@@ -83,35 +87,37 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
   },
 
   setChampion: (championId) => {
-    const { currentStepIndex, blueBans, redBans, bluePicks, redPicks, allChampions, history } = get();
+    const { selectedBanSlot, blueBans, redBans, currentStepIndex, bluePicks, redPicks, history } = get();
+
+    // If there is an active ban slot selected, set that ban instead of a pick
+    if (selectedBanSlot) {
+      const newBans = selectedBanSlot.team === "blue" ? [...blueBans] : [...redBans];
+      newBans[selectedBanSlot.index] = championId;
+
+      if (selectedBanSlot.team === "blue") {
+        set({ blueBans: newBans, selectedBanSlot: null, searchQuery: "" });
+      } else {
+        set({ redBans: newBans, selectedBanSlot: null, searchQuery: "" });
+      }
+      get().recalculateBrain();
+      return;
+    }
 
     if (currentStepIndex >= DRAFT_ORDER.length) return;
 
     const step = DRAFT_ORDER[currentStepIndex];
-    const newBlueBans = [...blueBans];
-    const newRedBans = [...redBans];
     const newBluePicks = [...bluePicks];
     const newRedPicks = [...redPicks];
 
     // Record previous value for history
     let previousValue: string | null = null;
 
-    if (step.type === "ban") {
-      if (step.team === "blue") {
-        previousValue = newBlueBans[step.index];
-        newBlueBans[step.index] = championId;
-      } else {
-        previousValue = newRedBans[step.index];
-        newRedBans[step.index] = championId;
-      }
+    if (step.team === "blue") {
+      previousValue = newBluePicks[step.index];
+      newBluePicks[step.index] = championId;
     } else {
-      if (step.team === "blue") {
-        previousValue = newBluePicks[step.index];
-        newBluePicks[step.index] = championId;
-      } else {
-        previousValue = newRedPicks[step.index];
-        newRedPicks[step.index] = championId;
-      }
+      previousValue = newRedPicks[step.index];
+      newRedPicks[step.index] = championId;
     }
 
     const nextStepIndex = currentStepIndex + 1;
@@ -124,8 +130,6 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     ];
 
     set({
-      blueBans: newBlueBans,
-      redBans: newRedBans,
       bluePicks: newBluePicks,
       redPicks: newRedPicks,
       currentStepIndex: nextStepIndex,
@@ -138,7 +142,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
   },
 
   undo: () => {
-    const { history, blueBans, redBans, bluePicks, redPicks } = get();
+    const { history, bluePicks, redPicks } = get();
     if (history.length === 0) return;
 
     const newHistory = [...history];
@@ -146,28 +150,16 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     const prevStepIndex = lastAction.stepIndex;
 
     const step = DRAFT_ORDER[prevStepIndex];
-    const newBlueBans = [...blueBans];
-    const newRedBans = [...redBans];
     const newBluePicks = [...bluePicks];
     const newRedPicks = [...redPicks];
 
-    if (step.type === "ban") {
-      if (step.team === "blue") {
-        newBlueBans[step.index] = null;
-      } else {
-        newRedBans[step.index] = null;
-      }
+    if (step.team === "blue") {
+      newBluePicks[step.index] = null;
     } else {
-      if (step.team === "blue") {
-        newBluePicks[step.index] = null;
-      } else {
-        newRedPicks[step.index] = null;
-      }
+      newRedPicks[step.index] = null;
     }
 
     set({
-      blueBans: newBlueBans,
-      redBans: newRedBans,
       bluePicks: newBluePicks,
       redPicks: newRedPicks,
       currentStepIndex: prevStepIndex,
@@ -203,6 +195,19 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
       localStorage.removeItem("userRole");
     }
     set({ userRole: role });
+    get().recalculateBrain();
+  },
+
+  setSelectedBanSlot: (slot) => {
+    set({ selectedBanSlot: slot });
+  },
+
+  autoFillBans: () => {
+    set({
+      blueBans: ["senna", "caitlyn", "rakan", "lulu", "ashe"],
+      redBans: ["senna", "caitlyn", "rakan", "lulu", "ashe"],
+      selectedBanSlot: null,
+    });
     get().recalculateBrain();
   },
 

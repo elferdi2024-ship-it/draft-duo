@@ -448,9 +448,7 @@ export class CompetitiveBrain {
     const isMyTurn = currentStep.team === state.side;
     
     // Evaluate current phase label
-    let phaseLabel: BrainAnalysis["phase"] = "ban1";
-    if (stepIndex <= 9) phaseLabel = "ban1"; // Steps 0-9 are bans (Phase 1)
-    else phaseLabel = "pick1";               // Steps 10-19 are picks (Phase 2)
+    let phaseLabel: BrainAnalysis["phase"] = "pick1";
 
     // Recommendations
     const recommendations = currentStep.type === "ban" 

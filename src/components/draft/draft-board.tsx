@@ -24,6 +24,9 @@ export default function DraftBoard() {
     initDraft,
     setChampion,
     isComplete,
+    selectedBanSlot,
+    setSelectedBanSlot,
+    autoFillBans,
   } = useDraftStore();
 
   const [version, setVersion] = useState("15.11.1");
@@ -165,15 +168,16 @@ export default function DraftBoard() {
           <div className="flex gap-2">
             {blueBans.map((id, index) => {
               const champ = getChampionById(id);
-              const isActive =
-                step?.team === "blue" && step?.type === "ban" && step?.index === index;
+              const isSelected = selectedBanSlot?.team === "blue" && selectedBanSlot?.index === index;
 
               return (
-                <div
+                <button
                   key={index}
-                  className={`w-[44px] h-[44px] md:w-[58px] md:h-[58px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
-                    isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
+                  onClick={() => setSelectedBanSlot({ team: "blue", index })}
+                  className={`w-[44px] h-[44px] md:w-[58px] md:h-[58px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
+                    isSelected ? "lol-slot-active border-[#0397ab] ring-2 ring-[#0397ab]/40 animate-pulse" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
                   }`}
+                  title="Haz clic para seleccionar o cambiar este ban"
                 >
                   {champ ? (
                     <Image
@@ -183,12 +187,10 @@ export default function DraftBoard() {
                       className="object-cover grayscale filter opacity-75 hover:opacity-100 transition-opacity"
                       sizes="58px"
                     />
-                  ) : isActive ? (
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#0397ab] animate-ping" />
                   ) : (
-                    <span className="text-xs md:text-sm text-[#5e6b77] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm text-[#785a28] font-bold">{index + 1}</span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -206,15 +208,16 @@ export default function DraftBoard() {
           <div className="flex gap-2">
             {redBans.map((id, index) => {
               const champ = getChampionById(id);
-              const isActive =
-                step?.team === "red" && step?.type === "ban" && step?.index === index;
+              const isSelected = selectedBanSlot?.team === "red" && selectedBanSlot?.index === index;
 
               return (
-                <div
+                <button
                   key={index}
-                  className={`w-[44px] h-[44px] md:w-[58px] md:h-[58px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all ${
-                    isActive ? "lol-slot-active border-[#0397ab]" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
+                  onClick={() => setSelectedBanSlot({ team: "red", index })}
+                  className={`w-[44px] h-[44px] md:w-[58px] md:h-[58px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
+                    isSelected ? "lol-slot-active border-[#0397ab] ring-2 ring-[#0397ab]/40 animate-pulse" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
                   }`}
+                  title="Haz clic para seleccionar o cambiar este ban"
                 >
                   {champ ? (
                     <Image
@@ -224,12 +227,10 @@ export default function DraftBoard() {
                       className="object-cover grayscale filter opacity-75 hover:opacity-100 transition-opacity"
                       sizes="58px"
                     />
-                  ) : isActive ? (
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#0397ab] animate-ping" />
                   ) : (
-                    <span className="text-xs md:text-sm text-[#5e6b77] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm text-[#785a28] font-bold">{index + 1}</span>
                   )}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -237,6 +238,19 @@ export default function DraftBoard() {
             Bans Rojo
           </span>
         </div>
+      </div>
+
+      {/* Ban Instructions & AutoFill */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#eadecd]/30 border border-[#c8aa6e]/30 px-5 py-3 rounded-sm">
+        <span className="text-xs text-[#785a28] font-bold leading-normal text-center sm:text-left">
+          💡 <span className="underline">Bans Simultáneos</span>: Haz clic en cualquiera de las 10 ranuras numeradas arriba, luego selecciona un campeón del grid para banearlo.
+        </span>
+        <button
+          onClick={autoFillBans}
+          className="px-4 py-2 border border-[#c8aa6e] bg-[#0a1428] text-[#f0e6d3] hover:bg-[#c8aa6e] hover:text-[#0a1428] text-xs font-black uppercase tracking-widest transition-all rounded shadow-sm shrink-0 cursor-pointer"
+        >
+          Auto-rellenar Bans de Confort
+        </button>
       </div>
 
       {/* Mobile Sub-Tab Switcher */}

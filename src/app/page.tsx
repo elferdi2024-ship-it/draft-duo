@@ -101,44 +101,67 @@ export default function Home() {
   }
 
   return (
-    <div className="w-full max-w-[1850px] mx-auto px-4 md:px-12 py-8 flex flex-col gap-12">
+    <div className="w-full max-w-[1720px] mx-auto px-4 md:px-12 py-8 flex flex-col gap-12">
       {/* Hero Welcome Banner */}
-      <div className="lol-panel-dark p-8 md:p-16 relative overflow-hidden flex flex-col items-center text-center shadow-lg">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(200,170,110,0.08),transparent_60%)] pointer-events-none" />
-
-        <div className="flex items-center gap-2.5 mb-4 bg-[#c8aa6e]/10 border border-[#c8aa6e]/40 px-4 py-1.5 rounded-sm text-xs text-[#c8aa6e] font-mono">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          SESIÓN ACTIVA: {userRole === "fer" ? "FER (ADC)" : "RALPH (SOPORTE)"}
+      <div className="lol-panel-dark p-8 md:p-16 relative overflow-hidden flex flex-col items-center text-center shadow-lg min-h-[380px] justify-center">
+        {/* Background Banner Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/banner.webp"
+            alt="Duo Draft Background Banner"
+            fill
+            className="object-cover opacity-20 filter brightness-90 select-none pointer-events-none"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a1428] via-[#0a1428]/70 to-[#0a1428]/45" />
         </div>
 
-        <h1 className="font-serif text-4xl md:text-6xl font-black tracking-widest text-[#f0e6d3] uppercase drop-shadow-md shimmer-text-light">
-          DUO DRAFT
-        </h1>
-        <p className="text-xs md:text-base text-[#c8aa6e] uppercase tracking-widest font-black mt-3">
-          Competitive Botlane Draft Intelligence • Patch 26.11
-        </p>
+        <div className="relative z-10 flex flex-col items-center">
+          {/* Logo centered */}
+          <div className="relative w-20 h-20 rounded border border-[#c8aa6e]/30 overflow-hidden bg-[#0a1428]/75 mb-5 shadow-lg flex items-center justify-center">
+            <Image
+              src="/logo-draft.png"
+              alt="DUO DRAFT LOGO"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
+          </div>
 
-        {/* Personalized welcome quote */}
-        <p className="max-w-3xl text-sm md:text-lg text-[#a0a8b0] mt-6 leading-relaxed italic font-medium">
-          {userRole === "fer"
-            ? "\"Fer, tu rol es dictar el ritmo de la oleada y asegurar el daño core. El pokeo perpendicular de Ashe y la letalidad de Varus son tus herramientas. Posicionamiento impecable = Victoria.\""
-            : "\"Ralph, tu rol es gobernar el mapa desde la niebla profunda. Wards en el pixel bush, linternas salvavidas y desenganches perfectos son tus armas. La supervivencia de Fer es tu prioridad.\""}
-        </p>
+          <div className="flex items-center gap-2.5 mb-4 bg-[#c8aa6e]/10 border border-[#c8aa6e]/40 px-4 py-1.5 rounded-sm text-xs text-[#c8aa6e] font-mono backdrop-blur-sm">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            SESIÓN ACTIVA: {userRole === "fer" ? "FER (ADC)" : "RALPH (SOPORTE)"}
+          </div>
 
-        <div className="flex flex-wrap gap-6 justify-center mt-10">
-          <Link
-            href="/draft"
-            className="px-8 py-4 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md flex items-center gap-3 group"
-          >
-            <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-            Iniciar Simulador en Vivo
-          </Link>
-          <button
-            onClick={() => setUserRole(null)}
-            className="px-6 py-3 border border-[#c8aa6e]/60 bg-transparent text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#0a1428] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md cursor-pointer"
-          >
-            Cambiar de Perfil
-          </button>
+          <h1 className="font-serif text-4xl md:text-6xl font-black tracking-widest text-[#f0e6d3] uppercase drop-shadow-md shimmer-text-light">
+            DUO DRAFT
+          </h1>
+          <p className="text-xs md:text-base text-[#c8aa6e] uppercase tracking-widest font-black mt-3">
+            Competitive Botlane Draft Intelligence • Patch 26.11
+          </p>
+
+          {/* Personalized welcome quote */}
+          <p className="max-w-3xl text-sm md:text-lg text-[#a0a8b0] mt-6 leading-relaxed italic font-medium">
+            {userRole === "fer"
+              ? "\"Fer, tu rol es dictar el ritmo de la oleada y asegurar el daño core. El pokeo perpendicular de Ashe y la letalidad de Varus son tus herramientas. Posicionamiento impecable = Victoria.\""
+              : "\"Ralph, tu rol es gobernar el mapa desde la niebla profunda. Wards en el pixel bush, linternas salvavidas y desenganches perfectos son tus armas. La supervivencia de Fer es tu prioridad.\""}
+          </p>
+
+          <div className="flex flex-wrap gap-6 justify-center mt-10">
+            <Link
+              href="/draft"
+              className="px-8 py-4 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3] font-serif font-black uppercase text-sm md:text-base tracking-widest rounded-sm transition-all shadow-md flex items-center gap-3 group"
+            >
+              <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              Iniciar Simulador en Vivo
+            </Link>
+            <button
+              onClick={() => setUserRole(null)}
+              className="px-6 py-3 border border-[#c8aa6e]/60 bg-transparent text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#0a1428] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md cursor-pointer"
+            >
+              Cambiar de Perfil
+            </button>
+          </div>
         </div>
       </div>
 

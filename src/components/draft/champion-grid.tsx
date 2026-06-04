@@ -113,13 +113,13 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
       </div>
 
       {/* Grid Container */}
-      <div className="flex-1 overflow-y-auto max-h-[500px] md:max-h-[780px] border border-[#eadecd] bg-[#fdfbf7] p-3">
+      <div className="flex-1 overflow-y-auto max-h-[480px] md:max-h-[710px] border border-[#eadecd] bg-[#fdfbf7] p-2.5">
         {filteredChampions.length === 0 ? (
           <div className="text-center text-xs text-[#5e6b77] py-12">
             No se encontraron campeones coincidentes.
           </div>
         ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-6 xl:grid-cols-7 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2.5">
             {filteredChampions.map((champ) => {
               const isUnavailable = pickedBannedIds.has(champ.id);
               const iconUrl = getChampionIconUrl(ddragonVersion, champ.ddragonKey);

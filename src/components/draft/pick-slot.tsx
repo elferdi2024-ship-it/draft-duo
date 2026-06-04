@@ -35,7 +35,7 @@ export default function PickSlot({
 
   return (
     <div
-      className={`relative w-full h-[120px] md:h-[155px] border transition-all duration-300 overflow-hidden flex items-center ${
+      className={`relative w-full h-[110px] md:h-[136px] border transition-all duration-300 overflow-hidden flex items-center ${
         isActive
           ? "lol-slot-active bg-[#0a1428]/45 border-[#0397ab]"
           : isOurs
@@ -76,7 +76,7 @@ export default function PickSlot({
             {roleLabel}
           </span>
           {champion ? (
-            <span className="font-serif font-black text-lg md:text-3xl tracking-widest uppercase text-[#f0e6d3] drop-shadow-md truncate max-w-[140px] md:max-w-[280px]">
+            <span className="font-serif font-black text-lg md:text-2xl tracking-widest uppercase text-[#f0e6d3] drop-shadow-md truncate max-w-[140px] md:max-w-[280px]">
               {champion.name}
             </span>
           ) : (

@@ -52,12 +52,11 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
     .filter((champ) => {
       // Role filter
       if (activeRoleFilter !== "All") {
-        const matchesRole =
-          champ.role === activeRoleFilter || champ.roles?.includes(champ.role);
-        // Fallback checks
-        const matchesRolesArray = champ.roles?.includes(activeRoleFilter as any);
-        if (!matchesRole && !matchesRolesArray) return false;
+        const matchesMainRole = champ.role === activeRoleFilter;
+        const matchesAltRoles = champ.roles?.includes(activeRoleFilter as any) || false;
+        if (!matchesMainRole && !matchesAltRoles) return false;
       }
+
 
       // Search filter
       if (searchQuery.trim()) {
@@ -81,7 +80,7 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
       {/* Header filters */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Search Input */}
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative w-full md:w-72 min-w-[220px]">
           <Search className="absolute left-3 top-3 w-4 h-4 text-[#785a28]" />
           <input
             type="text"
@@ -92,6 +91,7 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
             className="w-full bg-[#f3ebd7] border border-[#c8aa6e] rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#0f1923] placeholder-[#785a28]/60 focus:outline-none focus:ring-1 focus:ring-[#0397ab] focus:border-[#0397ab]"
           />
         </div>
+
 
         {/* Role Filters */}
         <div className="flex flex-wrap gap-1.5">

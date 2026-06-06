@@ -10,6 +10,7 @@ import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
 import ChampionMatchupEvaluator from "./champion-matchup-evaluator";
 import LiveGameplanTimeline from "./live-gameplan-timeline";
 import TeemoCoach from "../teemo-coach";
+import { CompetitiveBrain } from "@/lib/draft-engine";
 import { 
   Heart, 
   RotateCcw, 
@@ -89,11 +90,17 @@ export default function BrainPanel() {
   const ourPicks = side === "blue" ? bluePicks : redPicks;
   const adcPickId = ourPicks[myPickSlots[0]];
   const supPickId = ourPicks[myPickSlots[1]];
-  const matchingDuo = duos.find(
+  let matchingDuo = duos.find(
     (d) => 
       (d.adcId === adcPickId && d.supId === supPickId) ||
       (d.adcId === supPickId && d.supId === adcPickId)
   );
+
+  // Generación adaptativa si no es un combo de confort preestablecido
+  if (!matchingDuo && adcPickId && supPickId) {
+    const brain = new CompetitiveBrain(allChampions);
+    matchingDuo = brain.generateDynamicDuo(adcPickId, supPickId) || undefined;
+  }
 
   // Retrieve recommendation card badge styles
   const getBadgeStyle = (tag: BrainRecommendation["tag"]) => {
@@ -216,12 +223,18 @@ export default function BrainPanel() {
                       </span>
                     ))}
                   </div>
-                  <Link
-                    href={`/duos/${matchingDuo.id}`}
-                    className="mt-2 w-full py-2.5 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3]/20 rounded-sm font-serif font-black text-[10px] tracking-widest text-center uppercase transition-all shadow cursor-pointer"
-                  >
-                    Abrir Guía Completa →
-                  </Link>
+                  {duos.some(d => d.id === matchingDuo.id) ? (
+                    <Link
+                      href={`/duos/${matchingDuo.id}`}
+                      className="mt-2 w-full py-2.5 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3]/20 rounded-sm font-serif font-black text-[10px] tracking-widest text-center uppercase transition-all shadow cursor-pointer"
+                    >
+                      Abrir Guía Completa →
+                    </Link>
+                  ) : (
+                    <div className="mt-2 text-center text-[10px] uppercase font-black tracking-widest text-[#c8aa6e] bg-[#c8aa6e]/15 border border-[#c8aa6e]/30 py-2 rounded-sm">
+                      ⚡ Estrategia Adaptativa Activa
+                    </div>
+                  )}
                 </div>
 
                 {/* Evaluador de Matchup y Timeline interactivo de Setup por minutos */}

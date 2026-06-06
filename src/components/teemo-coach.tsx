@@ -14,7 +14,7 @@ export default function TeemoCoach({ isTalking = false, message }: TeemoCoachPro
   const [clickCount, setClickCount] = useState(0);
   const controls = useAnimation();
 
-  // Frases aleatorias de Teemo Coach al hacer clic
+  // Frases de Teemo Coach de nivel competitivo y macro
   const teemoQuotes = [
     "¡Las setas están listas en el río, pisa con cuidado!",
     "¡Tamaño no lo es todo, la macro lo es todo!",
@@ -43,120 +43,169 @@ export default function TeemoCoach({ isTalking = false, message }: TeemoCoachPro
     const randomQuote = teemoQuotes[Math.floor(Math.random() * teemoQuotes.length)];
     setDialogText(randomQuote);
 
-    // Animación física reactiva de salto/emoción
+    // Animación de salto de Teemo con rotación y compresión elástica
     await controls.start({
-      y: [0, -20, 4, -2, 0],
-      scale: [1, 1.15, 0.9, 1.05, 1],
-      rotate: [0, -5, 5, 0],
-      transition: { duration: 0.6, ease: "easeInOut" }
+      y: [0, -25, 6, -3, 0],
+      scale: [1, 1.18, 0.88, 1.06, 1],
+      rotate: [0, -7, 7, -3, 0],
+      transition: { duration: 0.65, ease: "easeInOut" }
     });
   };
 
   return (
     <div className="flex flex-col items-center justify-center p-4 bg-transparent select-none relative max-w-sm mx-auto">
-      {/* Globo de diálogo de Teemo Coach */}
+      {/* Globo de diálogo Premium - Glassmorphism Hextech */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 15 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
-        className="relative bg-[#0a1428] border-2 border-[#c8aa6e] text-[#f0e6d3] p-3.5 px-4 rounded-lg shadow-[0_4px_16px_rgba(3,151,171,0.15)] text-xs md:text-sm text-center font-serif leading-relaxed mb-5 max-w-[280px]"
+        transition={{ type: "spring", stiffness: 220, damping: 14 }}
+        className="relative bg-[#0a1428]/85 backdrop-blur-md border-2 border-[#c8aa6e] text-[#f0e6d3] p-4 px-5 rounded-lg shadow-[0_8px_32px_rgba(200,170,110,0.25)] text-xs md:text-sm text-center font-serif leading-relaxed mb-6 max-w-[290px] border-t-[#f0e6d3]"
       >
         <span className="font-sans font-black text-[9px] text-[#c8aa6e] uppercase tracking-widest block mb-1">
-          Teemo Coach Dice:
+          Teemo Coach Analiza:
         </span>
-        "{dialogText}"
-        {/* Flecha del globo de diálogo */}
+        <span className="text-[#f0e6d3] font-medium font-sans">
+          "{dialogText}"
+        </span>
+        {/* Flechas de diálogo */}
         <div className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-[#c8aa6e]" />
         <div className="absolute bottom-[-8px] left-1/2 -translate-x-1/2 w-0 h-0 border-l-[7px] border-l-transparent border-r-[7px] border-r-transparent border-t-[8px] border-t-[#0a1428]" />
       </motion.div>
 
-      {/* Personaje Teemo en SVG 2.5D */}
+      {/* Personaje Teemo en SVG 2.5D con Gradientes y Sombreados de Profundidad */}
       <motion.div
         animate={controls}
         onClick={handleTeemoClick}
         className="cursor-pointer relative group flex items-center justify-center"
-        title="¡Haz clic en Teemo Coach para recibir consejos!"
-        whileHover={{ scale: 1.05 }}
-        style={{ width: "160px", height: "160px" }}
+        title="¡Haz clic en Teemo Coach!"
+        whileHover={{ scale: 1.06 }}
+        style={{ width: "170px", height: "170px" }}
       >
         <svg
           viewBox="0 0 200 200"
-          className="w-full h-full filter drop-shadow-[0_8px_16px_rgba(10,20,40,0.3)]"
+          className="w-full h-full filter drop-shadow-[0_12px_24px_rgba(10,20,40,0.4)]"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Animación de respiración integrada en el cuerpo principal */}
+          {/* DEFINICIONES DE GRADIENTES PARA VOLUMEN 3D */}
+          <defs>
+            {/* Gradiente de la Cara (Piel) */}
+            <radialGradient id="faceGrad" cx="50%" cy="40%" r="50%" fx="40%" fy="30%">
+              <stop offset="0%" stopColor="#fff0e0" />
+              <stop offset="75%" stopColor="#f4d4b2" />
+              <stop offset="100%" stopColor="#e2bc94" />
+            </radialGradient>
+
+            {/* Gradiente del Sombrero Verde */}
+            <linearGradient id="hatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#3d8b5a" />
+              <stop offset="70%" stopColor="#22543d" />
+              <stop offset="100%" stopColor="#143525" />
+            </linearGradient>
+
+            {/* Gradiente del Borde de Gafas (Dorado) */}
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#f0e6d3" />
+              <stop offset="30%" stopColor="#c8aa6e" />
+              <stop offset="70%" stopColor="#a37e3c" />
+              <stop offset="100%" stopColor="#785a28" />
+            </linearGradient>
+
+            {/* Gradiente de Lente de Explorador */}
+            <radialGradient id="lensGrad" cx="35%" cy="35%" r="65%">
+              <stop offset="0%" stopColor="#faff80" />
+              <stop offset="40%" stopColor="#ccff00" />
+              <stop offset="85%" stopColor="#73b300" />
+              <stop offset="100%" stopColor="#437000" />
+            </radialGradient>
+
+            {/* Gradiente de las Orejas */}
+            <linearGradient id="earInnerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#ffdfd3" />
+              <stop offset="100%" stopColor="#e2c5a7" />
+            </linearGradient>
+            
+            {/* Gradiente de las Gafas de Coach */}
+            <linearGradient id="coachGlasses" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="rgba(3, 151, 171, 0.4)" />
+              <stop offset="100%" stopColor="rgba(0, 90, 130, 0.1)" />
+            </linearGradient>
+          </defs>
+
+          {/* Animación de respiración integrada */}
           <motion.g
             animate={{
-              y: [0, -3, 0],
-              scaleY: [1, 1.02, 1],
+              y: [0, -3.5, 0],
+              scaleY: [1, 1.025, 1],
             }}
             transition={{
-              duration: 3.2,
+              duration: 3.4,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           >
-            {/* Orejas */}
-            <path d="M40 70 C20 40, 15 80, 45 85 Z" fill="#b08a65" stroke="#7a5a3a" strokeWidth="3" />
-            <path d="M40 70 C30 50, 25 75, 42 78 Z" fill="#e2c5a7" />
-            <path d="M160 70 C180 40, 185 80, 155 85 Z" fill="#b08a65" stroke="#7a5a3a" strokeWidth="3" />
-            <path d="M160 70 C170 50, 175 75, 158 78 Z" fill="#e2c5a7" />
+            {/* Oreja Izquierda */}
+            <path d="M42 66 C15 35, 10 75, 45 82 Z" fill="#b08a65" stroke="#66462c" strokeWidth="3" />
+            <path d="M38 68 C25 48, 20 70, 42 76 Z" fill="url(#earInnerGrad)" />
 
-            {/* Rostro base */}
-            <circle cx="100" cy="108" r="58" fill="#f4d4b2" stroke="#7a5a3a" strokeWidth="4" />
+            {/* Oreja Derecha */}
+            <path d="M158 66 C185 35, 190 75, 155 82 Z" fill="#b08a65" stroke="#66462c" strokeWidth="3" />
+            <path d="M162 68 C175 48, 180 70, 158 76 Z" fill="url(#earInnerGrad)" />
+
+            {/* Rostro Base (Con Gradiente Radial 3D) */}
+            <circle cx="100" cy="108" r="58" fill="url(#faceGrad)" stroke="#66462c" strokeWidth="4.5" />
             
-            {/* Mejillas sonrosadas */}
-            <ellipse cx="62" cy="120" rx="10" ry="6" fill="#f87b8b" opacity="0.4" />
-            <ellipse cx="138" cy="120" rx="10" ry="6" fill="#f87b8b" opacity="0.4" />
+            {/* Mejillas Sonrosadas */}
+            <ellipse cx="60" cy="122" rx="11" ry="7" fill="#ff6b8b" opacity="0.35" />
+            <ellipse cx="140" cy="122" rx="11" ry="7" fill="#ff6b8b" opacity="0.35" />
 
-            {/* Ojos achinados típicos de Teemo */}
+            {/* Ojos achinados de Teemo (Animación de Parpadeo) */}
             {/* Ojo Izquierdo */}
             <motion.path
-              d="M58 102 C68 96, 74 98, 80 104 C72 108, 64 108, 58 102 Z"
-              fill="#523924"
+              d="M58 102 C67 95, 73 97, 79 103 C72 107, 65 107, 58 102 Z"
+              fill="#4a311b"
               animate={{
-                scaleY: [1, 0.1, 1],
+                scaleY: [1, 0.08, 1],
               }}
               transition={{
-                duration: 4.5,
+                duration: 4.8,
                 repeat: Infinity,
-                repeatDelay: 2.5,
+                repeatDelay: 2.8,
               }}
             />
             {/* Ojo Derecho */}
             <motion.path
-              d="M142 102 C132 96, 126 98, 120 104 C128 108, 136 108, 142 102 Z"
-              fill="#523924"
+              d="M142 102 C133 95, 127 97, 121 103 C128 107, 135 107, 142 102 Z"
+              fill="#4a311b"
               animate={{
-                scaleY: [1, 0.1, 1],
+                scaleY: [1, 0.08, 1],
               }}
               transition={{
-                duration: 4.5,
+                duration: 4.8,
                 repeat: Infinity,
-                repeatDelay: 2.5,
+                repeatDelay: 2.8,
               }}
             />
 
-            {/* Nariz de Mapache */}
-            <polygon points="96,110 104,110 100,115" fill="#523924" />
+            {/* Nariz */}
+            <polygon points="96,111 104,111 100,116" fill="#4a311b" />
 
             {/* Boca con animación de habla */}
             {isTalking ? (
               <motion.ellipse
                 cx="100"
-                cy="124"
+                cy="126"
                 rx="6"
                 ry="8"
-                fill="#822020"
-                stroke="#523924"
-                strokeWidth="2"
+                fill="#8f1d2c"
+                stroke="#4a311b"
+                strokeWidth="2.5"
                 animate={{
-                  ry: [3, 9, 4, 8, 3],
-                  scaleY: [0.9, 1.2, 0.9, 1.1, 0.9]
+                  ry: [2.5, 9, 3.5, 8.5, 2.5],
+                  scaleY: [0.85, 1.25, 0.85, 1.15, 0.85]
                 }}
                 transition={{
-                  duration: 0.45,
+                  duration: 0.42,
                   repeat: Infinity,
                   ease: "easeInOut"
                 }}
@@ -164,51 +213,81 @@ export default function TeemoCoach({ isTalking = false, message }: TeemoCoachPro
             ) : (
               // Boca sonriente cerrada
               <path
-                d="M93 122 Q100 128 107 122"
-                stroke="#523924"
+                d="M93 124 Q100 130 107 124"
+                stroke="#4a311b"
                 strokeWidth="3.5"
                 strokeLinecap="round"
                 fill="none"
               />
             )}
 
-            {/* Gorro clásico de Teemo (Explorador verde) */}
+            {/* Gafas de Coach / Analista (Montura redonda de metal) */}
+            <circle cx="68" cy="103" r="19" stroke="url(#goldGrad)" strokeWidth="3" fill="url(#coachGlasses)" />
+            <circle cx="68" cy="103" r="17.5" stroke="#1a1c24" strokeWidth="1" fill="none" />
+            
+            <circle cx="132" cy="103" r="19" stroke="url(#goldGrad)" strokeWidth="3" fill="url(#coachGlasses)" />
+            <circle cx="132" cy="103" r="17.5" stroke="#1a1c24" strokeWidth="1" fill="none" />
+
+            {/* Puente de las Gafas */}
+            <path d="M87 103 Q100 99 113 103" stroke="url(#goldGrad)" strokeWidth="3.5" fill="none" />
+
+            {/* Brillo de los cristales de las gafas */}
+            <path d="M54 94 L62 90" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M118 94 L126 90" stroke="white" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+
+            {/* Sombrero clásico de Explorador (Con Gradiente Lineal 3D) */}
             <path
               d="M36 78 C36 78, 60 25, 100 25 C140 25, 164 78, 164 78 C164 78, 145 92, 100 92 C55 92, 36 78, 36 78 Z"
-              fill="#2d6a4f"
-              stroke="#1b4332"
+              fill="url(#hatGrad)"
+              stroke="#0f261a"
               strokeWidth="4"
             />
             
-            {/* Franja Roja del Gorro */}
+            {/* Franja Roja del Sombrero */}
             <path
-              d="M41 72 C41 72, 62 65, 100 65 C138 65, 159 72, 159 72"
-              stroke="#b7094c"
-              strokeWidth="10"
+              d="M40 72 C40 72, 61 65, 100 65 C139 65, 160 72, 160 72"
+              stroke="#9e0a36"
+              strokeWidth="9"
+              strokeLinecap="round"
               fill="none"
             />
-
-            {/* Lentes de Explorador en el Gorro */}
-            <circle cx="72" cy="52" r="14" fill="#aacc00" stroke="#1b4332" strokeWidth="3" />
-            <circle cx="70" cy="50" r="10" fill="#ddff00" />
-            <circle cx="128" cy="52" r="14" fill="#aacc00" stroke="#1b4332" strokeWidth="3" />
-            <circle cx="126" cy="50" r="10" fill="#ddff00" />
-            
-            {/* Cinta dorada que une los lentes */}
-            <rect x="85" y="49" width="30" height="6" fill="#c8aa6e" stroke="#785a28" strokeWidth="1.5" />
-
-            {/* Pluma de explorador azul en el gorro */}
             <path
-              d="M100 25 C92 10, 85 0, 85 0 C85 0, 95 8, 100 18 Z"
-              fill="#0096c7"
+              d="M41 71 C41 71, 62 64, 100 64 C138 64, 159 71, 159 71"
+              stroke="#e63946"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+              opacity="0.8"
+            />
+
+            {/* Lentes de Explorador del Gorro */}
+            {/* Ojo Lente Izquierdo */}
+            <circle cx="71" cy="51" r="14.5" fill="#1b4332" stroke="#0a1d13" strokeWidth="2.5" />
+            <circle cx="71" cy="51" r="12" fill="url(#lensGrad)" />
+            {/* Reflejo de cristal */}
+            <circle cx="67" cy="46" r="3.5" fill="white" opacity="0.45" />
+
+            {/* Ojo Lente Derecho */}
+            <circle cx="129" cy="51" r="14.5" fill="#1b4332" stroke="#0a1d13" strokeWidth="2.5" />
+            <circle cx="129" cy="51" r="12" fill="url(#lensGrad)" />
+            {/* Reflejo de cristal */}
+            <circle cx="125" cy="46" r="3.5" fill="white" opacity="0.45" />
+            
+            {/* Banda dorada de unión de los lentes */}
+            <rect x="85" y="48" width="30" height="5" fill="url(#goldGrad)" stroke="#66462c" strokeWidth="1.5" />
+
+            {/* Pluma de Explorador Azul (Gradiente de pluma) */}
+            <path
+              d="M100 25 C92 9, 84 0, 84 0 C84 0, 94 8, 100 17 Z"
+              fill="#00b4d8"
               stroke="#0077b6"
               strokeWidth="1.5"
             />
           </motion.g>
         </svg>
 
-        {/* Halo de brillo animado en hover */}
-        <div className="absolute inset-0 rounded-full border border-dashed border-[#c8aa6e]/30 scale-110 opacity-0 group-hover:opacity-100 group-hover:animate-spin transition-all duration-500" style={{ animationDuration: "12s" }} />
+        {/* Halo de Brillo Hextech en Hover */}
+        <div className="absolute inset-0 rounded-full border border-dashed border-[#c8aa6e]/30 scale-[1.08] opacity-0 group-hover:opacity-100 group-hover:animate-spin transition-all duration-700" style={{ animationDuration: "16s" }} />
       </motion.div>
     </div>
   );

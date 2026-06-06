@@ -8,7 +8,8 @@ import type {
   ChampionData, 
   ChampionScore,
   DraftPhaseStep,
-  CompType
+  CompType,
+  DuoData
 } from "@/lib/types";
 import { DRAFT_ORDER } from "@/lib/types";
 import { ownChampions, staticFallbackChampions } from "@/data/champions";
@@ -564,6 +565,74 @@ export class CompetitiveBrain {
       warnings,
       winConditions,
       phase: phaseLabel
+    };
+  }
+
+  /**
+   * Generates dynamic DuoData in real-time for any arbitrary ADC + Support combination
+   */
+  public generateDynamicDuo(adcId: string, supId: string): DuoData | null {
+    const adc = this.getChampionById(adcId);
+    const sup = this.getChampionById(supId);
+    if (!adc || !sup) return null;
+
+    const adcTags = adc.tags || [];
+    const supTags = sup.tags || [];
+    const combinedTags = Array.from(new Set([...adcTags, ...supTags]));
+
+    // Deducir el Pilar Estratégico de juego
+    let pillar = "Línea Híbrida Adaptativa";
+    if (supTags.includes("Engage") || supTags.includes("CC")) {
+      if (adcTags.includes("Burst") || adcTags.includes("All-in") || adcTags.includes("Tempo")) {
+        pillar = "Iniciación Opresiva y Combate (Adaptativa)";
+      } else {
+        pillar = "Engage y Control en Línea (Adaptativa)";
+      }
+    } else if (supTags.includes("Poke") || supTags.includes("Shield")) {
+      if (adcTags.includes("Poke") || adcTags.includes("Range")) {
+        pillar = "Acoso Lineal y Asedio Extremo (Adaptativa)";
+      }
+    } else if (supTags.includes("Peel") || supTags.includes("Anti-dive")) {
+      if (adcTags.includes("Hypercarry") || adcTags.includes("Scaling")) {
+        pillar = "Supervivencia y Escalamiento Seguro (Adaptativa)";
+      }
+    } else if (supTags.includes("Fog") || supTags.includes("Execute")) {
+      pillar = "Emboscadas desde la Niebla (Adaptativa)";
+    }
+
+    // Deducir el Tier representativo del combo
+    let tier = "A";
+    if (adc.tier === "S+" || sup.tier === "S+") tier = "S";
+    if (adc.tier === "S" && sup.tier === "S") tier = "S";
+    if (adc.tier === "A+" && sup.tier === "A+") tier = "A+";
+
+    // Filosofía de juego
+    const philosophy = `Sinergia dinámica y adaptativa enfocada en complementar el kiting y rango de ${adc.name} con las utilidades defensivas y de control de masas de ${sup.name}.`;
+
+    // Instrucciones de ejecución
+    const execution = `Fase de líneas: ${adc.name} prioriza last-hits y desgasta de forma perpendicular, mientras ${sup.name} administra el espacio con amenazas de control y visión en río. En mid-game, coordinar rotaciones rápidas y mantener a ${adc.name} protegido.`;
+
+    // Condiciones de victoria
+    const winCondition = `Dominar el tempo en el carril inferior para habilitar prioridad de dragón y farmear ítems clave de daño y utilidad para peleas tardías.`;
+
+    return {
+      id: `${adc.id}-${sup.id}`,
+      name: `${adc.name} + ${sup.name}`,
+      adcId: adc.id,
+      supId: sup.id,
+      adcDdragonKey: adc.ddragonKey,
+      supDdragonKey: sup.ddragonKey,
+      pillar,
+      tier,
+      philosophy,
+      execution,
+      winCondition,
+      powerSpikes: [
+        "Nivel 2 (Intercambio temprano)",
+        "Nivel 6 (Encadenamiento de Ultimates)",
+        "2 Items (Spike de daño principal)",
+      ],
+      tags: combinedTags,
     };
   }
 }

@@ -3,8 +3,9 @@
 
 import { useState, useEffect } from "react";
 import { setups } from "@/data/setups";
+import { staticFallbackChampions } from "@/data/champions";
 import { CheckSquare, Square, ChevronDown, ChevronUp, Clock, HelpCircle } from "lucide-react";
-import type { SetupCheckpoint } from "@/lib/types";
+import type { SetupCheckpoint, SetupTimeline } from "@/lib/types";
 
 interface LiveGameplanTimelineProps {
   duoId: string;
@@ -12,11 +13,112 @@ interface LiveGameplanTimelineProps {
 }
 
 export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTimelineProps) {
-  const setup = setups.find((s) => s.duoId === duoId);
   const [completedActions, setCompletedActions] = useState<Record<string, boolean>>({});
   const [expandedCheckpoints, setExpandedCheckpoints] = useState<Record<number, boolean>>({
     0: true, // Expand primer item por defecto
   });
+
+  // Intentar resolver el setup de la base de datos estática setups.ts
+  let activeSetup = setups.find((s) => s.duoId === duoId);
+
+  // Si no existe, construir un timeline adaptativo inteligente al vuelo
+  if (!activeSetup) {
+    const [adcId, supId] = duoId.split("-");
+    const adc = staticFallbackChampions.find((c) => c.id === adcId);
+    const sup = staticFallbackChampions.find((c) => c.id === supId);
+
+    if (adc && sup) {
+      const supTags = sup.tags || [];
+      const adcTags = adc.tags || [];
+
+      // Definir acciones adaptativas basadas en tags del soporte
+      const visionAction = supTags.includes("Fog") 
+        ? `${sup.name} usa Youmuu's/Youmuu's para invadir la jungla y sembrar visión profunda.` 
+        : `${sup.name} coloca un ward defensivo y custodia la entrada del río.`;
+
+      const level2SupportAction = (supTags.includes("Engage") || supTags.includes("CC"))
+        ? `${sup.name} busca conectar su control de masas (Q/E) inmediatamente al subir de nivel para forzar hechizos.`
+        : `${sup.name} usa sus escudos/curaciones para mitigar el hostigamiento y desgastar con ataques.`;
+
+      const ultimateChainAction = (supTags.includes("Engage") || supTags.includes("CC"))
+        ? `${sup.name} inicia con su habilidad definitiva en área, permitiendo que ${adc.name} alinee todo su daño.`
+        : `${sup.name} reserva su habilidad definitiva para desenganchar o blindar a ${adc.name} si es diveado.`;
+
+      const lateGameSupportAction = (supTags.includes("Peel") || supTags.includes("Protect") || supTags.includes("Shield"))
+        ? `Dar peel absoluto a ${adc.name}. Guardar habilidades de desenganche únicamente para salvarlo de asesinos.`
+        : `Buscar flancos y asegurar una iniciación limpia sobre el tirador rival utilizando tu kit de control.`;
+
+      // Armar checkpoints dinámicos
+      activeSetup = {
+        duoId,
+        name: `${adc.name} + ${sup.name} (Adaptativo)`,
+        checkpoints: [
+          {
+            time: "0:00",
+            title: "Inicio y Control de Visión",
+            actions: [
+              "Configurar y asegurar arbustos defensivos en el carril inferior.",
+              visionAction,
+              `${adc.name} inicia last-hits pasivos a súbditos melé.`
+            ]
+          },
+          {
+            time: "1:30",
+            title: "Asegurar el Nivel 2",
+            actions: [
+              "Hacer push a la oleada rápido para adelantarse en experiencia.",
+              level2SupportAction,
+              `${adc.name} aprende su segunda habilidad y busca trades cortos con su rango.`
+            ]
+          },
+          {
+            time: "3:00",
+            title: "Nivel 3 & Gank Safety",
+            actions: [
+              "Lanzar baratijas de visión en el río y arbustos de línea.",
+              `${adc.name} guarda maná o habilidades de desplazamiento defensivo.`
+            ],
+            decision: {
+              condition: "¿El jungla o botlane rival tiene potencial de all-in?",
+              ifTrue: "Mantener oleada cerca de la torre aliada y farmear bajo rango seguro.",
+              ifFalse: "Empujar oleada para forzar placas y rotar a controlar la prioridad de jungla."
+            }
+          },
+          {
+            time: "6:00",
+            title: "Power Spike de Ultimates",
+            actions: [
+              ultimateChainAction,
+              `${adc.name} activa su definitiva para forzar una baja o presionar bajo torre.`,
+              "Coordinar rotaciones de regreso a base para comprar el primer spike de items."
+            ]
+          },
+          {
+            time: "12:00",
+            title: "Asedio de Torre y Dragón",
+            actions: [
+              "Acumular oleada grande de cañón y asediar la primera torre inferior.",
+              `${sup.name} asegura el pixel ward 45 segundos antes de que aparezca el Dragón.`
+            ],
+            decision: {
+              condition: "¿Lograron tirar la torre o forzar al enemigo a base?",
+              ifTrue: "Rotar inmediatamente a la línea de mid para abrir el mapa y asediar la torre central.",
+              ifFalse: "Mantener el farm en bot y denegar campamentos de jungla cercanos."
+            }
+          },
+          {
+            time: "20:00+",
+            title: "Fase Tardía (Teamfights 5v5)",
+            actions: [
+              lateGameSupportAction,
+              `${adc.name} se posiciona en el carril trasero y castiga la frontline de adelante hacia atrás.`,
+              "Mantener el control visual de Baron Nashor y Dragón Ancestral."
+            ]
+          }
+        ]
+      };
+    }
+  }
 
   // Reset checklist al cambiar de duo
   useEffect(() => {
@@ -24,10 +126,10 @@ export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTi
     setExpandedCheckpoints({ 0: true });
   }, [duoId]);
 
-  if (!setup) {
+  if (!activeSetup) {
     return (
       <div className="border border-[#c8aa6e]/30 bg-[#eadecd]/20 p-4 rounded text-center text-xs text-[#785a28] font-bold">
-        Línea de tiempo no configurada para este dúo. Consulta la sección de Dúos Maestros.
+        Línea de tiempo no configurada.
       </div>
     );
   }
@@ -51,10 +153,10 @@ export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTi
   const highlightAction = (actionText: string): boolean => {
     if (!userRole) return false;
     const lower = actionText.toLowerCase();
-    if (userRole === "fer" && (lower.includes("ashe") || lower.includes("varus") || lower.includes("tirador") || lower.includes("adc") || lower.includes("last hit") || lower.includes("farm"))) {
+    if (userRole === "fer" && (lower.includes("adc") || lower.includes("tirador") || lower.includes("last-hit") || lower.includes("farm") || lower.includes("kiting") || lower.includes("ashe") || lower.includes("varus") || lower.includes("jhin") || lower.includes("tristana") || lower.includes("jinx") || lower.includes("ezreal") || lower.includes("lucian") || lower.includes("caitlyn"))) {
       return true;
     }
-    if (userRole === "ralph" && (lower.includes("karma") || lower.includes("nami") || lower.includes("nautilus") || lower.includes("soporte") || lower.includes("support") || lower.includes("ward") || lower.includes("visión") || lower.includes("peel") || lower.includes("escudo"))) {
+    if (userRole === "ralph" && (lower.includes("support") || lower.includes("soporte") || lower.includes("ward") || lower.includes("visión") || lower.includes("peel") || lower.includes("escudo") || lower.includes("engage") || lower.includes("inmovil") || lower.includes("karma") || lower.includes("nautilus") || lower.includes("pyke") || lower.includes("renata") || lower.includes("lulu") || lower.includes("nami") || lower.includes("braum") || lower.includes("thresh") || lower.includes("morgana") || lower.includes("leona") || lower.includes("rell"))) {
       return true;
     }
     return false;
@@ -77,7 +179,7 @@ export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTi
       </div>
 
       <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
-        {setup.checkpoints.map((cp, cpIdx) => {
+        {activeSetup.checkpoints.map((cp, cpIdx) => {
           const isExpanded = !!expandedCheckpoints[cpIdx];
 
           // Cuenta de acciones completadas en este checkpoint

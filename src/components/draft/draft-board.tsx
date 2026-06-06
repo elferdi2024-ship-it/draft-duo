@@ -27,6 +27,9 @@ export default function DraftBoard() {
     selectedBanSlot,
     setSelectedBanSlot,
     autoFillBans,
+    isBridgeConnected,
+    connectBridge,
+    disconnectBridge,
   } = useDraftStore();
 
   const [version, setVersion] = useState("15.11.1");
@@ -37,6 +40,10 @@ export default function DraftBoard() {
   useEffect(() => {
     loadChampions();
     getLatestVersion().then(setVersion);
+    connectBridge();
+    return () => {
+      disconnectBridge();
+    };
   }, []);
 
   const getChampionById = (id: string | null): any => {
@@ -223,11 +230,24 @@ export default function DraftBoard() {
           </div>
         </div>
 
-        {/* Phase Indicator */}
-        <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-7 py-3 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[200px]">
-          <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
-            {step ? step.label : "Fase Completada"}
-          </span>
+        {/* Phase Indicator & LCU Sincronización */}
+        <div className="flex flex-col items-center gap-2 shrink-0">
+          <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-7 py-3 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[200px]">
+            <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
+              {step ? step.label : "Fase Completada"}
+            </span>
+          </div>
+          <button
+            onClick={isBridgeConnected ? disconnectBridge : connectBridge}
+            className={`px-3 py-1 border rounded-sm text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${
+              isBridgeConnected
+                ? "bg-emerald-950/20 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
+                : "bg-rose-950/20 border-rose-600 text-rose-500 hover:bg-rose-600 hover:text-white animate-pulse"
+            }`}
+            title={isBridgeConnected ? "Sincronización activa. Haz clic para desconectar." : "Sincronización inactiva. Haz clic para conectar tu cliente de LoL en vivo."}
+          >
+            {isBridgeConnected ? "🟢 LCU Sincronizado" : "🔴 Conectar Cliente"}
+          </button>
         </div>
 
         {/* Red Bans (5 slots) */}

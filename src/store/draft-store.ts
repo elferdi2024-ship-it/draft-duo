@@ -25,6 +25,8 @@ interface DraftStore {
   activeRoleFilter: string; // 'All' | 'Top' | 'Jungle' | 'Mid' | 'ADC' | 'Support'
   userRole: UserRole | null;
   selectedBanSlot: { team: "blue" | "red"; index: number } | null;
+  isBridgeConnected: boolean;
+  bridgeSocket: any;
 
   // Actions
   loadChampions: () => Promise<void>;
@@ -38,6 +40,8 @@ interface DraftStore {
   setSelectedBanSlot: (slot: { team: "blue" | "red"; index: number } | null) => void;
   autoFillBans: () => void;
   recalculateBrain: () => void;
+  connectBridge: () => void;
+  disconnectBridge: () => void;
 }
 
 const initialDraftState = {
@@ -55,6 +59,8 @@ const initialDraftState = {
   activeRoleFilter: "All",
   userRole: null,
   selectedBanSlot: null,
+  isBridgeConnected: false,
+  bridgeSocket: null,
 };
 
 export const useDraftStore = create<DraftStore>((set, get) => ({
@@ -229,5 +235,67 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     const analysis = brain.analyze(stateSnapshot, userRole);
 
     set({ brainAnalysis: analysis });
+  },
+
+  connectBridge: () => {
+    const { bridgeSocket } = get();
+    if (bridgeSocket) return;
+
+    try {
+      console.log("[Store] Conectando con el LCU Bridge local...");
+      const socket = new WebSocket("ws://localhost:3015");
+
+      socket.onopen = () => {
+        console.log("[Store] LCU Bridge conectado.");
+        set({ isBridgeConnected: true });
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload.type === "DRAFT_UPDATE") {
+            const { side, bluePicks, redPicks, blueBans, redBans, currentStepIndex, isComplete } = payload.data;
+            
+            set({
+              side,
+              bluePicks,
+              redPicks,
+              blueBans,
+              redBans,
+              currentStepIndex,
+              isComplete,
+            });
+
+            get().recalculateBrain();
+          }
+        } catch (err) {
+          console.error("[Store] Error al parsear mensaje de LCU Bridge:", err);
+        }
+      };
+
+      socket.onclose = () => {
+        console.log("[Store] LCU Bridge desconectado.");
+        set({ isBridgeConnected: false, bridgeSocket: null });
+      };
+
+      socket.onerror = () => {
+        set({ isBridgeConnected: false });
+      };
+
+      set({ bridgeSocket: socket });
+    } catch (e) {
+      console.error("[Store] Error al conectar con LCU Bridge:", e);
+      set({ isBridgeConnected: false, bridgeSocket: null });
+    }
+  },
+
+  disconnectBridge: () => {
+    const { bridgeSocket } = get();
+    if (bridgeSocket) {
+      try {
+        bridgeSocket.close();
+      } catch (e) {}
+      set({ bridgeSocket: null, isBridgeConnected: false });
+    }
   },
 }));

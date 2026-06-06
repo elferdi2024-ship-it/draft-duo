@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "bridge": "cd bridge && npm install && node index.js"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.8",

@@ -46,7 +46,13 @@ export interface DuoData {
   winCondition: string;
   powerSpikes: string[];
   tags: string[];
+  // Campos de Analítica de Coach Profesional (Especialmente para Tanques)
+  coachVerdict?: string;
+  tankMacroDirective?: string;
+  lanePositioningPattern?: string;
+  ccChainSequence?: string;
 }
+
 
 // ============================================
 // Build Types

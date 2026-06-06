@@ -17,6 +17,10 @@ export const duos: DuoData[] = [
     winCondition: "Farm superior + poke incesante → colapso de torre → control total de dragones y mapa.",
     powerSpikes: ["Nivel 2 (W + Q all-in trade)", "Nivel 6 (R Flecha + R-E Escudo)", "2 Items (Hexoptics + Phantom Dancer)"],
     tags: ["Poke", "Velocidad", "Rotaciones", "Visión", "Corazón"],
+    coachVerdict: "Línea opresiva de desgaste continuo. Karma debe forzar el ritmo de oleadas. Ashe debe castigar en diagonal cada vez que el rival intente dar el último golpe a un súbdito.",
+    tankMacroDirective: "Enchanter de prioridad: Mantener el escudo activo sobre Ashe para el bonus de velocidad de movimiento y negar engage enemigo mediante ralentizaciones cruzadas.",
+    lanePositioningPattern: "Posicionamiento en diagonal en V abierta: Ashe y Karma se abren para forzar al soporte rival a elegir a quién presionar, duplicando el ángulo de poke.",
+    ccChainSequence: "Ashe W (Ralentización) -> Karma Q -> Karma W (Enlace) -> Karma R-Q (Detonación) -> Ashe R (post-6)"
   },
   {
     id: "varus-karma",
@@ -32,6 +36,10 @@ export const duos: DuoData[] = [
     winCondition: "Secuestrar al soporte enemigo con R de Varus desde niebla y demoler torres a base de poke.",
     powerSpikes: ["Nivel 3 (Poke from fog)", "1 Item (Youmuu's lethality spike)", "3 Items (Manru Emblem spike)"],
     tags: ["Asedio", "Poke", "Pick", "Lethality", "Corazón"],
+    coachVerdict: "Asedio absoluto. Denegar la presencia del tirador rival en la oleada mediante la amenaza constante del daño letal de la Q de Varus desde la niebla de guerra.",
+    tankMacroDirective: "Asegurar la visión perpendicular en arbustos bot para evitar que el rival responda al asedio lineal.",
+    lanePositioningPattern: "Bloqueo lineal de presión: Karma toma el arbusto medio de la línea zonificando mientras Varus carga la flecha desde atrás.",
+    ccChainSequence: "Varus R -> Karma W (Enlace para stun garantizado) -> Karma R-Q -> Varus Q Maximizada"
   },
   {
     id: "tristana-nautilus",
@@ -47,6 +55,10 @@ export const duos: DuoData[] = [
     winCondition: "Conseguir ventaja de oro inicial a través de asesinatos y placas masivas para habilitar a Tristana 1v9.",
     powerSpikes: ["Nivel 2 (Q Hook + W Jump all-in)", "Nivel 6 (Nautilus R + Tristana R burst)", "2 Items (PD + IE)"],
     tags: ["Dive", "Engage", "Reset", "Placas", "Aggressive"],
+    coachVerdict: "Línea de colapso extremo. Ralph debe buscar el enganche al nivel 2 o 3 tras acumular una oleada de cañón. El control se inicia con Q, seguido de básico pasiva y E. Fer salta inmediatamente con W, aplicando la E y detonándola. Si el rival flashea, Tristana puede resetear la W y perseguir.",
+    tankMacroDirective: "Rol de Tanque Primario: Ralph debe liderar la entrada bajo torre y absorber los primeros dos disparos de torre. Conservar la W (Escudo de Nautilus) exclusivamente para mitigar el daño de la torre al salir del rango.",
+    lanePositioningPattern: "Paralelismo Ofensivo: Nautilus y Tristana se mueven en la misma línea horizontal para asegurar que el enganche sea seguido de inmediato por el salto.",
+    ccChainSequence: "Nautilus Q -> Autoataque (Inmovilización Pasiva) -> Tristana E + W -> Nautilus E -> Nautilus R (post-6) -> Tristana R"
   },
   {
     id: "jhin-pyke",
@@ -62,6 +74,10 @@ export const duos: DuoData[] = [
     winCondition: "Cazar al soporte o jungla enemigo en la niebla, generar bola de nieve con oro compartido de la R de Pyke.",
     powerSpikes: ["Nivel 2 (Pyke Q + Jhin W chain)", "Nivel 6 (Pyke R Ejecución + Jhin R Curtain Call)", "1 Item (Umbral Glaive / Collector)"],
     tags: ["Niebla", "Pick", "Visión", "Ejecución", "Shadows"],
+    coachVerdict: "Dominación invisible. Pyke debe perma-limpiar visión con Glaive Sombría. Jhin debe colocar cepos W en las entradas de la jungla aliada para facilitar el hook reactivo.",
+    tankMacroDirective: "Asesino-Tanque utilitario: Pyke debe priorizar desenganchar con E (Corriente Fantasma) si el rival logra colapsar sobre Jhin, usando la W para reposicionarse en la niebla.",
+    lanePositioningPattern: "Triangulación asimétrica: Pyke acecha desde la niebla del río mientras Jhin farmea seguro controlando la distancia del carril.",
+    ccChainSequence: "Pyke Q -> Jhin W (Aturdimiento a larga distancia) -> Pyke E -> Jhin Cuarto Básico -> Pyke R (Ejecución)"
   },
   {
     id: "ashe-renata",
@@ -77,6 +93,10 @@ export const duos: DuoData[] = [
     winCondition: "Bait de dive enemigo → Renata W in Ashe → Renata R → Counter-engage con R de Ashe y ralentizaciones.",
     powerSpikes: ["Nivel 6 (Renata R + Ashe R)", "1 Item (Locket on Renata)", "3 Items (Ashe Crit + PD)"],
     tags: ["Anti-dive", "Counter-engage", "Peel", "Scaling", "Defensive"],
+    coachVerdict: "Línea de bait. Dejen que el rival empuje y proponga la agresión. La W de Renata permite que Ashe juegue en el límite de la muerte para dar la vuelta al combate.",
+    tankMacroDirective: "Soporte de control/desarme: Guardar la R (Hostilidad Creciente) para interrumpir el avance de colosos enemigos o tanques medianos.",
+    lanePositioningPattern: "Escudo en diagonal: Renata se sitúa un paso al frente para interceptar stuns lineales, liberando a Ashe para kitear hacia atrás.",
+    ccChainSequence: "Renata Q -> Ashe R (Aturdimiento prolongado) -> Renata R -> Ashe W (Ralentización continua)"
   },
   {
     id: "varus-renata",
@@ -92,6 +112,10 @@ export const duos: DuoData[] = [
     winCondition: "Reducir la vida de la frontline enemiga antes de la pelea, neutralizar su engage con Renata R.",
     powerSpikes: ["Nivel 6 (Double R Lockdown)", "1 Item (Lethality spike)", "2 Items (Edge of Night + Helia)"],
     tags: ["Asedio", "Anti-tank", "Disengage", "Poke"],
+    coachVerdict: "Desmantelación de frontlines. Varus desgasta la resistencia mágica y física. Renata Glasc deniega cualquier intento de engage enemigo mediante la amenaza de su R.",
+    tankMacroDirective: "Mitigación y rescate: Mantener la W (Rescate Financiero) activa en Varus solo cuando su barra de vida baje de 20% para asegurar el reset de kill.",
+    lanePositioningPattern: "Formación de embudo: Renata bloquea el acceso al arbusto mientras Varus castiga desde el centro del carril.",
+    ccChainSequence: "Varus R -> Renata R -> Renata Q (Empuje al clon enemigo) -> Varus Q Maximizada"
   },
   {
     id: "jinx-lulu",
@@ -107,55 +131,11 @@ export const duos: DuoData[] = [
     winCondition: "Sobrevivir a la fase de líneas, agruparse en 5v5, y ganar teamfights de late game por puro DPS de Jinx.",
     powerSpikes: ["Nivel 6 (Lulu R anti-burst)", "3 Items (PD + IE + Manru on Jinx)", "5+ Items (Invencible)"],
     tags: ["Hypercarry", "Peel", "Late Game", "Scaling", "Balanced"],
+    coachVerdict: "Línea de escalado puro. Denegar trades largos al inicio. Lulu debe pokear con Q y E solo para mantener la prioridad de súbditos.",
+    tankMacroDirective: "Enchanter hiperactivo: Reservar el Polimorfismo (W) exclusivamente para el carry o asesino enemigo que intente divear a Jinx. No usarlo ofensivamente.",
+    lanePositioningPattern: "Escolta en tándem: Lulu se posiciona exactamente a 150 unidades detrás de Jinx, lista para mitigar cualquier ráfaga sorpresa.",
+    ccChainSequence: "Lulu W (Polymorph al rival) -> Jinx E (Trampas debajo) -> Lulu R (Levantamiento) -> Jinx W"
   },
-  {
-    id: "ashe-lulu",
-    name: "Ashe + Lulu",
-    adcId: "ashe",
-    supId: "lulu",
-    adcDdragonKey: "Ashe",
-    supDdragonKey: "Lulu",
-    pillar: "Poke + Buff",
-    tier: "A+",
-    philosophy: "Control constante de peleas a través de escudos, velocidad de ataque y ralentizaciones continuas.",
-    execution: "Ashe pokea con W e inicia con R, Lulu le otorga velocidad y knockup si intentan divearla.",
-    winCondition: "Asediar y pokear de manera segura mientras se mantiene al ADC libre de amenazas directas.",
-    powerSpikes: ["Nivel 6 (Ashe R pick + Lulu R peel)", "2 Items (Ashe Crit + Lulu Helia)", "3 Items (Lulu Moonstone)"],
-    tags: ["Poke", "Peel", "Anti-dive", "Utility"],
-  },
-  {
-    id: "tristana-lulu",
-    name: "Tristana + Lulu",
-    adcId: "tristana",
-    supId: "lulu",
-    adcDdragonKey: "Tristana",
-    supDdragonKey: "Lulu",
-    pillar: "Dive + Buff",
-    tier: "S",
-    philosophy: "All-in selectivo y escalamiento blindado. Mitiga los riesgos naturales de los saltos de Tristana.",
-    execution: "Buscar intercambios cortos con escudo de Lulu, saltar solo si Lulu tiene W y R listos para seguir.",
-    winCondition: "Demoler placas rápidamente gracias a la E de Tristana, y dominar escaramuzas con la supervivencia de Lulu.",
-    powerSpikes: ["Nivel 2 (All-in shield trade)", "Nivel 6 (Lulu R dive support)", "2 Items (PD + IE)"],
-    tags: ["Dive", "Peel", "Scaling", "Reset"],
-  },
-  {
-    id: "jhin-karma",
-    name: "Jhin + Karma",
-    adcId: "jhin",
-    supId: "karma",
-    adcDdragonKey: "Jhin",
-    supDdragonKey: "Karma",
-    pillar: "Niebla + Buff",
-    tier: "A+",
-    philosophy: "Control total de tempo, kiteo extremo y pokeo opresivo de largo alcance.",
-    execution: "Poke con Q de Karma, Jhin sigue con W a larga distancia, rotaciones veloces con R-E de Karma.",
-    winCondition: "Moverse más rápido que el enemigo en el mapa, pokear desde lejos y ejecutar picks con Curtain Call.",
-    powerSpikes: ["Nivel 2 (Karma Q + Jhin W)", "Nivel 6 (Jhin R + Karma R-E)", "2 Items (Collector + Echoes of Helia)"],
-    tags: ["Poke", "Velocidad", "Pick", "Kiting"],
-  },
-  // ============================================
-  // Clinical Duo Additions (Phase 9)
-  // ============================================
   {
     id: "lucian-nami",
     name: "Lucian + Nami",
@@ -170,6 +150,10 @@ export const duos: DuoData[] = [
     winCondition: "Snowball temprano en niveles 2-3, crash de oleadas seguidos de rotaciones de invade o placas rápidas.",
     powerSpikes: ["Nivel 2 (E + Q passive burst + Nami E)", "Nivel 6 (Nami R tsunami + Lucian R burst)", "2 Items (Collector + Infinity Edge)"],
     tags: ["Burst", "Snowball", "Aggressive", "Trades Cortos"],
+    coachVerdict: "Snowball agresivo clínico. El trade debe durar máximo 2 segundos. Ralph debe reaccionar de inmediato con la E cuando Fer avance con su dash.",
+    tankMacroDirective: "Soporte de trade: Usar la curación rebotante (W) para castigar al tirador rival y curar a Lucian simultáneamente.",
+    lanePositioningPattern: "Paralelismo dinámico: Avanzar coordinados para forzar el trade corto y replegarse de inmediato usando el bono de velocidad de Nami.",
+    ccChainSequence: "Nami R -> Lucian E + AA (Detona pasiva de Nami) -> Nami Q (Burbuja) -> Lucian Q + AA"
   },
   {
     id: "kaisa-nautilus",
@@ -185,6 +169,10 @@ export const duos: DuoData[] = [
     winCondition: "Fijar y explotar al soporte/tirador rival sin movilidad. Dominar peleas en espacios cerrados (drake).",
     powerSpikes: ["Nivel 2 (Nautilus Q hook + Kai'Sa plasma burst)", "Nivel 6 (Double R engage/dive potential)", "1.5 Items (Q evolve on Kai'Sa)"],
     tags: ["Dive", "Plasma Chain", "Engage Duro", "All-In"],
+    coachVerdict: "Sinergia de iniciación y explosión de Plasma. Cada CC de Nautilus aplica una marca de plasma a Kai'Sa, permitiendo una detonación ultrarrápida del burst. All-ins en nivel 2 y 6 son obligatorios si el rival cruza la mitad de la línea.",
+    tankMacroDirective: "Rol de Tanque Engager: Ralph debe ser el iniciador principal. Evitar ganchos a la frontline pesada. Priorizar al carry frágil. En peleas de objetivos, usar la R de Nautilus en el objetivo de atrás para golpear a múltiples enemigos.",
+    lanePositioningPattern: "Presión de arbusto de línea: Nautilus domina la visión del arbusto medio forzando al rival a retirarse, mientras Kai'Sa farmea y mantiene el carril.",
+    ccChainSequence: "Nautilus Q -> Autoataque (Root Pasiva) -> Kai'Sa W + Q -> Nautilus R -> Kai'Sa R ( reposicionamiento detrás) -> Nautilus E"
   },
   {
     id: "jinx-thresh",
@@ -200,6 +188,10 @@ export const duos: DuoData[] = [
     winCondition: "Sobrevivir a la fase de líneas, forzar picks con Thresh Q + trampas de Jinx, y habilitar pasivas de Jinx en late.",
     powerSpikes: ["Nivel 2 (Hook + Trampas chain)", "Nivel 6 (Thresh R Box + Jinx R execution)", "3 Items (PD + IE + LDR on Jinx)"],
     tags: ["Protect", "Linterna", "Scaling", "Picks"],
+    coachVerdict: "Línea de transición controlada. Thresh es el guardián de Jinx. Jinx debe concentrarse en el farmeo perpendicular, sabiendo que la linterna de Thresh compensa errores de sobreextensión. La colocación de trampas de Jinx debe ser milimétrica.",
+    tankMacroDirective: "Rol de Tanque/Peeler Adaptativo: Priorizar el peel reactivo. Guardar la W (Linterna de Thresh) principalmente para rescate, o para facilitar el engage del jungla. No usar Flay (E) ofensivamente si el jungla rival no está localizado.",
+    lanePositioningPattern: "Triangulación Defensiva: Thresh se sitúa un paso por detrás y en ángulo diagonal respecto a Jinx, optimizando el alcance máximo de lanzamiento de la linterna (W).",
+    ccChainSequence: "Thresh Q (Sentencia) -> Jinx coloca E (Trampas) debajo del objetivo suspendido -> Thresh E (Flay hacia las trampas) -> Jinx W -> Thresh R (Box)"
   },
   {
     id: "caitlyn-morgana",
@@ -215,6 +207,10 @@ export const duos: DuoData[] = [
     winCondition: "Asedio opresivo bajo torre rival, denegación total de engage enemigo con el Escudo Negro (E) de Morgana.",
     powerSpikes: ["Nivel 2 (Q Bind + W Trap trap chain)", "Nivel 6 (Morgana R stun + Caitlyn R finish)", "2 Items (Collector + Infinity Edge)"],
     tags: ["Catch", "Asedio", "Cepo Chain", "Anti-engage"],
+    coachVerdict: "Línea de opresión absoluta. Morgana debe denegar los ganchos enemigos con el Escudo Negro (E). Caitlyn debe mantener la torre rival bajo ataque constante raspando placas.",
+    tankMacroDirective: "Protección anti-cc: Monitorizar los cooldowns de engage del rival. El Escudo Negro debe colocarse anticipadamente al proyectil de control.",
+    lanePositioningPattern: "Zonificación paralela: Morgana y Caitlyn empujan juntas el carril, manteniendo distancia del río con wards colocados en los accesos.",
+    ccChainSequence: "Morgana Q -> Caitlyn coloca W (Cepo) abajo -> Caitlyn AA Headshot -> Morgana W -> Caitlyn Q"
   },
   {
     id: "ezreal-braum",
@@ -230,5 +226,9 @@ export const duos: DuoData[] = [
     winCondition: "Kitear composiciones de iniciación agresivas, resistir la fase de líneas sin ceder bajas y brillar en mid game.",
     powerSpikes: ["Nivel 2 (Braum Q slows + Ezreal Q trades)", "Nivel 6 (Braum R fisura + Ezreal R global)", "2 Items (Trinity Force + Muramana)"],
     tags: ["Kiting", "Anti-engage", "Supervivencia", "Poke"],
-  },
+    coachVerdict: "Línea defensiva insuperable. Excelente contra composiciones de asedio y poke. Braum mitiga el daño lineal, mientras Ezreal aplica daño libre de riesgo con la Q.",
+    tankMacroDirective: "Rol de Tanque Defensor/Protector: Conservar la E (Inquebrantable) para interceptar definitivas clave o ráfagas directas. Usar la W (Detrás de mí) en Ezreal para ganar armadura y posicionamiento rápido.",
+    lanePositioningPattern: "Bloqueo Diagonal Frontal: Braum se coloca en la trayectoria de los proyectiles enemigos, permitiendo que Ezreal farmee cómodamente detrás del escudo.",
+    ccChainSequence: "Braum Q (Ralentización y Marca Glacial) -> Ezreal AA + Q (Aplica marcas adicionales) -> Aturdimiento Glacial (4 marcas) -> Braum R"
+  }
 ];

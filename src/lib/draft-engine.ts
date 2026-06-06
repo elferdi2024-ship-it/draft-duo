@@ -609,7 +609,11 @@ export class CompetitiveBrain {
           "Nivel 6 (Engache con Thresh R + Ezreal R)",
           "2 Items (Ezreal Muramana + Trinity / Thresh Locket)"
         ],
-        tags: ["Kiting", "Peel", "Safe", "Poke", "Linterna"]
+        tags: ["Kiting", "Peel", "Safe", "Poke", "Linterna"],
+        coachVerdict: "Línea sumamente elusiva y reactiva. Combina el posicionamiento libre de Ezreal con la salvación instantánea de la Linterna de Thresh. Ideal para mitigar diveadores enemigos.",
+        tankMacroDirective: "Rol de Tanque/Peeler reactivo: Prioriza desenganchar con E y W. Thresh no debe comprometerse con Qs ofensivas a menos que sepa la ubicación del jungla rival.",
+        lanePositioningPattern: "Triangulación Defensiva: Thresh se posiciona ligeramente por detrás en diagonal para mantener el rango óptimo de linterna.",
+        ccChainSequence: "Thresh Q (Sentencia) -> Ezreal AA + Q -> Thresh E (Flay hacia atrás) -> Thresh R (Box) -> Ezreal R"
       };
     }
 
@@ -631,7 +635,11 @@ export class CompetitiveBrain {
           "Nivel 6 (R de Kai'Sa para seguimiento de Hook)",
           "Evolución Q de Kai'Sa (Spike de daño masivo)"
         ],
-        tags: ["Burst", "Dive", "Plasma Chain", "Engage"]
+        tags: ["Burst", "Dive", "Plasma Chain", "Engage"],
+        coachVerdict: "Sinergia letal basada en engage. Cada CC de Thresh carga la pasiva de plasma de Kai'Sa permitiendo un burst instantáneo.",
+        tankMacroDirective: "Rol de Tanque Engager / Catch: Ralph debe liderar con Sentencia (Q) sobre el carry rival y posicionar la Linterna para que el jungla se sume al burst de forma fluida.",
+        lanePositioningPattern: "Paralelismo Ofensivo: Avanzar en la misma línea para responder al hook de Thresh de forma inmediata.",
+        ccChainSequence: "Thresh Q -> Kai'Sa W + Q -> Thresh E (Flay hacia atrás) -> Kai'Sa R (detrás del objetivo) -> Thresh R"
       };
     }
 
@@ -653,7 +661,11 @@ export class CompetitiveBrain {
           "Nivel 6 (R de Ashe + R de Braum lockdown)",
           "2 Items (KRAKEN + LOCKET)"
         ],
-        tags: ["Anti-engage", "Peel", "CC Chain", "Glacial"]
+        tags: ["Anti-engage", "Peel", "CC Chain", "Glacial"],
+        coachVerdict: "Línea de control y aturdimiento glacial absoluto. Las ralentizaciones de Ashe facilitan la aplicación rápida del Golpe Conmocionante.",
+        tankMacroDirective: "Rol de Tanque Protector: Conservar la E (Inquebrantable) para mitigar ráfagas y stuns del rival, y usar W para dar armadura y resistencia a Ashe.",
+        lanePositioningPattern: "Bloqueo Diagonal Frontal: Braum se interpone entre el proyectil enemigo y Ashe, absorbiendo agresiones mientras ella kitea.",
+        ccChainSequence: "Ashe W -> Braum Q (ralentiza) -> Autoataques cruzados (detona stun de Braum) -> Braum R -> Ashe R"
       };
     }
 
@@ -675,7 +687,11 @@ export class CompetitiveBrain {
           "Nivel 6 (Lux R + Caitlyn R combo de ejecución)",
           "1.5 Items (Lethality/Crit en Caitlyn + Luden en Lux)"
         ],
-        tags: ["Poke", "Asedio", "Cepo Chain", "Range"]
+        tags: ["Poke", "Asedio", "Cepo Chain", "Range"],
+        coachVerdict: "Opresión por rango extremo. Forzar al rival bajo su torre mediante el empuje de oleadas y castigar su retroceso con Lux Q.",
+        tankMacroDirective: "Controlador/Enchanter de asedio: Utilizar el escudo (W) para mitigar el agro de los súbditos al hostigar al rival bajo torre.",
+        lanePositioningPattern: "Diagonal de asedio: Lux cubre el arbusto medio zonificando con E mientras Caitlyn golpea la torre.",
+        ccChainSequence: "Lux Q -> Caitlyn coloca W (Cepo) abajo -> Caitlyn AA -> Lux R -> Caitlyn Q"
       };
     }
 
@@ -699,20 +715,32 @@ export class CompetitiveBrain {
     const adcPoke = adcTags.includes("Poke") || adcTags.includes("Range") || ["varus", "ashe", "ezreal", "smolder"].includes(adc.id);
     const adcLate = adcTags.includes("Hypercarry") || adcTags.includes("Scaling") || ["jinx", "kaisa", "vayne", "kogmaw"].includes(adc.id);
 
+    // Campos de Coach de Inferencia Algorítmica
+    let coachVerdict = `Línea de sinergia adaptativa. Complementa el rango de ${adc.name} con las capacidades de ${sup.name}.`;
+    let tankMacroDirective = `Soporte reactivo: Priorizar asegurar visión en río y usar habilidades de control para desenganchar trades desfavorables.`;
+    let lanePositioningPattern = "Posicionamiento en diagonal neutra: Mantener el espacio en el carril sin sobreextenderse.";
+    let ccChainSequence = `${sup.name} CC -> ${adc.name} Habilidad principal de daño`;
+
     // Deducir variables
     if (hasEngage) {
+      tankMacroDirective = `Rol de Tanque Iniciador: Ralph debe buscar el gancho o CC en el carry enemigo si está aislado. Absorber el primer impacto de la oleada.`;
+      lanePositioningPattern = "Paralelismo Ofensivo: Avanzar juntos en la línea para capitalizar cualquier control del tanque.";
+      ccChainSequence = `${sup.name} Iniciación de CC -> ${adc.name} Ráfaga de Daño`;
+
       if (adcBurst) {
         pillar = "Iniciación y Ráfaga Explosiva (All-In)";
         tier = "S";
         philosophy = `Sinergia ofensiva brutal. Aprovecha el control pesado de ${sup.name} para asestar todo el daño en ráfaga de ${adc.name} al instante.`;
         execution = `Fase de líneas: Acumular oleada corta y buscar el choque de nivel 2 o 3. ${sup.name} inicia con CC y ${adc.name} desgasta la barra de vida rival rápidamente. Forzar flashes tempranos.`;
         winCondition = `Dominar los asesinatos en línea para conseguir placas e invadir la jungla enemiga con prioridad.`;
+        coachVerdict = `Línea de all-in muy fuerte. Ralph debe forzar el ritmo del combate al nivel 2. Fer debe seguir con todo su daño al instante.`;
       } else if (adcLate) {
         pillar = "Iniciación y Escalado Protegido";
         tier = "A+";
         philosophy = `Línea equilibrada de control. ${sup.name} actúa como disuasor principal para mantener a salvo a ${adc.name} mientras acumula súbditos de cara al juego tardío.`;
         execution = `Fase de líneas: Priorizar farm estable. Solo iniciar si el oponente comete un error grave de posicionamiento cerca de tu torre. Mantener al tirador a salvo.`;
         winCondition = `Asegurar farm alto y ganar peleas por objetivos grupales en el río a base de control de masas frontal.`;
+        coachVerdict = `Iniciación defensiva. Ralph solo debe buscar pelear si el oponente se sobreextiende cerca de la torre. Priorizar el farm de ${adc.name}.`;
       } else {
         pillar = "Control y Desgaste Híbrido";
         tier = "A";
@@ -721,18 +749,24 @@ export class CompetitiveBrain {
         winCondition = `Capturar carries en la transición de río y neutralizar la botlane mediante control de visión.`;
       }
     } else if (hasPoke) {
+      lanePositioningPattern = "Diagonal en V Abierta: Dividir los ángulos de pokeo para desgastar al rival continuamente.";
+      tankMacroDirective = `Soporte de Poke: Hostigar con habilidades de rango sin comprometer el posicionamiento. Evitar all-ins enemigos.`;
+      ccChainSequence = `${sup.name} Ralentización/Poke -> ${adc.name} Habilidad de largo rango`;
+
       if (adcPoke) {
         pillar = "Asedio Lineal y Poke Sostenido";
         tier = "S-";
         philosophy = `Control por distancia y opresión. Mantiene al rival bajo su torre debido al daño incesante infligido a rango máximo por ambos campeones.`;
         execution = `Fase de líneas: Disparar constantemente habilidades sobre el tirador rival cuando vaya a dar el último golpe. Empujar oleadas rápido para golpear placas.`;
         winCondition = `Reducir la vida enemiga al 30% antes de dragones para denegar su entrada y demoler estructuras por presión de asedio.`;
+        coachVerdict = `Poke incesante. Mantener la oleada empujada. Ralph y Fer deben pokear en diagonal para negar esquives fáciles del rival.`;
       } else if (adcBurst) {
         pillar = "Desgaste y Remate Agresivo";
         tier = "A+";
         philosophy = `Línea de desgaste estratégico. ${sup.name} reduce la vida enemiga lentamente hasta que entran en rango de ejecución de ${adc.name}.`;
         execution = `Hostigar con habilidades a distancia segura. Una vez el rival baje de la mitad de la barra de vida, ${adc.name} inicia con un salto o ráfaga para liquidar.`;
         winCondition = `Expulsar al rival de línea repetidamente provocando pérdida masiva de experiencia y oro.`;
+        coachVerdict = `Desgaste previo. Ralph baja la vida del rival. Fer busca el remate letal en niveles 3 y 6.`;
       } else {
         pillar = "Opresión y Zonificación";
         tier = "A";
@@ -741,6 +775,10 @@ export class CompetitiveBrain {
         winCondition = `Conseguir ventajas sustanciales de placas de torre y rotar al carril central de forma segura.`;
       }
     } else if (hasPeel) {
+      lanePositioningPattern = "Triangulación Defensiva: Soporte un paso detrás del carry listo para mitigar el engage rival.";
+      tankMacroDirective = `Soporte Protector: Guardar los escudos o CC de desenganche para cuando el enemigo inicie su all-in.`;
+      ccChainSequence = `Enemigo Engage -> ${sup.name} Desenganche/Peel -> ${adc.name} Kiteo hacia atrás`;
+
       if (adcLate) {
         pillar = "Hiperescalado Defensivo";
         tier = "S";
@@ -748,6 +786,7 @@ export class CompetitiveBrain {
         execution = `Fase de líneas: Jugar de forma conservadora. ${sup.name} guarda habilidades clave para mitigar iniciaciones enemigas (peel reactivo). ${adc.name} solo asesta last-hits.`;
         winCondition = `Mantener al tirador con 0 muertes y farm perfecto hasta conseguir sus objetos clave y destruir teamfights 5v5.`;
         powerSpikes[2] = "3 Items (Hiperescalado desbloqueado)";
+        coachVerdict = `Escalado blindado. Jugar de forma conservadora. Ralph protege de forma reactiva y Fer asegura farm perfecto sin arriesgar.`;
       } else {
         pillar = "Kiteo y Supervivencia Adaptativa";
         tier = "A";
@@ -755,11 +794,6 @@ export class CompetitiveBrain {
         execution = `Mantener la línea en un estado neutro, castigando las entradas agresivas del oponente y conservando el maná para el juego medio.`;
         winCondition = `Resistir la presión del rival en fases tempranas y brillar en las escaramuzas de mid game por mejor posicionamiento.`;
       }
-    } else {
-      // Valor por defecto adaptativo
-      philosophy = `Sinergia mixta para el carril inferior enfocada en el rango de ${adc.name} y la adaptabilidad de ${sup.name}.`;
-      execution = `Mantener posicionamiento en V abierta, priorizar farm y visión perpendicular para evitar emboscadas del jungla.`;
-      winCondition = `Neutralizar la línea en early game y conseguir ventajas mediante rotaciones y peleas de equipo estructuradas.`;
     }
 
     return {
@@ -776,6 +810,10 @@ export class CompetitiveBrain {
       winCondition,
       powerSpikes,
       tags: combinedTags,
+      coachVerdict,
+      tankMacroDirective,
+      lanePositioningPattern,
+      ccChainSequence
     };
   }
 }

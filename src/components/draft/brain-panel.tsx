@@ -223,6 +223,68 @@ export default function BrainPanel() {
                       </span>
                     ))}
                   </div>
+
+                  {/* Bloque de Analítica de Coach Profesional (Enfoque en Tanques y Sinergia Competitiva) */}
+                  {(matchingDuo.coachVerdict || matchingDuo.tankMacroDirective) && (
+                    <div className="mt-3 pt-3 border-t border-[#c8aa6e]/20 flex flex-col gap-2.5 bg-[#1a2233]/50 p-3.5 rounded border border-[#c8aa6e]/15">
+                      <div className="flex items-center gap-1.5 justify-between">
+                        <span className="text-[9px] uppercase tracking-wider font-extrabold text-[#00c8c8] flex items-center gap-1">
+                          <ShieldAlert className="w-3.5 h-3.5" />
+                          Directiva de Coach Profesional
+                        </span>
+                        {["nautilus", "thresh", "braum"].includes(matchingDuo.supId) && (
+                          <span className="text-[8px] bg-amber-500 text-[#0a1428] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse">
+                            Rol: Tanque
+                          </span>
+                        )}
+                      </div>
+
+                      {matchingDuo.coachVerdict && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] uppercase tracking-wider font-bold text-[#c8aa6e]">
+                            Veredicto de Línea 2v2
+                          </span>
+                          <p className="text-[11px] text-[#a0a8b0] leading-relaxed">
+                            {matchingDuo.coachVerdict}
+                          </p>
+                        </div>
+                      )}
+
+                      {matchingDuo.lanePositioningPattern && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] uppercase tracking-wider font-bold text-[#c8aa6e]">
+                            Patrón Geométrico de Línea
+                          </span>
+                          <p className="text-[11px] text-[#f0e6d3] font-mono leading-relaxed">
+                            🧭 {matchingDuo.lanePositioningPattern}
+                          </p>
+                        </div>
+                      )}
+
+                      {matchingDuo.ccChainSequence && (
+                        <div className="flex flex-col gap-0.5 bg-[#0a1428]/60 p-2 rounded border border-[#c8aa6e]/10">
+                          <span className="text-[8px] uppercase tracking-wider font-bold text-[#00c8c8]">
+                            Secuencia de CC óptimo
+                          </span>
+                          <p className="text-[11px] text-[#00c8c8] font-semibold">
+                            ⚡ {matchingDuo.ccChainSequence}
+                          </p>
+                        </div>
+                      )}
+
+                      {matchingDuo.tankMacroDirective && (
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-[8px] uppercase tracking-wider font-bold text-[#ff4655]">
+                            Conducta del Tanque / Absorción
+                          </span>
+                          <p className="text-[11px] text-[#a0a8b0] leading-relaxed">
+                            🛡️ {matchingDuo.tankMacroDirective}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {duos.some(d => d.id === matchingDuo.id) ? (
                     <Link
                       href={`/duos/${matchingDuo.id}`}
@@ -235,6 +297,7 @@ export default function BrainPanel() {
                       ⚡ Estrategia Adaptativa Activa
                     </div>
                   )}
+
                 </div>
 
                 {/* Evaluador de Matchup y Timeline interactivo de Setup por minutos */}

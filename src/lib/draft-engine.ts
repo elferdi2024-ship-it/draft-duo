@@ -47,16 +47,17 @@ export class CompetitiveBrain {
       const classes = c.philosophy || "";
 
       // Heuristics based on tags and strategic philosophy
-      if (tags.includes("Dive") || tags.includes("Engage") || tags.includes("Assassin") || classes.includes("Dive") || classes.includes("CC")) {
+      if (tags.includes("Dive") || tags.includes("Engage") || tags.includes("Assassin") || classes.includes("Dive") || classes.includes("CC") || tags.includes("CC")) {
         diveCount++;
       }
-      if (tags.includes("Poke") || tags.includes("Range") || classes.includes("Poke") || classes.includes("Asedio")) {
+      if (tags.includes("Poke") || tags.includes("Range") || classes.includes("Poke") || classes.includes("Asedio") || tags.includes("Siege")) {
         pokeCount++;
       }
-      if (tags.includes("Scaling") || tags.includes("Hypercarry") || classes.includes("Late") || classes.includes("1v9") || classes.includes("scaling")) {
+      if (tags.includes("Scaling") || tags.includes("Hypercarry") || classes.includes("Late") || classes.includes("1v9") || classes.includes("scaling") || tags.includes("Vision")) {
+        // Vision / control counts as scaling utility
         scalingCount++;
       }
-      if (tags.includes("Peel") || tags.includes("Anti-dive") || tags.includes("Disengage") || classes.includes("Peel") || classes.includes("counter-engage")) {
+      if (tags.includes("Peel") || tags.includes("Anti-dive") || tags.includes("Disengage") || classes.includes("Peel") || classes.includes("counter-engage") || tags.includes("Anti-projectile")) {
         peelCount++;
       }
     });
@@ -97,7 +98,7 @@ export class CompetitiveBrain {
   public scoreChampion(champ: ChampionData, state: LiveDraftState, activeStep: DraftPhaseStep, userRole: "fer" | "ralph" | null = null): ChampionScore {
     const isAlly = activeStep.team === state.side;
     
-    // 1. Comfort score (highly values our 10 comfort champions)
+    // 1. Comfort score (highly values our comfort champions)
     let comfort = 20;
     if (champ.isOwnPool) {
       if (champ.learningStatus === "mastered") comfort = 100;
@@ -141,7 +142,7 @@ export class CompetitiveBrain {
     // 3. Synergy Score
     let synergy = 50;
     if (validAllyPicks.length > 0) {
-      // Check if we form one of our 10 consolidated duos
+      // Check if we form one of our consolidated duos
       let bestSynergy = 50;
       validAllyPicks.forEach(allyChamp => {
         // Look up duo definition
@@ -152,9 +153,16 @@ export class CompetitiveBrain {
         if (foundDuo) {
           bestSynergy = Math.max(bestSynergy, 100);
         } else {
-          // Semi-comfort synergy
+          // Semi-comfort synergy or known competitive synergies
           const hasExplicitSynergy = champ.synergies?.includes(allyChamp.name) || 
-                                     allyChamp.synergies?.includes(champ.name);
+                                     allyChamp.synergies?.includes(champ.name) ||
+                                     (champ.id === "ezreal" && allyChamp.id === "thresh") ||
+                                     (champ.id === "thresh" && allyChamp.id === "ezreal") ||
+                                     (champ.id === "kaisa" && allyChamp.id === "thresh") ||
+                                     (champ.id === "thresh" && allyChamp.id === "kaisa") ||
+                                     (champ.id === "ashe" && allyChamp.id === "braum") ||
+                                     (champ.id === "braum" && allyChamp.id === "ashe");
+
           if (hasExplicitSynergy) {
             bestSynergy = Math.max(bestSynergy, 85);
           } else {
@@ -230,7 +238,7 @@ export class CompetitiveBrain {
           }
         } else if (enemyComp.type === "poke") {
           // Boost engage/dive supports to lock down poke
-          if (champ.role === "Support" && (champ.tags?.includes("Engage") || ["nautilus", "pyke"].includes(champ.id))) {
+          if (champ.role === "Support" && (champ.tags?.includes("Engage") || ["nautilus", "pyke", "thresh"].includes(champ.id))) {
             counter = Math.min(100, counter + 20);
           }
           // Boost healers/sustain to survive poke
@@ -273,8 +281,6 @@ export class CompetitiveBrain {
     const isAlly = activeStep.team === state.side;
     
     // Only recommend ADC/Support roles since we are locked in those roles
-    // Figure out if our slot is ADC or Support
-    // The store defines myPickSlots: [number, number] representing the indices in bluePicks or redPicks
     const picksList = state.side === "blue" ? state.bluePicks : state.redPicks;
     const isMySlotADC = state.myPickSlots.includes(activeStep.index) && 
       (!picksList[state.myPickSlots[0]] && activeStep.index === state.myPickSlots[0] 
@@ -346,6 +352,10 @@ export class CompetitiveBrain {
         reasoning += " Salvavidas con W y desarmador masivo de composiciones agresivas con R.";
       } else if (champ.id === "lulu") {
         reasoning += " Peel inigualable para blindar a tu tirador contra asesinos y diveadores.";
+      } else if (champ.id === "thresh") {
+        reasoning += " Salvación de carries inmovilizados con linterna (W) y control versátil (Q + E).";
+      } else if (champ.id === "braum") {
+        reasoning += " Baluarte defensivo ideal para detener proyectiles pesados y proteger con escudo (E).";
       }
 
       return {
@@ -460,9 +470,6 @@ export class CompetitiveBrain {
     const currentStep = DRAFT_ORDER[stepIndex];
     const isMyTurn = currentStep.team === state.side;
     
-    // Evaluate current phase label
-    let phaseLabel: BrainAnalysis["phase"] = "pick1";
-
     // Recommendations
     const recommendations = currentStep.type === "ban" 
       ? this.recommendBans(state, currentStep)
@@ -552,7 +559,7 @@ export class CompetitiveBrain {
         winConditions.push("Ralph: Controla la visión del río y trackea al jungla enemigo para proteger a Fer.");
       } else {
         winConditions.push("Farmear eficientemente y mantener el control de visión en arbustos de línea.");
-        winConditions.push("Wardear pixel bush 45s antes de dragones y trackear al jungla rival.");
+        winConditions.push("Wardear pixel bush 45s antes de dragones y trackea al jungla rival.");
       }
     }
 
@@ -564,12 +571,13 @@ export class CompetitiveBrain {
       allyComp,
       warnings,
       winConditions,
-      phase: phaseLabel
+      phase: stepIndex < 6 ? "pick1" : "pick2"
     };
   }
 
   /**
    * Generates dynamic DuoData in real-time for any arbitrary ADC + Support combination
+   * Highly optimized with professional meta heuristics for millions of drafts (e.g. Ezreal + Thresh)
    */
   public generateDynamicDuo(adcId: string, supId: string): DuoData | null {
     const adc = this.getChampionById(adcId);
@@ -580,43 +588,182 @@ export class CompetitiveBrain {
     const supTags = sup.tags || [];
     const combinedTags = Array.from(new Set([...adcTags, ...supTags]));
 
-    // Deducir el Pilar Estratégico de juego
-    let pillar = "Línea Híbrida Adaptativa";
-    if (supTags.includes("Engage") || supTags.includes("CC")) {
-      if (adcTags.includes("Burst") || adcTags.includes("All-in") || adcTags.includes("Tempo")) {
-        pillar = "Iniciación Opresiva y Combate (Adaptativa)";
-      } else {
-        pillar = "Engage y Control en Línea (Adaptativa)";
-      }
-    } else if (supTags.includes("Poke") || supTags.includes("Shield")) {
-      if (adcTags.includes("Poke") || adcTags.includes("Range")) {
-        pillar = "Acoso Lineal y Asedio Extremo (Adaptativa)";
-      }
-    } else if (supTags.includes("Peel") || supTags.includes("Anti-dive")) {
-      if (adcTags.includes("Hypercarry") || adcTags.includes("Scaling")) {
-        pillar = "Supervivencia y Escalamiento Seguro (Adaptativa)";
-      }
-    } else if (supTags.includes("Fog") || supTags.includes("Execute")) {
-      pillar = "Emboscadas desde la Niebla (Adaptativa)";
+    // 1. Detectar duos competitivos clasicos conocidos que no esten explicitamente en duos.ts
+    const comboKey = `${adc.id}-${sup.id}`;
+    
+    if (comboKey === "ezreal-thresh") {
+      return {
+        id: comboKey,
+        name: "Ezreal + Thresh",
+        adcId,
+        supId,
+        adcDdragonKey: adc.ddragonKey,
+        supDdragonKey: sup.ddragonKey,
+        pillar: "Desenganche y Kiting Seguro",
+        tier: "S",
+        philosophy: "Línea sumamente elusiva y reactiva. Combina el posicionamiento libre de Ezreal con la salvación instantánea de la Linterna de Thresh.",
+        execution: "Ezreal pokea con Qs seguras. Thresh zonea con la amenaza de Q (Sentencia). Si el jungla enemigo ataca, Thresh tira W hacia atrás para sacar a Ezreal de peligro.",
+        winCondition: "Mantener neutralidad en fase de líneas sin morir, castigar errores de posicionamiento con ganks del jungla facilitados por Thresh y desgastar antes de teamfights.",
+        powerSpikes: [
+          "Nivel 2 (Hook chain a larga distancia)",
+          "Nivel 6 (Engache con Thresh R + Ezreal R)",
+          "2 Items (Ezreal Muramana + Trinity / Thresh Locket)"
+        ],
+        tags: ["Kiting", "Peel", "Safe", "Poke", "Linterna"]
+      };
     }
 
-    // Deducir el Tier representativo del combo
+    if (comboKey === "kaisa-thresh") {
+      return {
+        id: comboKey,
+        name: "Kai'Sa + Thresh",
+        adcId,
+        supId,
+        adcDdragonKey: adc.ddragonKey,
+        supDdragonKey: sup.ddragonKey,
+        pillar: "Dive de Salto de Plasma",
+        tier: "S",
+        philosophy: "Agresividad en base a control. Los cc prolongados de Thresh cargan marcas de plasma permitiendo que Kai'Sa vuele instantáneamente al combate.",
+        execution: "Thresh busca Q/Flay en el carry rival → Aplica marcas → Kai'Sa responde con W + Q y usa R (Instinto Asesino) para reposicionarse detrás y burstear.",
+        winCondition: "Bola de nieve en línea. Forzar peleas en 2v2 cerca de paredes y neutralizar objetivos con la ventaja de rango de entrada de Kai'Sa.",
+        powerSpikes: [
+          "Nivel 2 (Hook + All-In de Plasma)",
+          "Nivel 6 (R de Kai'Sa para seguimiento de Hook)",
+          "Evolución Q de Kai'Sa (Spike de daño masivo)"
+        ],
+        tags: ["Burst", "Dive", "Plasma Chain", "Engage"]
+      };
+    }
+
+    if (comboKey === "ashe-braum") {
+      return {
+        id: comboKey,
+        name: "Ashe + Braum",
+        adcId,
+        supId,
+        adcDdragonKey: adc.ddragonKey,
+        supDdragonKey: sup.ddragonKey,
+        pillar: "Cadena de Aturdimiento Glacial",
+        tier: "A+",
+        philosophy: "Defensa absoluta y control de masas ininterrumpido. Las ralentizaciones constantes de Ashe facilitan la aplicación del aturdimiento de Braum.",
+        execution: "Ashe ataca primero aplicando perma-slow con básicos o W. Braum salta con W + Q aplicando Golpe Conmocionante. Ashe activa Q e inflige stun instantáneo.",
+        winCondition: "Bloquear toda agresión enemiga con escudo de Braum y castigar desenganches enemigos lentos con perma-slow e iniciación de Flechas.",
+        powerSpikes: [
+          "Nivel 1 (Invasiones potentes por pasiva de Braum)",
+          "Nivel 6 (R de Ashe + R de Braum lockdown)",
+          "2 Items (KRAKEN + LOCKET)"
+        ],
+        tags: ["Anti-engage", "Peel", "CC Chain", "Glacial"]
+      };
+    }
+
+    if (comboKey === "caitlyn-lux") {
+      return {
+        id: comboKey,
+        name: "Caitlyn + Lux",
+        adcId,
+        supId,
+        adcDdragonKey: adc.ddragonKey,
+        supDdragonKey: sup.ddragonKey,
+        pillar: "Asedio y Captura a Larga Distancia",
+        tier: "S",
+        philosophy: "Castigo y pokeo insoportable bajo torre enemiga. Cadena de inmovilización letal sin riesgo de exposición.",
+        execution: "Lux busca Q (Hechizo Luminoso) → Si conecta, Caitlyn deposita trampa W inmediatamente debajo → Burst de Lux (E + R) y Caitlyn Headshot.",
+        winCondition: "Demoler todas las placas antes de los 14 minutos negándole farm bajo torre al rival mediante poke.",
+        powerSpikes: [
+          "Nivel 2 (Lux Q + Caitlyn W combo letal)",
+          "Nivel 6 (Lux R + Caitlyn R combo de ejecución)",
+          "1.5 Items (Lethality/Crit en Caitlyn + Luden en Lux)"
+        ],
+        tags: ["Poke", "Asedio", "Cepo Chain", "Range"]
+      };
+    }
+
+    // 2. Inferencia algoritmica inteligente si es un combo arbitrario
+    let pillar = "Línea Híbrida Adaptativa";
     let tier = "A";
-    if (adc.tier === "S+" || sup.tier === "S+") tier = "S";
-    if (adc.tier === "S" && sup.tier === "S") tier = "S";
-    if (adc.tier === "A+" && sup.tier === "A+") tier = "A+";
+    let philosophy = "";
+    let execution = "";
+    let winCondition = "";
+    const powerSpikes = [
+      "Nivel 2 (Intercambio temprano de habilidades)",
+      "Nivel 6 (Encadenamiento de habilidades definitivas)",
+      "2 Items (Spike de poder del tirador y utilidad del soporte)"
+    ];
 
-    // Filosofía de juego
-    const philosophy = `Sinergia dinámica y adaptativa enfocada en complementar el kiting y rango de ${adc.name} con las utilidades defensivas y de control de masas de ${sup.name}.`;
+    const hasEngage = supTags.includes("Engage") || supTags.includes("CC") || ["nautilus", "thresh", "leona", "rell", "rakan"].includes(sup.id);
+    const hasPoke = supTags.includes("Poke") || ["karma", "lux", "nami"].includes(sup.id);
+    const hasPeel = supTags.includes("Peel") || supTags.includes("Anti-dive") || ["lulu", "renata", "braum", "janna"].includes(sup.id);
 
-    // Instrucciones de ejecución
-    const execution = `Fase de líneas: ${adc.name} prioriza last-hits y desgasta de forma perpendicular, mientras ${sup.name} administra el espacio con amenazas de control y visión en río. En mid-game, coordinar rotaciones rápidas y mantener a ${adc.name} protegido.`;
+    const adcBurst = adcTags.includes("Burst") || adcTags.includes("All-in") || ["lucian", "tristana", "kaisa", "caitlyn"].includes(adc.id);
+    const adcPoke = adcTags.includes("Poke") || adcTags.includes("Range") || ["varus", "ashe", "ezreal", "smolder"].includes(adc.id);
+    const adcLate = adcTags.includes("Hypercarry") || adcTags.includes("Scaling") || ["jinx", "kaisa", "vayne", "kogmaw"].includes(adc.id);
 
-    // Condiciones de victoria
-    const winCondition = `Dominar el tempo en el carril inferior para habilitar prioridad de dragón y farmear ítems clave de daño y utilidad para peleas tardías.`;
+    // Deducir variables
+    if (hasEngage) {
+      if (adcBurst) {
+        pillar = "Iniciación y Ráfaga Explosiva (All-In)";
+        tier = "S";
+        philosophy = `Sinergia ofensiva brutal. Aprovecha el control pesado de ${sup.name} para asestar todo el daño en ráfaga de ${adc.name} al instante.`;
+        execution = `Fase de líneas: Acumular oleada corta y buscar el choque de nivel 2 o 3. ${sup.name} inicia con CC y ${adc.name} desgasta la barra de vida rival rápidamente. Forzar flashes tempranos.`;
+        winCondition = `Dominar los asesinatos en línea para conseguir placas e invadir la jungla enemiga con prioridad.`;
+      } else if (adcLate) {
+        pillar = "Iniciación y Escalado Protegido";
+        tier = "A+";
+        philosophy = `Línea equilibrada de control. ${sup.name} actúa como disuasor principal para mantener a salvo a ${adc.name} mientras acumula súbditos de cara al juego tardío.`;
+        execution = `Fase de líneas: Priorizar farm estable. Solo iniciar si el oponente comete un error grave de posicionamiento cerca de tu torre. Mantener al tirador a salvo.`;
+        winCondition = `Asegurar farm alto y ganar peleas por objetivos grupales en el río a base de control de masas frontal.`;
+      } else {
+        pillar = "Control y Desgaste Híbrido";
+        tier = "A";
+        philosophy = `Línea adaptativa basada en picks rápidos. Combina la iniciación de ${sup.name} con las respuestas de medio alcance de ${adc.name}.`;
+        execution = `Buscar castigar al soporte enemigo frágil mediante iniciaciones desde arbustos ciegos usando baratijas de visión.`;
+        winCondition = `Capturar carries en la transición de río y neutralizar la botlane mediante control de visión.`;
+      }
+    } else if (hasPoke) {
+      if (adcPoke) {
+        pillar = "Asedio Lineal y Poke Sostenido";
+        tier = "S-";
+        philosophy = `Control por distancia y opresión. Mantiene al rival bajo su torre debido al daño incesante infligido a rango máximo por ambos campeones.`;
+        execution = `Fase de líneas: Disparar constantemente habilidades sobre el tirador rival cuando vaya a dar el último golpe. Empujar oleadas rápido para golpear placas.`;
+        winCondition = `Reducir la vida enemiga al 30% antes de dragones para denegar su entrada y demoler estructuras por presión de asedio.`;
+      } else if (adcBurst) {
+        pillar = "Desgaste y Remate Agresivo";
+        tier = "A+";
+        philosophy = `Línea de desgaste estratégico. ${sup.name} reduce la vida enemiga lentamente hasta que entran en rango de ejecución de ${adc.name}.`;
+        execution = `Hostigar con habilidades a distancia segura. Una vez el rival baje de la mitad de la barra de vida, ${adc.name} inicia con un salto o ráfaga para liquidar.`;
+        winCondition = `Expulsar al rival de línea repetidamente provocando pérdida masiva de experiencia y oro.`;
+      } else {
+        pillar = "Opresión y Zonificación";
+        tier = "A";
+        philosophy = `Espaciamiento defensivo con rango. Limita la toma de decisiones enemiga zonificando las entradas al carril inferior.`;
+        execution = `Establecer trampas o proyectiles para forzar movimientos incómodos del rival y ganar prioridad de empuje constante.`;
+        winCondition = `Conseguir ventajas sustanciales de placas de torre y rotar al carril central de forma segura.`;
+      }
+    } else if (hasPeel) {
+      if (adcLate) {
+        pillar = "Hiperescalado Defensivo";
+        tier = "S";
+        philosophy = `Seguro de vida de late game. Blindaje absoluto para ${adc.name} potenciando su velocidad, escudos y curaciones.`;
+        execution = `Fase de líneas: Jugar de forma conservadora. ${sup.name} guarda habilidades clave para mitigar iniciaciones enemigas (peel reactivo). ${adc.name} solo asesta last-hits.`;
+        winCondition = `Mantener al tirador con 0 muertes y farm perfecto hasta conseguir sus objetos clave y destruir teamfights 5v5.`;
+        powerSpikes[2] = "3 Items (Hiperescalado desbloqueado)";
+      } else {
+        pillar = "Kiteo y Supervivencia Adaptativa";
+        tier = "A";
+        philosophy = `Sinergia de desgaste seguro. Enfocada en repeler asaltos y permitir que el tirador se reposicione continuamente.`;
+        execution = `Mantener la línea en un estado neutro, castigando las entradas agresivas del oponente y conservando el maná para el juego medio.`;
+        winCondition = `Resistir la presión del rival en fases tempranas y brillar en las escaramuzas de mid game por mejor posicionamiento.`;
+      }
+    } else {
+      // Valor por defecto adaptativo
+      philosophy = `Sinergia mixta para el carril inferior enfocada en el rango de ${adc.name} y la adaptabilidad de ${sup.name}.`;
+      execution = `Mantener posicionamiento en V abierta, priorizar farm y visión perpendicular para evitar emboscadas del jungla.`;
+      winCondition = `Neutralizar la línea en early game y conseguir ventajas mediante rotaciones y peleas de equipo estructuradas.`;
+    }
 
     return {
-      id: `${adc.id}-${sup.id}`,
+      id: comboKey,
       name: `${adc.name} + ${sup.name}`,
       adcId: adc.id,
       supId: sup.id,
@@ -627,11 +774,7 @@ export class CompetitiveBrain {
       philosophy,
       execution,
       winCondition,
-      powerSpikes: [
-        "Nivel 2 (Intercambio temprano)",
-        "Nivel 6 (Encadenamiento de Ultimates)",
-        "2 Items (Spike de daño principal)",
-      ],
+      powerSpikes,
       tags: combinedTags,
     };
   }

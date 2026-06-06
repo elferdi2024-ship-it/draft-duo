@@ -52,50 +52,52 @@ export default function Home() {
           {/* Card Fer (ADC) */}
           <button
             onClick={() => setUserRole("fer")}
-            className="flex-1 text-left lol-panel p-6 bg-[#fcf9f2] border border-[#c8aa6e] hover:border-[#0397ab] hover:shadow-[0_0_20px_rgba(3,151,171,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+            className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#0097e6] hover:shadow-[0_0_24px_rgba(0,151,230,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
           >
             <div className="flex flex-col gap-3">
-              <div className="w-10 h-10 rounded bg-[#c8aa6e]/10 border border-[#c8aa6e] flex items-center justify-center text-[#c8aa6e] group-hover:bg-[#0397ab]/15 group-hover:text-[#0397ab] group-hover:border-[#0397ab] transition-all">
+              <div className="w-10 h-10 rounded bg-[#c8aa6e]/10 border border-[var(--border-dark)] flex items-center justify-center text-[#c8aa6e] group-hover:bg-[#0097e6]/15 group-hover:text-[#0097e6] group-hover:border-[#0097e6] transition-all">
                 <FlameIcon className="w-5 h-5" />
               </div>
-              <h2 className="font-serif text-2xl font-black tracking-wider text-[#0f1923]">
+              <h2 className="font-serif text-2xl font-black tracking-wider text-[#f0e6d3]">
                 FER (ADC)
               </h2>
-              <p className="text-xs text-[#5e6b77] leading-relaxed">
+              <p className="text-xs text-[#8a9dae] leading-relaxed">
                 Optimiza todo el sistema para tu rol de **Tirador**. Enfócate en wave control, posicionamiento perpendicular, daño crítico máximo y timelines de asedio al carril.
               </p>
             </div>
-            <div className="mt-8 border-t border-[#eadecd] pt-3 flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#785a28] group-hover:text-[#0397ab] transition-colors">
+            <div className="mt-8 border-t border-[#c8aa6e]/20 pt-3 flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#c8aa6e] group-hover:text-[#0097e6] transition-colors">
                 Ingresar como ADC
               </span>
               <span className="text-[#c8aa6e] font-bold text-xs select-none">→</span>
             </div>
           </button>
 
+
           {/* Card Ralph (Support) */}
           <button
             onClick={() => setUserRole("ralph")}
-            className="flex-1 text-left lol-panel p-6 bg-[#fcf9f2] border border-[#c8aa6e] hover:border-emerald-600 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
+            className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#00c8c8] hover:shadow-[0_0_24px_rgba(0,200,200,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
           >
             <div className="flex flex-col gap-3">
-              <div className="w-10 h-10 rounded bg-emerald-500/10 border border-emerald-500/60 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500/15 group-hover:text-emerald-500 group-hover:border-emerald-500 transition-all">
+              <div className="w-10 h-10 rounded bg-emerald-500/10 border border-emerald-500/60 flex items-center justify-center text-[#00c8c8] group-hover:bg-[#00c8c8]/15 group-hover:text-[#00c8c8] group-hover:border-[#00c8c8] transition-all">
                 <ShieldIcon className="w-5 h-5" />
               </div>
-              <h2 className="font-serif text-2xl font-black tracking-wider text-[#0f1923]">
+              <h2 className="font-serif text-2xl font-black tracking-wider text-[#f0e6d3]">
                 RALPH (SUP)
               </h2>
-              <p className="text-xs text-[#5e6b77] leading-relaxed">
+              <p className="text-xs text-[#8a9dae] leading-relaxed">
                 Optimiza todo el sistema para tu rol de **Soporte**. Enfócate en control de visión en la niebla, setups de warding profundo, desenganches anti-all in y peel.
               </p>
             </div>
-            <div className="mt-8 border-t border-[#eadecd] pt-3 flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#785a28] group-hover:text-emerald-600 transition-colors">
+            <div className="mt-8 border-t border-[#c8aa6e]/20 pt-3 flex items-center justify-between">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#c8aa6e] group-hover:text-[#00c8c8] transition-colors">
                 Ingresar como Soporte
               </span>
               <span className="text-[#c8aa6e] font-bold text-xs select-none">→</span>
             </div>
           </button>
+
         </div>
       </div>
     );
@@ -176,13 +178,13 @@ export default function Home() {
         {/* Left column: Duos and guides */}
         <div className="xl:col-span-8 flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-[#c8aa6e]/40 pb-3">
-            <h2 className="lol-title font-bold text-lg md:text-xl text-[#0f1923] flex items-center gap-2.5">
+            <h2 className="lol-title font-bold text-lg md:text-xl text-[#f0e6d3] flex items-center gap-2.5">
               <Trophy className="w-6 h-6 text-[#c8aa6e]" />
               Dúos Clínicos del Meta (Total 15)
             </h2>
             <Link
               href="/duos"
-              className="text-xs md:text-sm uppercase tracking-widest font-extrabold text-[#785a28] hover:text-[#c8aa6e] flex items-center gap-1.5"
+              className="text-xs md:text-sm uppercase tracking-widest font-extrabold text-[#c8aa6e] hover:text-[#fcf9f2] flex items-center gap-1.5"
             >
               Ver los 15 Dúos <Compass className="w-4 h-4" />
             </Link>
@@ -193,9 +195,9 @@ export default function Home() {
               <Link
                 key={duo.id}
                 href={`/duos/${duo.id}`}
-                className="lol-panel lol-panel-interactive p-5 md:p-6 bg-[#fcf9f2] border border-[#c8aa6e] flex gap-5 group shadow-sm hover:shadow-md"
+                className="lol-panel lol-panel-interactive p-5 md:p-6 bg-[var(--panel)] border border-[var(--border-dark)] flex gap-5 group shadow-sm hover:shadow-md"
               >
-                <div className="flex gap-2 shrink-0 items-center justify-center bg-[#0a1428]/5 p-2 rounded-sm border border-[#eadecd]">
+                <div className="flex gap-2 shrink-0 items-center justify-center bg-[#0a1428]/40 p-2 rounded-sm border border-[#c8aa6e]/20">
                   <ChampionAvatar
                     ddragonKey={duo.adcDdragonKey}
                     name={duo.adcId}
@@ -214,38 +216,39 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col justify-center min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-serif font-black text-base md:text-lg text-[#0f1923] group-hover:text-[#785a28] transition-colors truncate">
+                    <span className="font-serif font-black text-base md:text-lg text-[#f0e6d3] group-hover:text-[#c8aa6e] transition-colors truncate">
                       {duo.name}
                     </span>
                     <span className="bg-amber-500 text-[#0a1428] text-[10px] md:text-xs font-black uppercase px-2 py-0.5 rounded-sm">
                       {duo.tier}
                     </span>
                   </div>
-                  <span className="text-xs text-[#785a28] uppercase font-bold tracking-widest mt-1 truncate">
+                  <span className="text-xs text-[#c8aa6e] uppercase font-bold tracking-widest mt-1 truncate">
                     {duo.pillar}
                   </span>
-                  <p className="text-xs md:text-sm text-[#5e6b77] italic mt-2 line-clamp-2 leading-relaxed">
+                  <p className="text-xs md:text-sm text-[#8a9dae] italic mt-2 line-clamp-2 leading-relaxed">
                     "{duo.philosophy}"
                   </p>
                 </div>
               </Link>
             ))}
           </div>
+
         </div>
 
         {/* Right column: Personalized pool view */}
         <div className="xl:col-span-4 flex flex-col gap-6">
           <div className="flex items-center justify-between border-b border-[#c8aa6e]/40 pb-3">
-            <h2 className="lol-title font-bold text-lg md:text-xl text-[#0f1923] flex items-center gap-2.5">
-              <Heart className="w-6 h-6 text-rose-700" />
+            <h2 className="lol-title font-bold text-lg md:text-xl text-[#f0e6d3] flex items-center gap-2.5">
+              <Heart className="w-6 h-6 text-[#ff4655]" />
               {userRole === "fer" ? "Tus ADC Confort (Fer)" : "Tus Soportes Confort (Ralph)"}
             </h2>
           </div>
 
-          <div className="lol-panel p-5 md:p-6 bg-[#fcf9f2] border border-[#c8aa6e] flex flex-col gap-5 shadow-sm">
+          <div className="lol-panel p-5 md:p-6 bg-[var(--panel)] border border-[var(--border-dark)] flex flex-col gap-5 shadow-sm">
             {/* Show list according to role */}
             <div className="flex flex-col gap-3.5">
-              <span className="text-xs uppercase font-black tracking-widest text-[#785a28] border-b border-[#eadecd] pb-2">
+              <span className="text-xs uppercase font-black tracking-widest text-[#c8aa6e] border-b border-[#c8aa6e]/20 pb-2">
                 {userRole === "fer" ? "Tiradores Core de Fer" : "Protectores Core de Ralph"}
               </span>
               <div className="flex flex-wrap gap-3.5">
@@ -261,7 +264,7 @@ export default function Home() {
                       tier={champ.tier}
                       size="md"
                     />
-                    <span className="text-[10px] md:text-xs font-bold uppercase text-[#5e6b77] group-hover:text-[#785a28] transition-colors">
+                    <span className="text-[10px] md:text-xs font-bold uppercase text-[#8a9dae] group-hover:text-[#c8aa6e] transition-colors">
                       {champ.name}
                     </span>
                   </Link>
@@ -271,7 +274,7 @@ export default function Home() {
 
             {/* Other teammate pool for reference */}
             <div className="flex flex-col gap-3.5 mt-2">
-              <span className="text-xs uppercase font-black tracking-widest text-[#5e6b77] border-b border-[#eadecd] pb-2">
+              <span className="text-xs uppercase font-black tracking-widest text-[#8a9dae] border-b border-[#c8aa6e]/20 pb-2">
                 {userRole === "fer" ? "Soportes Asociados de Ralph" : "Tiradores Asociados de Fer"}
               </span>
               <div className="flex flex-wrap gap-3">
@@ -287,7 +290,7 @@ export default function Home() {
                       tier={champ.tier}
                       size="md"
                     />
-                    <span className="text-[10px] md:text-xs font-bold uppercase text-[#5e6b77]">
+                    <span className="text-[10px] md:text-xs font-bold uppercase text-[#8a9dae]">
                       {champ.name}
                     </span>
                   </Link>
@@ -296,7 +299,7 @@ export default function Home() {
             </div>
 
             {/* Micro banner directives */}
-            <div className="p-4 border border-[#c8aa6e]/20 bg-[#eadecd]/30 flex gap-3 rounded-sm text-xs md:text-sm text-[#785a28] items-start mt-3 leading-relaxed">
+            <div className="p-4 border border-[#c8aa6e]/30 bg-[#0a1428]/60 flex gap-3 rounded-sm text-xs md:text-sm text-[#c8aa6e] items-start mt-3 leading-relaxed">
               <Shield className="w-5 h-5 text-[#c8aa6e] shrink-0 mt-0.5" />
               <span>
                 {userRole === "fer"
@@ -306,6 +309,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );

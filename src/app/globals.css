@@ -4,28 +4,28 @@
 @theme {
   --font-serif: 'Cinzel', Georgia, serif;
   --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
-  --color-lol-bg: #f5f3e9;
-  --color-lol-panel: #fdfcf9;
-  --color-lol-panel-dark: #e8dcc4;
+  --color-lol-bg: #010a13;
+  --color-lol-panel: #091420;
+  --color-lol-panel-dark: #0a1428;
   --color-lol-gold: #c8aa6e;
   --color-lol-gold-dark: #785a28;
-  --color-lol-blue: #0a1428;
-  --color-lol-cyan: #0397ab;
+  --color-lol-blue: #091420;
+  --color-lol-cyan: #0097e6;
 }
 
 :root {
-  --background: #f5f3e9;   /* Cleaner sand parchment */
-  --panel: #fdfcf9;        /* Pure alabaster for high-contrast reading */
-  --panel-strong: #eadecd; /* Warm sand */
-  --border: #c8aa6e;       /* Hextech gold */
-  --border-dark: #785a28;  /* Deep bronze */
-  --text: #0b131a;         /* High-contrast charcoal */
-  --text-muted: #3a4754;   /* Very readable slate gray */
+  --background: #010a13;   /* Official LoL Client Dark Background */
+  --panel: #091420;        /* Official LoL Panel Dark Blue */
+  --panel-strong: #0a1428; /* Deep Hextech Navy */
+  --border: #c8aa6e;       /* Hextech Gold */
+  --border-dark: #785a28;  /* Deep Bronze/Brown */
+  --text: #f0e6d3;         /* Hextech Pale Gold Text */
+  --text-muted: #8a9dae;   /* LoL Slate / Blue-gray text */
   --gold: #c8aa6e;
-  --blue: #0a1428;         /* Deep LoL Navy */
-  --cyan: #0397ab;         /* Magic blue accent */
-  --red: #c63333;
-  --green: #23893e;
+  --blue: #0a1428;
+  --cyan: #0097e6;         /* Magic Hextech Blue */
+  --red: #ff4655;          /* Neon damage red */
+  --green: #00c8c8;        /* Neon active green */
 }
 
 * {
@@ -43,28 +43,32 @@ body {
   color: var(--text);
   background-color: var(--background);
   font-family: var(--font-sans);
+  /* Épicos gradientes mágicos Hextech en el fondo */
   background-image: 
-    radial-gradient(circle at 10% 0%, rgba(200, 170, 110, 0.08) 0%, transparent 40rem),
-    radial-gradient(circle at 90% 10%, rgba(3, 151, 171, 0.06) 0%, transparent 35rem);
+    radial-gradient(circle at 50% -20%, rgba(3, 151, 171, 0.15) 0%, transparent 55rem),
+    radial-gradient(circle at 10% 80%, rgba(200, 170, 110, 0.05) 0%, transparent 45rem),
+    radial-gradient(circle at 90% 80%, rgba(3, 151, 171, 0.05) 0%, transparent 45rem);
 }
 
-/* Scrollbar Customization */
+/* Scrollbar Customización Hextech */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--panel-strong);
+  background: #010a13;
+  border-left: 1px solid rgba(200, 170, 110, 0.1);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
+  background: var(--border-dark);
+  border: 1px solid var(--border);
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--border-dark);
+  background: var(--border);
 }
 
-/* Animations */
+/* Animaciones */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -72,23 +76,23 @@ body {
 
 @keyframes pulse-gold {
   0%, 100% { 
-    box-shadow: 0 0 6px rgba(200, 170, 110, 0.25); 
+    box-shadow: 0 0 8px rgba(200, 170, 110, 0.2), inset 0 0 4px rgba(200, 170, 110, 0.1); 
     border-color: rgba(200, 170, 110, 0.6);
   }
   50% { 
-    box-shadow: 0 0 22px rgba(200, 170, 110, 0.85), inset 0 0 10px rgba(200, 170, 110, 0.4); 
+    box-shadow: 0 0 24px rgba(200, 170, 110, 0.75), inset 0 0 12px rgba(200, 170, 110, 0.3); 
     border-color: rgba(200, 170, 110, 1);
   }
 }
 
 @keyframes pulse-cyan {
   0%, 100% { 
-    box-shadow: 0 0 6px rgba(3, 151, 171, 0.25); 
-    border-color: rgba(3, 151, 171, 0.6);
+    box-shadow: 0 0 8px rgba(0, 151, 230, 0.2), inset 0 0 4px rgba(0, 151, 230, 0.1); 
+    border-color: rgba(0, 151, 230, 0.6);
   }
   50% { 
-    box-shadow: 0 0 22px rgba(3, 151, 171, 0.85), inset 0 0 10px rgba(3, 151, 171, 0.4); 
-    border-color: rgba(3, 151, 171, 1);
+    box-shadow: 0 0 24px rgba(0, 151, 230, 0.75), inset 0 0 12px rgba(0, 151, 230, 0.3); 
+    border-color: rgba(0, 151, 230, 1);
   }
 }
 
@@ -112,34 +116,35 @@ body {
 .lol-panel {
   border-width: 1px;
   border-style: solid;
-  box-shadow: 0 4px 12px rgba(120, 90, 40, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   border-radius: 2px;
 }
 :where(.lol-panel) {
   background-color: var(--panel);
-  border-color: var(--border);
+  border-color: var(--border-dark);
 }
 
 .lol-panel-dark {
-  background: var(--blue);
-  border: 1px solid var(--border);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  background: #091420;
+  border: 1px solid var(--border-dark);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
   border-radius: 2px;
   color: #f0e6d3;
 }
 
 .lol-panel-interactive {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .lol-panel-interactive:hover {
-  transform: translateY(-2px);
-  border-color: var(--border-dark);
-  box-shadow: 0 8px 24px rgba(120, 90, 40, 0.15);
+  transform: translateY(-3px);
+  border-color: var(--border);
+  box-shadow: 0 12px 30px rgba(200, 170, 110, 0.12);
+  background-color: #0c1829;
 }
 
 .lol-border-fancy {
   position: relative;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-dark);
   padding: 8px;
   background: var(--panel);
 }
@@ -150,17 +155,17 @@ body {
   left: 2px;
   right: 2px;
   bottom: 2px;
-  border: 1px solid rgba(200, 170, 110, 0.4);
+  border: 1px solid rgba(200, 170, 110, 0.2);
   pointer-events: none;
 }
 
 .lol-card-active {
-  animation: pulse-gold 2s infinite ease-in-out;
+  animation: pulse-gold 2.2s infinite ease-in-out;
   border-color: var(--border);
 }
 
 .lol-slot-active {
-  animation: pulse-cyan 1.5s infinite ease-in-out;
+  animation: pulse-cyan 1.6s infinite ease-in-out;
   border-color: var(--cyan);
 }
 
@@ -168,41 +173,46 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #1e2830 0%, #0c1216 100%);
-  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #1e2830 0%, #0a1428 100%);
+  border: 1px solid var(--border-dark);
   color: var(--border);
-  padding: 0.5rem 1.25rem;
+  padding: 0.55rem 1.35rem;
   font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.075em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  transition: all 0.25s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 .lol-button:hover:not(:disabled) {
   background: linear-gradient(180deg, #c8aa6e 0%, #785a28 100%);
-  color: #0a1428;
+  color: #010a13;
   border-color: #f0e6d3;
-  box-shadow: 0 0 10px rgba(200, 170, 110, 0.4);
+  box-shadow: 0 0 16px rgba(200, 170, 110, 0.5);
+  transform: translateY(-1px);
 }
 .lol-button:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
-  border-color: var(--text-muted);
+  border-color: rgba(200, 170, 110, 0.1);
   color: var(--text-muted);
 }
 
 .lol-button-active {
   background: linear-gradient(180deg, #c8aa6e 0%, #785a28 100%);
-  color: #0a1428;
+  color: #010a13;
   border-color: #f0e6d3;
+  box-shadow: 0 0 12px rgba(200, 170, 110, 0.3);
 }
 
 .lol-title {
   font-family: 'Cinzel', Georgia, serif;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: var(--text);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .diagonal-shimmer {
@@ -219,7 +229,7 @@ body {
   background: linear-gradient(
     45deg,
     transparent 45%,
-    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.15) 50%,
     transparent 55%
   );
   transform: rotate(45deg);

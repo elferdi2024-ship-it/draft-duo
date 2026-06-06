@@ -83,21 +83,23 @@ export default function PersonalizedCoachNotes({
   return (
     <div className={`lol-panel p-4 border flex gap-3 text-xs items-start rounded-sm ${
       userRole === "fer" 
-        ? "bg-[#c8aa6e]/5 border-[#c8aa6e]/60 text-[#785a28]" 
-        : "bg-[#0397ab]/5 border-[#0397ab]/60 text-[#005a82]"
+        ? "bg-[#c8aa6e]/10 border-[#c8aa6e]/50 text-[#f0e6d3]" 
+        : "bg-[#0397ab]/10 border-[#0397ab]/50 text-[#f0e6d3]"
     }`}>
       <div className="shrink-0 mt-0.5">
         {userRole === "fer" ? (
           <Sword className="w-4 h-4 text-[#c8aa6e]" />
         ) : (
-          <Shield className="w-4 h-4 text-[#0397ab]" />
+          <Shield className="w-4 h-4 text-[#00c8c8]" />
         )}
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-[9px] uppercase tracking-wider font-extrabold font-sans">
+        <span className={`text-[9px] uppercase tracking-wider font-extrabold font-sans ${
+          userRole === "fer" ? "text-[#c8aa6e]" : "text-[#00c8c8]"
+        }`}>
           {userRole === "fer" ? "Directiva de Combate (Fer)" : "Directiva de Utilidad (Ralph)"}
         </span>
-        <p className="leading-relaxed font-semibold">
+        <p className="leading-relaxed font-medium">
           {notes}
         </p>
       </div>

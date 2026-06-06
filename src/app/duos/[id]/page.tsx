@@ -97,9 +97,9 @@ export default async function DuoDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-[#f3ebd7]/30 min-h-screen pb-12">
+    <div className="w-full flex flex-col gap-6 bg-[#010a13] min-h-screen pb-12 text-[#f0e6d3]">
       {/* Duo Header Banner */}
-      <div className="bg-[#0a1428] border-b border-[#c8aa6e] py-6 px-4 md:px-8">
+      <div className="bg-[#0a1428] border-b border-[#785a28]/60 py-6 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <Link
@@ -112,7 +112,7 @@ export default async function DuoDetailPage({ params }: PageProps) {
               <span className="bg-amber-500 text-[#0a1428] text-[9px] font-black uppercase px-2 py-0.5 rounded-sm">
                 Tier {duo.tier}
               </span>
-              <span className="bg-[#0397ab] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-sm">
+              <span className="bg-[#00c8c8]/10 text-[#00c8c8] text-[9px] font-black uppercase px-2 py-0.5 rounded-sm border border-[#00c8c8]/30">
                 BOTLANE DÚO
               </span>
             </div>
@@ -125,7 +125,7 @@ export default async function DuoDetailPage({ params }: PageProps) {
           </div>
 
           {/* Large Avatars Container */}
-          <div className="flex items-center gap-4 bg-[#1e232a]/60 border border-[#c8aa6e]/30 p-4 rounded shadow-md">
+          <div className="flex items-center gap-4 bg-[#1e232a]/60 border border-[#785a28]/40 p-4 rounded shadow-md">
             {adc && (
               <Link href={`/champions/${adc.id}`} className="flex flex-col items-center gap-1 group">
                 <ChampionAvatar ddragonKey={duo.adcDdragonKey} name={adc.name} tier={adc.tier} size="md" isComfort />
@@ -147,8 +147,8 @@ export default async function DuoDetailPage({ params }: PageProps) {
       <div className="w-full max-w-7xl mx-auto px-4 md:px-8 grid grid-cols-1 xl:grid-cols-12 gap-6 items-start mt-4">
         {/* Left Side: Strategic Info (xl:col-span-4) */}
         <div className="xl:col-span-4 flex flex-col gap-4">
-          <div className="lol-panel p-5 bg-[#fcf9f2] border border-[#c8aa6e] flex flex-col gap-4">
-            <div className="flex items-center gap-2 border-b border-[#eadecd] pb-2 text-[#785a28]">
+          <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60 flex flex-col gap-4">
+            <div className="flex items-center gap-2 border-b border-[#785a28]/40 pb-2 text-[#c8aa6e]">
               <Star className="w-4 h-4" />
               <h3 className="lol-title font-bold text-xs uppercase tracking-wider">
                 Resumen de Sinergia
@@ -158,51 +158,51 @@ export default async function DuoDetailPage({ params }: PageProps) {
             <div className="flex flex-col gap-3.5 text-xs">
               {/* Identity */}
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#785a28]">
+                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#c8aa6e]">
                   Filosofía Clave
                 </span>
-                <p className="text-[#0f1923] leading-relaxed italic">
+                <p className="text-[#8a9dae] leading-relaxed italic font-medium">
                   "{duo.philosophy}"
                 </p>
               </div>
 
               {/* Execution */}
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#785a28]">
+                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#c8aa6e]">
                   Directiva de Ejecución
                 </span>
-                <p className="text-[#0f1923] leading-relaxed">
+                <p className="text-[#8a9dae] leading-relaxed">
                   {duo.execution}
                 </p>
               </div>
 
               {/* Win Condition */}
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#785a28]">
+                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#c8aa6e]">
                   Condición de Victoria Bot
                 </span>
-                <p className="text-[#0f1923] leading-relaxed">
+                <p className="text-[#8a9dae] leading-relaxed">
                   {duo.winCondition}
                 </p>
               </div>
 
               {/* Spikes list */}
               <div className="flex flex-col gap-1">
-                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#785a28]">
+                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#c8aa6e]">
                   Power Spikes del Combo
                 </span>
-                <div className="flex flex-col gap-1 mt-1 pl-1">
+                <div className="flex flex-col gap-1.5 mt-1 pl-1">
                   {duo.powerSpikes.map((spike, idx) => (
-                    <span key={idx} className="text-[#5e6b77]">• {spike}</span>
+                    <span key={idx} className="text-[#8a9dae]">• {spike}</span>
                   ))}
                 </div>
               </div>
             </div>
 
             {/* Tags display */}
-            <div className="flex flex-wrap gap-1 mt-2 border-t border-[#eadecd] pt-3">
+            <div className="flex flex-wrap gap-1 mt-2 border-t border-[#785a28]/40 pt-3">
               {duo.tags.map((tag) => (
-                <span key={tag} className="text-[8px] font-semibold uppercase text-[#5e6b77] bg-[#eadecd]/60 border border-[#d8ccb4]/40 px-1.5 py-0.5 rounded-sm">
+                <span key={tag} className="text-[8px] font-semibold uppercase text-[#8a9dae] bg-[#1e232a] border border-[#785a28]/30 px-1.5 py-0.5 rounded-sm">
                   {tag}
                 </span>
               ))}
@@ -212,12 +212,12 @@ export default async function DuoDetailPage({ params }: PageProps) {
 
         {/* Right Side: Timeline Checklist (xl:col-span-8) */}
         <div className="xl:col-span-8 flex flex-col gap-4">
-          <div className="border-b border-[#c8aa6e]/40 pb-1.5 flex items-center justify-between">
-            <h2 className="lol-title font-bold text-base text-[#0f1923] tracking-widest uppercase flex items-center gap-1.5">
+          <div className="border-b border-[#785a28]/40 pb-1.5 flex items-center justify-between">
+            <h2 className="lol-title font-bold text-base text-[#f0e6d3] tracking-widest uppercase flex items-center gap-1.5">
               <Compass className="w-5 h-5 text-[#c8aa6e]" />
               Guía de Setup por Minuto
             </h2>
-            <span className="text-[9px] uppercase font-extrabold text-[#785a28] bg-[#c8aa6e]/10 border border-[#c8aa6e]/30 px-2 py-0.5 rounded-sm">
+            <span className="text-[9px] uppercase font-extrabold text-[#c8aa6e] bg-[#c8aa6e]/10 border border-[#785a28]/40 px-2 py-0.5 rounded-sm">
               Checklist Interactivo
             </span>
           </div>

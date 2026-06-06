@@ -36,14 +36,14 @@ export default async function ChampionDetailPage({ params }: PageProps) {
   };
 
   return (
-    <div className="w-full flex flex-col gap-6 bg-[#f3ebd7]/30 min-h-screen pb-12">
+    <div className="w-full flex flex-col gap-6 bg-[#010a13] min-h-screen pb-12 text-[#f0e6d3]">
       {/* High-res Splash Header */}
       <SplashHero ddragonKey={champion.ddragonKey} name={champion.name}>
         <div className="flex items-center gap-2 mb-2">
           <span className="bg-amber-500 text-[#0a1428] text-[9px] font-black uppercase px-2 py-0.5 rounded-sm">
             Tier {champion.tier}
           </span>
-          <span className="bg-[#0397ab] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-sm">
+          <span className="bg-[#0097e6] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-sm border border-[#0097e6]/30">
             {getStatusLabel(champion.learningStatus)}
           </span>
         </div>
@@ -62,40 +62,40 @@ export default async function ChampionDetailPage({ params }: PageProps) {
         {/* Strategic Card Row */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Filosofía */}
-          <div className="lol-panel p-5 bg-[#fcf9f2] border border-[#c8aa6e]">
-            <div className="flex items-center gap-2 mb-3 border-b border-[#eadecd] pb-2 text-[#785a28]">
+          <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60">
+            <div className="flex items-center gap-2 mb-3 border-b border-[#785a28]/40 pb-2 text-[#c8aa6e]">
               <Heart className="w-4 h-4" />
               <h3 className="lol-title font-bold text-xs uppercase tracking-wider">
                 Filosofía Estratégica
               </h3>
             </div>
-            <p className="text-xs text-[#0f1923] leading-relaxed italic">
+            <p className="text-xs text-[#8a9dae] leading-relaxed italic">
               "{champion.philosophy}"
             </p>
           </div>
 
           {/* Cuándo elegir */}
-          <div className="lol-panel p-5 bg-[#fcf9f2] border border-[#c8aa6e]">
-            <div className="flex items-center gap-2 mb-3 border-b border-[#eadecd] pb-2 text-[#785a28]">
+          <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60">
+            <div className="flex items-center gap-2 mb-3 border-b border-[#785a28]/40 pb-2 text-[#c8aa6e]">
               <Flame className="w-4 h-4" />
               <h3 className="lol-title font-bold text-xs uppercase tracking-wider">
                 Cuándo Pickear
               </h3>
             </div>
-            <p className="text-xs text-[#0f1923] leading-relaxed">
+            <p className="text-xs text-[#8a9dae] leading-relaxed">
               {champion.pickWhen}
             </p>
           </div>
 
           {/* Win Condition */}
-          <div className="lol-panel p-5 bg-[#fcf9f2] border border-[#c8aa6e]">
-            <div className="flex items-center gap-2 mb-3 border-b border-[#eadecd] pb-2 text-[#785a28]">
+          <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60">
+            <div className="flex items-center gap-2 mb-3 border-b border-[#785a28]/40 pb-2 text-[#c8aa6e]">
               <CheckCircle className="w-4 h-4" />
               <h3 className="lol-title font-bold text-xs uppercase tracking-wider">
                 Condición de Victoria
               </h3>
             </div>
-            <p className="text-xs text-[#0f1923] leading-relaxed">
+            <p className="text-xs text-[#8a9dae] leading-relaxed">
               {champion.winCondition}
             </p>
           </div>
@@ -104,8 +104,8 @@ export default async function ChampionDetailPage({ params }: PageProps) {
         {/* Spikes & Matchups & Synergies Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Spikes and timelines */}
-          <div className="lol-panel p-5 bg-[#fcf9f2] border border-[#c8aa6e] flex flex-col gap-4">
-            <div className="flex items-center gap-2 border-b border-[#eadecd] pb-2 text-[#785a28]">
+          <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60 flex flex-col gap-4">
+            <div className="flex items-center gap-2 border-b border-[#785a28]/40 pb-2 text-[#c8aa6e]">
               <Clock className="w-4 h-4" />
               <h3 className="lol-title font-bold text-xs uppercase tracking-wider">
                 Picos de Poder (Power Spikes)
@@ -113,19 +113,19 @@ export default async function ChampionDetailPage({ params }: PageProps) {
             </div>
             <div className="flex flex-col gap-2">
               {champion.powerSpikes?.map((spike, idx) => (
-                <div key={idx} className="flex gap-2 text-xs items-start bg-[#fdfbf7] border border-[#eadecd] p-2.5 rounded-sm">
-                  <span className="w-4 h-4 rounded-full bg-[#0a1428] text-[#c8aa6e] flex items-center justify-center font-bold text-[9px] shrink-0 mt-0.5">
+                <div key={idx} className="flex gap-2.5 text-xs items-start bg-[#0a1428] border border-[#785a28]/40 p-2.5 rounded-sm">
+                  <span className="w-4 h-4 rounded-full bg-[#c8aa6e] text-[#0a1428] flex items-center justify-center font-bold text-[9px] shrink-0 mt-0.5 shadow-sm">
                     {idx + 1}
                   </span>
-                  <span className="text-[#0f1923] leading-relaxed">{spike}</span>
+                  <span className="text-[#f0e6d3] leading-relaxed">{spike}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Sinergias & Counters */}
-          <div className="lol-panel p-5 bg-[#fcf9f2] border border-[#c8aa6e] flex flex-col gap-4">
-            <div className="flex items-center gap-2 border-b border-[#eadecd] pb-2 text-[#785a28]">
+          <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60 flex flex-col gap-4">
+            <div className="flex items-center gap-2 border-b border-[#785a28]/40 pb-2 text-[#c8aa6e]">
               <Award className="w-4 h-4" />
               <h3 className="lol-title font-bold text-xs uppercase tracking-wider">
                 Aliados & Amenazas
@@ -135,12 +135,12 @@ export default async function ChampionDetailPage({ params }: PageProps) {
             <div className="flex flex-col gap-4">
               {/* Sinergias */}
               <div className="flex flex-col gap-1.5">
-                <span className="text-[9px] uppercase font-extrabold tracking-wider text-emerald-800 bg-emerald-500/10 px-2 py-0.5 self-start rounded-sm">
+                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#00c8c8] bg-[#00c8c8]/10 border border-[#00c8c8]/20 px-2 py-0.5 self-start rounded-sm">
                   Sinergias Máximas (Botlane)
                 </span>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {champion.synergies?.map((syn) => (
-                    <span key={syn} className="bg-[#fdfbf7] border border-[#d8ccb4] text-[#0f1923] px-3 py-1 rounded text-xs font-semibold">
+                    <span key={syn} className="bg-[#0a1428] border border-[#785a28]/40 text-[#f0e6d3] px-3 py-1 rounded text-xs font-semibold">
                       {syn}
                     </span>
                   ))}
@@ -149,18 +149,18 @@ export default async function ChampionDetailPage({ params }: PageProps) {
 
               {/* Counters / Amenazas */}
               <div className="flex flex-col gap-1.5">
-                <span className="text-[9px] uppercase font-extrabold tracking-wider text-rose-800 bg-rose-500/10 px-2 py-0.5 self-start rounded-sm">
+                <span className="text-[9px] uppercase font-extrabold tracking-wider text-[#ff4655] bg-[#ff4655]/10 border border-[#ff4655]/20 px-2 py-0.5 self-start rounded-sm">
                   Amenazas Directas (Evitar o Banear)
                 </span>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {champion.counters && champion.counters.length > 0 ? (
                     champion.counters.map((count) => (
-                      <span key={count} className="bg-red-950/5 border border-red-800/30 text-[#c63333] px-3 py-1 rounded text-xs font-semibold">
+                      <span key={count} className="bg-red-950/20 border border-red-500/30 text-[#ff4655] px-3 py-1 rounded text-xs font-semibold">
                         {count}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-[#5e6b77] italic pl-1">
+                    <span className="text-xs text-[#8a9dae] italic pl-1">
                       Ningún counter crítico listado. Pick de alta estabilidad.
                     </span>
                   )}
@@ -172,21 +172,21 @@ export default async function ChampionDetailPage({ params }: PageProps) {
 
         {/* builds and gear */}
         <div className="flex flex-col gap-4">
-          <div className="border-b border-[#c8aa6e]/40 pb-1.5">
-            <h2 className="lol-title font-bold text-base text-[#0f1923] tracking-widest uppercase">
+          <div className="border-b border-[#785a28]/40 pb-1.5">
+            <h2 className="lol-title font-bold text-base text-[#c8aa6e] tracking-widest uppercase">
               Rutas de Objetos & Runas
             </h2>
           </div>
 
           <div className="flex flex-col gap-8">
             {champBuilds.length === 0 ? (
-              <div className="lol-panel p-6 text-center text-xs text-[#5e6b77] bg-[#fcf9f2]">
+              <div className="lol-panel p-6 text-center text-xs text-[#8a9dae] bg-[#091420] border border-[#785a28]/40">
                 No hay builds registradas para este campeón.
               </div>
             ) : (
               champBuilds.map((build, idx) => (
                 <div key={idx} className="flex flex-col gap-3">
-                  <div className="bg-[#0a1428] border-l-4 border-[#c8aa6e] py-2 px-4">
+                  <div className="bg-[#0a1428] border-l-4 border-[#c8aa6e] py-2 px-4 border border-[#785a28]/25 rounded-sm">
                     <span className="font-serif font-black text-[#f0e6d3] text-sm uppercase tracking-wider">
                       {build.title}
                     </span>

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { ChampionData } from "@/lib/types";
 import { getChampionSplashUrl } from "@/lib/ddragon";
-import { User, ShieldAlert } from "lucide-react";
+import { User } from "lucide-react";
 import { useDraftStore } from "@/store/draft-store";
 
 interface PickSlotProps {
@@ -37,10 +37,10 @@ export default function PickSlot({
     <div
       className={`relative w-full h-[110px] md:h-[136px] border transition-all duration-300 overflow-hidden flex items-center ${
         isActive
-          ? "lol-slot-active bg-[#0a1428]/45 border-[#0397ab]"
+          ? "lol-slot-active bg-[#0a1428]/60 border-[#00c8c8] shadow-[0_0_16px_rgba(0,200,200,0.2)]"
           : isOurs
-          ? "border-[#c8aa6e] bg-[#fdfcf9] shadow-[inset_0_0_15px_rgba(200,170,110,0.15)] hover:shadow-[0_0_15px_rgba(200,170,110,0.25)]"
-          : "border-[#d8ccb4] bg-[#eadecd]/60"
+          ? "border-[#c8aa6e]/60 bg-[#091420]/70 shadow-[inset_0_0_20px_rgba(200,170,110,0.15)] hover:shadow-[inset_0_0_20px_rgba(200,170,110,0.25)] hover:border-[#c8aa6e]"
+          : "border-[#785a28]/30 bg-[#1e232a]/30"
       }`}
     >
       {/* Background Splash Art */}
@@ -57,8 +57,8 @@ export default function PickSlot({
           <div
             className={`absolute inset-0 bg-gradient-to-r z-10 ${
               team === "blue"
-                ? "from-[#0a1428]/90 via-[#0a1428]/45 to-transparent"
-                : "from-transparent via-[#0a1428]/45 to-[#0a1428]/90 flex-row-reverse"
+                ? "from-[#010a13]/95 via-[#010a13]/60 to-transparent"
+                : "from-transparent via-[#010a13]/60 to-[#010a13]/95 flex-row-reverse"
             }`}
           />
         </div>
@@ -72,7 +72,7 @@ export default function PickSlot({
       >
         {/* Champion Name & Role */}
         <div className="flex flex-col justify-center gap-1">
-          <span className="text-xs md:text-sm uppercase font-extrabold tracking-widest text-[#785a28]">
+          <span className="text-xs md:text-sm uppercase font-extrabold tracking-widest text-[#c8aa6e]">
             {roleLabel}
           </span>
           {champion ? (
@@ -80,7 +80,7 @@ export default function PickSlot({
               {champion.name}
             </span>
           ) : (
-            <span className="font-sans font-extrabold text-xs md:text-sm tracking-widest text-[#785a28]/60 uppercase animate-pulse">
+            <span className="font-sans font-extrabold text-xs md:text-sm tracking-widest text-[#8a9dae]/50 uppercase animate-pulse">
               Seleccionando
             </span>
           )}
@@ -91,8 +91,8 @@ export default function PickSlot({
           <div
             className={`flex items-center gap-2 px-3.5 py-1.5 md:px-5 md:py-2.5 rounded border text-[10px] md:text-xs font-black tracking-widest uppercase ${
               champion
-                ? "bg-[#c8aa6e]/95 text-[#0a1428] border-[#f0e6d3] shadow-sm"
-                : "bg-transparent text-[#785a28] border-[#c8aa6e]"
+                ? "bg-[#c8aa6e] text-[#010a13] border-[#f0e6d3] shadow-md font-bold"
+                : "bg-transparent text-[#c8aa6e] border-[#c8aa6e]/40"
             }`}
           >
             <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -108,7 +108,7 @@ export default function PickSlot({
 
         {/* Active picking glow label */}
         {isActive && !champion && (
-          <span className="text-xs md:text-sm uppercase tracking-widest font-black text-[#0397ab] animate-pulse">
+          <span className="text-xs md:text-sm uppercase tracking-widest font-black text-[#00c8c8] animate-pulse">
             ELEGIR
           </span>
         )}
@@ -116,7 +116,7 @@ export default function PickSlot({
 
       {/* Gold inner trim for our slot */}
       {isOurs && (
-        <div className="absolute inset-0.5 border border-[#c8aa6e]/30 pointer-events-none z-30" />
+        <div className="absolute inset-0.5 border border-[#c8aa6e]/25 pointer-events-none z-30" />
       )}
     </div>
   );

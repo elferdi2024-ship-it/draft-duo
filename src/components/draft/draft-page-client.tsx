@@ -11,13 +11,13 @@ export default function DraftPageClient() {
   return (
     <div className="flex flex-col gap-5">
       {/* Mobile Tab Switcher */}
-      <div className="flex xl:hidden border border-[#c8aa6e] bg-[#fdfcf9] rounded p-1 gap-1 shadow-sm">
+      <div className="flex xl:hidden border border-[#785a28] bg-[#091420] rounded p-1 gap-1 shadow-sm">
         <button
           onClick={() => setActiveTab("draft")}
           className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
             activeTab === "draft"
-              ? "bg-[#0a1428] text-[#f0e6d3] border border-[#f0e6d3]/20 shadow-sm"
-              : "text-[#785a28] hover:bg-[#eadecd]/30"
+              ? "bg-[#0a1428] text-[#f0e6d3] border border-[#c8aa6e]/30 shadow-sm"
+              : "text-[#8a9dae] hover:bg-[#1e232a]/50"
           }`}
         >
           🎮 Simulador
@@ -26,8 +26,8 @@ export default function DraftPageClient() {
           onClick={() => setActiveTab("brain")}
           className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
             activeTab === "brain"
-              ? "bg-[#0a1428] text-[#f0e6d3] border border-[#f0e6d3]/20 shadow-sm"
-              : "text-[#785a28] hover:bg-[#eadecd]/30"
+              ? "bg-[#0a1428] text-[#f0e6d3] border border-[#c8aa6e]/30 shadow-sm"
+              : "text-[#8a9dae] hover:bg-[#1e232a]/50"
           }`}
         >
           🧠 Asistente AI

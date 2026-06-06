@@ -34,7 +34,7 @@ export default function DraftBoard() {
 
   const [version, setVersion] = useState("15.11.1");
   const [selectedSide, setSelectedSide] = useState<"blue" | "red">("blue");
-  const [selectedSlots, setSelectedSlots] = useState<number[]>([3, 4]); // Por defecto Picks 4 y 5 (índices 3 y 4)
+  const [selectedSlots, setSelectedSlots] = useState<number[]>([3, 4]); // Picks 4 y 5
   const [mobileSubTab, setMobileSubTab] = useState<"picks" | "grid">("grid");
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function DraftBoard() {
       if (prev.length < 2) {
         return [...prev, slotIndex].sort((a, b) => a - b);
       }
-      // Si ya hay 2, sacamos el primero seleccionado y agregamos el nuevo, luego ordenamos
+      // Si ya hay 2, sacamos el primero seleccionado y agregamos el nuevo
       return [prev[1], slotIndex].sort((a, b) => a - b);
     });
   };
@@ -83,13 +83,13 @@ export default function DraftBoard() {
   // If side is null, show setup/configuration screen
   if (side === null) {
     return (
-      <div className="lol-panel max-w-2xl mx-auto p-6 md:p-8 bg-[#fcf9f2] border border-[#c8aa6e]">
+      <div className="lol-panel max-w-2xl mx-auto p-6 md:p-8 bg-[#091420] border border-[#785a28] text-[#f0e6d3] shadow-2xl">
         <div className="text-center mb-8">
           <Trophy className="w-12 h-12 text-[#c8aa6e] mx-auto mb-2 animate-bounce" />
-          <h2 className="lol-title text-2xl font-serif text-[#0f1923] tracking-widest uppercase">
+          <h2 className="lol-title text-2xl font-serif text-[#f0e6d3] tracking-widest uppercase">
             Iniciar Live Draft
           </h2>
-          <p className="text-xs text-[#5e6b77] uppercase font-bold tracking-wider mt-1">
+          <p className="text-xs text-[#8a9dae] uppercase font-bold tracking-wider mt-1.5">
             Configura el lado y turnos de selección para tu duo
           </p>
         </div>
@@ -97,33 +97,33 @@ export default function DraftBoard() {
         <div className="flex flex-col gap-6">
           {/* Lado selector */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase font-extrabold tracking-wider text-[#785a28]">
+            <label className="text-xs uppercase font-extrabold tracking-wider text-[#c8aa6e]">
               1. Selecciona tu Lado del Draft
             </label>
             <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => setSelectedSide("blue")}
-                className={`py-6 border rounded font-serif font-black uppercase text-sm md:text-base tracking-widest transition-all ${
+                className={`py-6 border rounded font-serif font-black uppercase text-sm md:text-base tracking-widest transition-all cursor-pointer ${
                   selectedSide === "blue"
-                    ? "bg-[#0397ab]/10 border-[#0397ab] text-[#0397ab]"
-                    : "bg-[#eadecd]/60 border-[#d8ccb4] text-[#5e6b77] hover:bg-[#e7dbbf]"
+                    ? "bg-[#00c8c8]/10 border-[#00c8c8] text-[#00c8c8] shadow-[0_0_12px_rgba(0,200,200,0.15)]"
+                    : "bg-[#1e232a]/40 border-[#785a28]/30 text-[#8a9dae] hover:bg-[#1e232a]"
                 }`}
               >
                 Lado Azul (Blue Side)
-                <span className="block text-[9px] uppercase tracking-normal font-sans font-bold text-[#5e6b77] mt-1">
+                <span className="block text-[9px] uppercase tracking-normal font-sans font-bold text-[#8a9dae] mt-1">
                   Tiene primer pick
                 </span>
               </button>
               <button
                 onClick={() => setSelectedSide("red")}
-                className={`py-6 border rounded font-serif font-black uppercase text-sm md:text-base tracking-widest transition-all ${
+                className={`py-6 border rounded font-serif font-black uppercase text-sm md:text-base tracking-widest transition-all cursor-pointer ${
                   selectedSide === "red"
-                    ? "bg-rose-500/10 border-rose-500 text-rose-600"
-                    : "bg-[#eadecd]/60 border-[#d8ccb4] text-[#5e6b77] hover:bg-[#e7dbbf]"
+                    ? "bg-[#ff4655]/10 border-[#ff4655] text-[#ff4655] shadow-[0_0_12px_rgba(255,70,85,0.15)]"
+                    : "bg-[#1e232a]/40 border-[#785a28]/30 text-[#8a9dae] hover:bg-[#1e232a]"
                 }`}
               >
                 Lado Rojo (Red Side)
-                <span className="block text-[9px] uppercase tracking-normal font-sans font-bold text-[#5e6b77] mt-1">
+                <span className="block text-[9px] uppercase tracking-normal font-sans font-bold text-[#8a9dae] mt-1">
                   Tiene counterpick final
                 </span>
               </button>
@@ -132,7 +132,7 @@ export default function DraftBoard() {
 
           {/* Posiciones de Pick selector */}
           <div className="flex flex-col gap-2">
-            <label className="text-xs uppercase font-extrabold tracking-wider text-[#785a28]">
+            <label className="text-xs uppercase font-extrabold tracking-wider text-[#c8aa6e]">
               2. Tus Posiciones de Pick (Selecciona exactamente 2)
             </label>
             <div className="grid grid-cols-5 gap-2">
@@ -154,10 +154,10 @@ export default function DraftBoard() {
                   <button
                     key={opt.label}
                     onClick={() => handleSlotClick(opt.index)}
-                    className={`py-3.5 border rounded text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 ${
+                    className={`py-3.5 border rounded text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
                       isSelected
                         ? "bg-[#0a1428] border-[#c8aa6e] text-[#f0e6d3] shadow-md scale-[1.02]"
-                        : "bg-[#eadecd]/60 border-[#d8ccb4] text-[#785a28] hover:bg-[#e7dbbf]"
+                        : "bg-[#1e232a]/60 border-[#785a28]/30 text-[#8a9dae] hover:bg-[#1e232a]"
                     }`}
                   >
                     <span>{opt.label}</span>
@@ -170,7 +170,7 @@ export default function DraftBoard() {
                 );
               })}
             </div>
-            <p className="text-[10px] text-[#5e6b77] italic mt-1 leading-normal">
+            <p className="text-[10px] text-[#8a9dae] italic mt-1.5 leading-normal">
               Selecciona dos picks del 1 al 5 en el orden en que los harás en la sala. El de menor número será tu ADC y el mayor tu Soporte.
             </p>
           </div>
@@ -178,7 +178,7 @@ export default function DraftBoard() {
           <button
             onClick={handleStartDraft}
             disabled={selectedSlots.length !== 2}
-            className="w-full py-3.5 mt-4 lol-button lol-button-active font-serif text-sm tracking-widest uppercase transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            className="w-full py-4 mt-4 lol-button lol-button-active font-serif text-sm tracking-widest uppercase transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             Iniciar Simulación
           </button>
@@ -191,12 +191,12 @@ export default function DraftBoard() {
   const step = currentStepIndex < DRAFT_ORDER.length ? DRAFT_ORDER[currentStepIndex] : null;
 
   return (
-    <div className="flex flex-col gap-5 md:gap-6 w-full h-full">
+    <div className="flex flex-col gap-5 md:gap-6 w-full h-full text-[#f0e6d3]">
       {/* Draft Header: Ban display */}
-      <div className="lol-panel p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-5 bg-[#fdfcf9]">
+      <div className="lol-panel p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-5 bg-[#091420] border border-[#785a28]/60 shadow-xl">
         {/* Blue Bans (5 slots) */}
-        <div className="flex items-center gap-3.5 flex-1">
-          <span className="text-xs md:text-sm uppercase font-extrabold text-[#0397ab] tracking-widest w-20 shrink-0">
+        <div className="flex items-center gap-3.5 flex-1 w-full justify-between md:justify-start">
+          <span className="text-xs md:text-sm uppercase font-extrabold text-[#00c8c8] tracking-widest w-20 shrink-0">
             Bans Azul
           </span>
           <div className="flex gap-1.5">
@@ -208,8 +208,10 @@ export default function DraftBoard() {
                 <button
                   key={index}
                   onClick={() => setSelectedBanSlot({ team: "blue", index })}
-                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
-                    isSelected ? "lol-slot-active border-[#0397ab] ring-2 ring-[#0397ab]/40 animate-pulse" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
+                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] border rounded bg-[#1e232a]/60 relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
+                    isSelected 
+                      ? "lol-slot-active border-[#00c8c8] ring-2 ring-[#00c8c8]/40 animate-pulse" 
+                      : "border-[#785a28]/40 hover:border-[#c8aa6e]"
                   }`}
                   title="Haz clic para seleccionar o cambiar este ban"
                 >
@@ -222,7 +224,7 @@ export default function DraftBoard() {
                       sizes="50px"
                     />
                   ) : (
-                    <span className="text-xs md:text-sm text-[#785a28] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm text-[#c8aa6e] font-bold">{index + 1}</span>
                   )}
                 </button>
               );
@@ -251,7 +253,7 @@ export default function DraftBoard() {
         </div>
 
         {/* Red Bans (5 slots) */}
-        <div className="flex items-center gap-3.5 flex-1 justify-end">
+        <div className="flex items-center gap-3.5 flex-1 w-full justify-between md:justify-end">
           <div className="flex gap-1.5">
             {redBans.map((id, index) => {
               const champ = getChampionById(id);
@@ -261,8 +263,10 @@ export default function DraftBoard() {
                 <button
                   key={index}
                   onClick={() => setSelectedBanSlot({ team: "red", index })}
-                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] border rounded bg-[#eadecd] relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
-                    isSelected ? "lol-slot-active border-[#0397ab] ring-2 ring-[#0397ab]/40 animate-pulse" : "border-[#d8ccb4] hover:border-[#c8aa6e]"
+                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] border rounded bg-[#1e232a]/60 relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
+                    isSelected 
+                      ? "lol-slot-active border-[#00c8c8] ring-2 ring-[#00c8c8]/40 animate-pulse" 
+                      : "border-[#785a28]/40 hover:border-[#c8aa6e]"
                   }`}
                   title="Haz clic para seleccionar o cambiar este ban"
                 >
@@ -275,39 +279,39 @@ export default function DraftBoard() {
                       sizes="50px"
                     />
                   ) : (
-                    <span className="text-xs md:text-sm text-[#785a28] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm text-[#c8aa6e] font-bold">{index + 1}</span>
                   )}
                 </button>
               );
             })}
           </div>
-          <span className="text-xs md:text-sm uppercase font-extrabold text-rose-600 tracking-widest w-20 text-right shrink-0">
+          <span className="text-xs md:text-sm uppercase font-extrabold text-[#ff4655] tracking-widest w-20 text-right shrink-0">
             Bans Rojo
           </span>
         </div>
       </div>
 
       {/* Ban Instructions & AutoFill */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#eadecd]/30 border border-[#c8aa6e]/30 px-5 py-2.5 rounded-sm">
-        <span className="text-xs text-[#785a28] font-bold leading-normal text-center sm:text-left">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#0a1428]/60 border border-[#c8aa6e]/30 px-5 py-3 rounded-sm">
+        <span className="text-xs text-[#c8aa6e] font-bold leading-normal text-center sm:text-left">
           💡 <span className="underline">Bans Simultáneos</span>: Haz clic en cualquiera de las 10 ranuras numeradas arriba, luego selecciona un campeón del grid para banearlo.
         </span>
         <button
           onClick={autoFillBans}
-          className="px-4 py-2 border border-[#c8aa6e] bg-[#0a1428] text-[#f0e6d3] hover:bg-[#c8aa6e] hover:text-[#0a1428] text-xs font-black uppercase tracking-widest transition-all rounded shadow-sm shrink-0 cursor-pointer"
+          className="px-4 py-2 border border-[#c8aa6e] bg-[#0a1428] text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#010a13] text-xs font-black uppercase tracking-widest transition-all rounded shadow-sm shrink-0 cursor-pointer"
         >
           Auto-rellenar Bans de Confort
         </button>
       </div>
 
       {/* Mobile Sub-Tab Switcher */}
-      <div className="flex lg:hidden border border-[#c8aa6e] bg-[#fdfcf9] rounded p-1.5 gap-1 shadow-sm mt-1">
+      <div className="flex lg:hidden border border-[#c8aa6e]/30 bg-[#0a1428]/80 rounded p-1.5 gap-1 shadow-sm mt-1">
         <button
           onClick={() => setMobileSubTab("grid")}
           className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
             mobileSubTab === "grid"
-              ? "bg-[#0a1428] text-[#f0e6d3] shadow-sm"
-              : "text-[#785a28] hover:bg-[#eadecd]/30"
+              ? "bg-[#c8aa6e] text-[#010a13] shadow-sm font-bold"
+              : "text-[#8a9dae] hover:bg-[#1e232a]/50"
           }`}
         >
           🔍 Selección (Grid)
@@ -316,8 +320,8 @@ export default function DraftBoard() {
           onClick={() => setMobileSubTab("picks")}
           className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
             mobileSubTab === "picks"
-              ? "bg-[#0a1428] text-[#f0e6d3] shadow-sm"
-              : "text-[#785a28] hover:bg-[#eadecd]/30"
+              ? "bg-[#c8aa6e] text-[#010a13] shadow-sm font-bold"
+              : "text-[#8a9dae] hover:bg-[#1e232a]/50"
           }`}
         >
           ⚔️ Ver Picks (Bot)
@@ -334,7 +338,7 @@ export default function DraftBoard() {
             ? "col-span-1 lg:col-span-3 flex flex-col gap-4" 
             : "hidden lg:flex lg:col-span-3 flex-col gap-4"
         }>
-          <div className="bg-[#0397ab]/10 border border-[#0397ab]/30 text-[#005a82] text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
+          <div className="bg-[#00c8c8]/10 border border-[#00c8c8]/30 text-[#00c8c8] text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
             Equipo Azul
           </div>
           {bluePicks.map((id, index) => {
@@ -376,7 +380,7 @@ export default function DraftBoard() {
             ? "col-span-1 lg:col-span-3 flex flex-col gap-4" 
             : "hidden lg:flex lg:col-span-3 flex-col gap-4"
         }>
-          <div className="bg-rose-500/10 border border-rose-500/30 text-rose-800 text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
+          <div className="bg-[#ff4655]/10 border border-[#ff4655]/30 text-[#ff4655] text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
             Equipo Rojo
           </div>
           {redPicks.map((id, index) => {

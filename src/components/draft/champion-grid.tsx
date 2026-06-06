@@ -76,19 +76,19 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
     });
 
   return (
-    <div className="v-stack gap-5 bg-[#fcf9f2] border border-[#c8aa6e] p-6 shadow-md w-full h-full flex-1">
+    <div className="v-stack gap-5 bg-[#091420] border border-[#785a28] p-6 shadow-md w-full h-full flex-1">
       {/* Header filters */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Search Input */}
         <div className="relative w-full md:w-72 min-w-[220px]">
-          <Search className="absolute left-3 top-3 w-4 h-4 text-[#785a28]" />
+          <Search className="absolute left-3 top-3 w-4 h-4 text-[#8a9dae]/70" />
           <input
             type="text"
             placeholder="Buscar campeón..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             disabled={disabled}
-            className="w-full bg-[#f3ebd7] border border-[#c8aa6e] rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#0f1923] placeholder-[#785a28]/60 focus:outline-none focus:ring-1 focus:ring-[#0397ab] focus:border-[#0397ab]"
+            className="w-full bg-[#0a1428] border border-[#785a28]/60 rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#f0e6d3] placeholder-[#8a9dae]/50 focus:outline-none focus:ring-1 focus:ring-[#00c8c8] focus:border-[#00c8c8]"
           />
         </div>
 
@@ -100,10 +100,10 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
               key={role.value}
               onClick={() => setRoleFilter(role.value)}
               disabled={disabled}
-              className={`px-4 py-2 rounded text-xs md:text-sm font-extrabold uppercase tracking-wider transition-all duration-200 ${
+              className={`px-4 py-2 rounded text-xs md:text-sm font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                 activeRoleFilter === role.value
-                  ? "bg-[#0a1428] text-[#f0e6d3] border border-[#0a1428]"
-                  : "bg-[#eadecd] text-[#785a28] border border-[#d8ccb4] hover:bg-[#e7dbbf]"
+                  ? "bg-[#c8aa6e] text-[#0a1428] border border-[#f0e6d3]"
+                  : "bg-[#1e232a] text-[#8a9dae] border border-[#785a28]/40 hover:bg-[#0a1428]"
               }`}
             >
               {role.label}
@@ -113,9 +113,9 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
       </div>
 
       {/* Grid Container */}
-      <div className="flex-1 overflow-y-auto max-h-[480px] md:max-h-[710px] border border-[#eadecd] bg-[#fdfbf7] p-2.5">
+      <div className="flex-1 overflow-y-auto max-h-[480px] md:max-h-[710px] border border-[#785a28]/40 bg-[#010a13] p-2.5">
         {filteredChampions.length === 0 ? (
-          <div className="text-center text-xs text-[#5e6b77] py-12">
+          <div className="text-center text-xs text-[#8a9dae] py-12">
             No se encontraron campeones coincidentes.
           </div>
         ) : (
@@ -129,12 +129,12 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
                   key={champ.id}
                   onClick={() => !isUnavailable && !disabled && onSelectChampion(champ.id)}
                   disabled={isUnavailable || disabled}
-                  className={`group relative aspect-square border transition-all flex flex-col items-center justify-center p-1 bg-[#fcf9f2] ${
+                  className={`group relative aspect-square border transition-all flex flex-col items-center justify-center p-1 bg-[#0a1428] ${
                     isUnavailable
-                      ? "opacity-35 cursor-not-allowed border-transparent bg-gray-200"
+                      ? "opacity-25 cursor-not-allowed border-transparent bg-[#010a13]"
                       : champ.isOwnPool
-                      ? "border-[#c8aa6e] hover:border-[#0397ab] hover:scale-105 shadow-[0_2px_4px_rgba(200,170,110,0.15)]"
-                      : "border-[#d8ccb4] hover:border-[#0397ab] hover:scale-105"
+                      ? "border-[#c8aa6e] hover:border-[#00c8c8] hover:scale-105 shadow-[0_2px_8px_rgba(200,170,110,0.25)]"
+                      : "border-[#785a28]/40 hover:border-[#00c8c8] hover:scale-105"
                   }`}
                   title={`${champ.name} (${champ.role})`}
                 >

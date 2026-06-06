@@ -192,6 +192,10 @@ export interface CompAnalysis {
   type: CompType;
   strengths: string[];
   weaknesses: string[];
+  apPercentage?: number;
+  adPercentage?: number;
+  trueDamage?: number;
+  scalingScore?: number;
 }
 
 export interface BrainAnalysis {
@@ -203,7 +207,10 @@ export interface BrainAnalysis {
   warnings: string[];
   winConditions: string[];
   phase: 'ban1' | 'pick1' | 'ban2' | 'pick2' | 'complete';
+  winProbability?: number;
+  recommendedSummoners?: { adc: string[]; sup: string[]; reason: string };
 }
+
 
 // ============================================
 // Legacy compat

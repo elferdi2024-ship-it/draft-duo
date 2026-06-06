@@ -28,6 +28,7 @@ export class CompetitiveBrain {
 
   /**
    * Detects the composition type of a team based on their picked champions
+   * and computes physical/magic damage balances and scaling scores
    */
   public analyzeComp(pickedIds: (string | null)[]): CompAnalysis | null {
     const validChamps = pickedIds
@@ -42,9 +43,15 @@ export class CompetitiveBrain {
     let scalingCount = 0;
     let peelCount = 0;
 
+    let totalAd = 0;
+    let totalAp = 0;
+    let totalTrue = 0;
+    let totalScaling = 0;
+
     validChamps.forEach(c => {
       const tags = c.tags || [];
       const classes = c.philosophy || "";
+      const id = c.id;
 
       // Heuristics based on tags and strategic philosophy
       if (tags.includes("Dive") || tags.includes("Engage") || tags.includes("Assassin") || classes.includes("Dive") || classes.includes("CC") || tags.includes("CC")) {
@@ -54,12 +61,51 @@ export class CompetitiveBrain {
         pokeCount++;
       }
       if (tags.includes("Scaling") || tags.includes("Hypercarry") || classes.includes("Late") || classes.includes("1v9") || classes.includes("scaling") || tags.includes("Vision")) {
-        // Vision / control counts as scaling utility
         scalingCount++;
       }
       if (tags.includes("Peel") || tags.includes("Anti-dive") || tags.includes("Disengage") || classes.includes("Peel") || classes.includes("counter-engage") || tags.includes("Anti-projectile")) {
         peelCount++;
       }
+
+      // Estimación del balance de daño (Capacidad iTero)
+      let ad = 0;
+      let ap = 0;
+      let tr = 0;
+      let sc = 50; // default scaling
+
+      const isMageOrEnchanter = ["karma", "lux", "morgana", "nami", "lulu", "renata", "ahri", "syndra", "janna"].includes(id);
+      const isCCtank = ["nautilus", "braum", "leona", "rell", "sejuani", "malphite"].includes(id);
+      const isTrueDamager = ["vayne", "pyke", "fiora"].includes(id);
+      const isHybrid = ["kaisa", "varus", "smolder", "kogmaw"].includes(id);
+
+      if (isMageOrEnchanter) {
+        ap = 95; ad = 5;
+      } else if (isCCtank) {
+        ap = 60; ad = 40;
+      } else if (isTrueDamager) {
+        ad = 80; tr = 20;
+      } else if (isHybrid) {
+        ad = 70; ap = 30;
+      } else {
+        // Full AD carries / fighters
+        ad = 100;
+      }
+
+      // Estimación de escalado
+      const isHyper = ["jinx", "kaisa", "vayne", "kogmaw", "smolder", "kassadin", "jax", "fiora"].includes(id);
+      const isMid = ["ashe", "ezreal", "tristana", "caitlyn", "varus", "viego", "syndra", "ahri"].includes(id);
+      const isEarly = ["lucian", "karma", "pyke", "nami", "leesin"].includes(id);
+      const isUtility = ["nautilus", "braum", "thresh", "renata", "lulu", "leona", "sejuani", "malphite"].includes(id);
+
+      if (isHyper) sc = 95;
+      else if (isMid) sc = 75;
+      else if (isEarly) sc = 45;
+      else if (isUtility) sc = 60;
+
+      totalAd += ad;
+      totalAp += ap;
+      totalTrue += tr;
+      totalScaling += sc;
     });
 
     const total = validChamps.length;
@@ -89,7 +135,21 @@ export class CompetitiveBrain {
       weaknesses.push("No destaca de manera sobresaliente en un estilo.", "Puede ser superada por composiciones especializadas.");
     }
 
-    return { type, strengths, weaknesses };
+    const count = validChamps.length;
+    const adPercentage = Math.round(totalAd / count);
+    const apPercentage = Math.round(totalAp / count);
+    const trueDamage = Math.round(totalTrue / count);
+    const scalingScore = Math.round(totalScaling / count);
+
+    return { 
+      type, 
+      strengths, 
+      weaknesses,
+      adPercentage,
+      apPercentage,
+      trueDamage,
+      scalingScore
+    };
   }
 
   /**
@@ -278,9 +338,6 @@ export class CompetitiveBrain {
    * Recommends picking options for our team
    */
   private recommendPicks(state: LiveDraftState, activeStep: DraftPhaseStep, userRole: "fer" | "ralph" | null = null): BrainRecommendation[] {
-    const isAlly = activeStep.team === state.side;
-    
-    // Only recommend ADC/Support roles since we are locked in those roles
     const picksList = state.side === "blue" ? state.bluePicks : state.redPicks;
     const isMySlotADC = state.myPickSlots.includes(activeStep.index) && 
       (!picksList[state.myPickSlots[0]] && activeStep.index === state.myPickSlots[0] 
@@ -377,13 +434,7 @@ export class CompetitiveBrain {
    * Recommends bans for the current team
    */
   private recommendBans(state: LiveDraftState, activeStep: DraftPhaseStep): BrainRecommendation[] {
-    const isAlly = activeStep.team === state.side;
-    
     // Standard ban priorities from macro plan
-    // 1. Senna (Always banned)
-    // 2. Caitlyn (Counter to Ashe, Jhin)
-    // 3. Rakan (Counter to dives)
-    // 4. Lulu (If enemy has scaling hypercarry)
     const macroBans = [
       { id: "senna", reason: "Anti-dictadura de oleada. Bloqueo obligatorio número 1.", tag: "PRIORITY_BAN" as const },
       { id: "caitlyn", reason: "Counter directo de rango a Ashe/Jhin. Bloqueo de línea.", tag: "PRIORITY_BAN" as const },
@@ -448,13 +499,42 @@ export class CompetitiveBrain {
   public analyze(state: LiveDraftState, userRole: "fer" | "ralph" | null = null): BrainAnalysis {
     const stepIndex = state.currentStepIndex;
     
+    // Resolve compositions
+    const allyPicks = state.side === "blue" ? state.bluePicks : state.redPicks;
+    const enemyPicks = state.side === "blue" ? state.redPicks : state.bluePicks;
+
+    const allyComp = this.analyzeComp(allyPicks);
+    const enemyComp = this.analyzeComp(enemyPicks);
+    
+    // Default / Complete state
     if (stepIndex >= DRAFT_ORDER.length) {
+      // Resolve matching clinical meta duo when complete
+      const ourPicks = state.side === "blue" ? state.bluePicks : state.redPicks;
+      const adcPickId = ourPicks[state.myPickSlots[0]];
+      const supPickId = ourPicks[state.myPickSlots[1]];
+      let matchingDuo = duos.find(
+        (d) => 
+          (d.adcId === adcPickId && d.supId === supPickId) ||
+          (d.adcId === supPickId && d.supId === adcPickId)
+      );
+      if (!matchingDuo && adcPickId && supPickId) {
+        matchingDuo = this.generateDynamicDuo(adcPickId, supPickId) || undefined;
+      }
+
+      // Calculate final win probability
+      let winProb = 50;
+      if (matchingDuo) {
+        winProb += 15;
+        if (matchingDuo.tier === "S+" || matchingDuo.tier === "S") winProb += 8;
+      }
+      winProb = Math.max(15, Math.min(88, winProb));
+
       return {
         isMyTurn: false,
         actionType: "pick",
         recommendations: [],
-        enemyComp: this.analyzeComp(state.side === "blue" ? state.redPicks : state.bluePicks),
-        allyComp: this.analyzeComp(state.side === "blue" ? state.bluePicks : state.redPicks),
+        enemyComp,
+        allyComp,
         warnings: [],
         winConditions: [
           userRole === "fer" 
@@ -463,7 +543,9 @@ export class CompetitiveBrain {
             ? "Ralph: Fase de Draft Completada. Secuestra wards enemigos, mantén visión en río y da peel a Fer."
             : "Fase de Draft Completada. Ejecuta tu plan macro minuto a minuto."
         ],
-        phase: "complete"
+        phase: "complete",
+        winProbability: winProb,
+        recommendedSummoners: this.computeRecommendedSummoners(adcPickId, supPickId, enemyPicks.filter(Boolean) as string[])
       };
     }
 
@@ -474,13 +556,6 @@ export class CompetitiveBrain {
     const recommendations = currentStep.type === "ban" 
       ? this.recommendBans(state, currentStep)
       : this.recommendPicks(state, currentStep, userRole);
-
-    // Resolve compositions
-    const allyPicks = state.side === "blue" ? state.bluePicks : state.redPicks;
-    const enemyPicks = state.side === "blue" ? state.redPicks : state.bluePicks;
-
-    const allyComp = this.analyzeComp(allyPicks);
-    const enemyComp = this.analyzeComp(enemyPicks);
 
     // Contextual warnings & win conditions
     const warnings: string[] = [];
@@ -563,6 +638,38 @@ export class CompetitiveBrain {
       }
     }
 
+    // Dynamic win probability estimation (iTero)
+    let winProb = 50;
+    
+    // Add logic based on comfort and counters
+    const myPicks = state.side === "blue" ? state.bluePicks : state.redPicks;
+    let comfortCount = 0;
+    let counterCount = 0;
+
+    myPicks.forEach(id => {
+      if (id) {
+        const c = this.getChampionById(id);
+        if (c?.isOwnPool) comfortCount++;
+      }
+    });
+
+    winProb += comfortCount * 4;
+
+    // Direct bots synergies checks
+    const adcId = myPicks[state.myPickSlots[0]];
+    const supId = myPicks[state.myPickSlots[1]];
+    if (adcId && supId) {
+      const foundDuo = duos.some(d => (d.adcId === adcId && d.supId === supId) || (d.adcId === supId && d.supId === adcId));
+      if (foundDuo) winProb += 10;
+    }
+
+    // Deduct on active warnings
+    if (warnings.length > 0 && !warnings[0].includes("despejada") && !warnings[0].includes("Línea despejada")) {
+      winProb -= warnings.length * 4;
+    }
+
+    winProb = Math.max(15, Math.min(88, winProb));
+
     return {
       isMyTurn,
       actionType: currentStep.type,
@@ -571,8 +678,52 @@ export class CompetitiveBrain {
       allyComp,
       warnings,
       winConditions,
-      phase: stepIndex < 6 ? "pick1" : "pick2"
+      phase: stepIndex < 6 ? "pick1" : "pick2",
+      winProbability: winProb,
+      recommendedSummoners: this.computeRecommendedSummoners(adcId, supId, enemyPickedIds)
     };
+  }
+
+  /**
+   * Helper that computes recommended summoner spells based on composition matchups
+   */
+  private computeRecommendedSummoners(adcId: string | null, supId: string | null, enemyPickedIds: string[]): { adc: string[]; sup: string[]; reason: string } {
+    let adcSumms = ["Curar", "Flash"];
+    let supSumms = ["Ignite (Prender)", "Flash"];
+    let reason = "Fase de líneas de composición equilibrada. Hechizos estándar recomendados.";
+
+    if (!adcId && !supId) {
+      return { adc: adcSumms, sup: supSumms, reason };
+    }
+
+    const hasHeavyEnemyCC = enemyPickedIds.some(id => ["nautilus", "leona", "ashe", "sejuani", "morgana", "rell"].includes(id));
+    const hasHeavyEnemyHeal = enemyPickedIds.some(id => ["nami", "lulu", "yuumi", "soraka", "nami"].includes(id));
+    const hasEnemyAssassin = enemyPickedIds.some(id => ["rengar", "viego", "pyke", "zed", "khazix"].includes(id));
+
+    if (hasHeavyEnemyCC) {
+      adcSumms = ["Cleanse (Limpiar)", "Flash"];
+      reason = "Se recomienda Limpiar en el ADC debido al alto control de masas y stuns enemigos detectados.";
+    } else if (hasEnemyAssassin) {
+      adcSumms = ["Exhaust (Extenuación)", "Flash"];
+      reason = "Se recomienda Extenuación en el ADC para mitigar la ráfaga de daño e interrupción de asesinos móviles.";
+    } else if (hasHeavyEnemyHeal) {
+      supSumms = ["Ignite (Prender)", "Flash"];
+      reason = "Se recomienda Prender en el soporte para aplicar heridas graves a la curación del rival.";
+    }
+
+    // Support adjustments
+    if (supId) {
+      const isUtilityOrPeel = ["lulu", "renata", "braum", "janna"].includes(supId);
+      if (isUtilityOrPeel && adcId && ["jinx", "kaisa", "kogmaw"].includes(adcId)) {
+        supSumms = ["Exhaust (Extenuación)", "Flash"];
+        reason += " Se sugiere Extenuación en el soporte para blindar y dar peel reactivo al tirador de hiper-escalado.";
+      } else if (["nautilus", "pyke", "leona"].includes(supId)) {
+        supSumms = ["Ignite (Prender)", "Flash"];
+        reason += " Además, soporte requiere Prender para maximizar el potencial de muerte rápida nivel 2.";
+      }
+    }
+
+    return { adc: adcSumms, sup: supSumms, reason };
   }
 
   /**
@@ -707,9 +858,9 @@ export class CompetitiveBrain {
       "2 Items (Spike de poder del tirador y utilidad del soporte)"
     ];
 
-    const hasEngage = supTags.includes("Engage") || supTags.includes("CC") || ["nautilus", "thresh", "leona", "rell", "rakan"].includes(sup.id);
-    const hasPoke = supTags.includes("Poke") || ["karma", "lux", "nami"].includes(sup.id);
-    const hasPeel = supTags.includes("Peel") || supTags.includes("Anti-dive") || ["lulu", "renata", "braum", "janna"].includes(sup.id);
+    const hasOriginalEngage = supTags.includes("Engage") || supTags.includes("CC") || ["nautilus", "thresh", "leona", "rell", "rakan"].includes(sup.id);
+    const hasOriginalPoke = supTags.includes("Poke") || ["karma", "lux", "nami"].includes(sup.id);
+    const hasOriginalPeel = supTags.includes("Peel") || supTags.includes("Anti-dive") || ["lulu", "renata", "braum", "janna"].includes(sup.id);
 
     const adcBurst = adcTags.includes("Burst") || adcTags.includes("All-in") || ["lucian", "tristana", "kaisa", "caitlyn"].includes(adc.id);
     const adcPoke = adcTags.includes("Poke") || adcTags.includes("Range") || ["varus", "ashe", "ezreal", "smolder"].includes(adc.id);
@@ -722,10 +873,10 @@ export class CompetitiveBrain {
     let ccChainSequence = `${sup.name} CC -> ${adc.name} Habilidad principal de daño`;
 
     // Deducir variables
-    if (hasEngage) {
+    if (hasOriginalEngage) {
       tankMacroDirective = `Rol de Tanque Iniciador: Ralph debe buscar el gancho o CC en el carry enemigo si está aislado. Absorber el primer impacto de la oleada.`;
       lanePositioningPattern = "Paralelismo Ofensivo: Avanzar juntos en la línea para capitalizar cualquier control del tanque.";
-      ccChainSequence = `${sup.name} Iniciación de CC -> ${adc.name} Ráfaga de Daño`;
+      ccChainSequence = `${sup.name} CC -> ${adc.name} Ráfaga de Daño`;
 
       if (adcBurst) {
         pillar = "Iniciación y Ráfaga Explosiva (All-In)";
@@ -748,7 +899,7 @@ export class CompetitiveBrain {
         execution = `Buscar castigar al soporte enemigo frágil mediante iniciaciones desde arbustos ciegos usando baratijas de visión.`;
         winCondition = `Capturar carries en la transición de río y neutralizar la botlane mediante control de visión.`;
       }
-    } else if (hasPoke) {
+    } else if (hasOriginalPoke) {
       lanePositioningPattern = "Diagonal en V Abierta: Dividir los ángulos de pokeo para desgastar al rival continuamente.";
       tankMacroDirective = `Soporte de Poke: Hostigar con habilidades de rango sin comprometer el posicionamiento. Evitar all-ins enemigos.`;
       ccChainSequence = `${sup.name} Ralentización/Poke -> ${adc.name} Habilidad de largo rango`;
@@ -774,7 +925,7 @@ export class CompetitiveBrain {
         execution = `Establecer trampas o proyectiles para forzar movimientos incómodos del rival y ganar prioridad de empuje constante.`;
         winCondition = `Conseguir ventajas sustanciales de placas de torre y rotar al carril central de forma segura.`;
       }
-    } else if (hasPeel) {
+    } else if (hasOriginalPeel) {
       lanePositioningPattern = "Triangulación Defensiva: Soporte un paso detrás del carry listo para mitigar el engage rival.";
       tankMacroDirective = `Soporte Protector: Guardar los escudos o CC de desenganche para cuando el enemigo inicie su all-in.`;
       ccChainSequence = `Enemigo Engage -> ${sup.name} Desenganche/Peel -> ${adc.name} Kiteo hacia atrás`;

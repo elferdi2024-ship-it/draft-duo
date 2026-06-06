@@ -93,7 +93,7 @@ export class CompetitiveBrain {
   /**
    * Scores a champion in the context of the current draft
    */
-  public scoreChampion(champ: ChampionData, state: LiveDraftState, activeStep: DraftPhaseStep): ChampionScore {
+  public scoreChampion(champ: ChampionData, state: LiveDraftState, activeStep: DraftPhaseStep, userRole: "fer" | "ralph" | null = null): ChampionScore {
     const isAlly = activeStep.team === state.side;
     
     // 1. Comfort score (highly values our 10 comfort champions)
@@ -102,6 +102,18 @@ export class CompetitiveBrain {
       if (champ.learningStatus === "mastered") comfort = 100;
       else if (champ.learningStatus === "learning") comfort = 80;
       else if (champ.learningStatus === "backup") comfort = 60;
+    }
+
+    // Priorización para Ralph: supports tanques primero, luego enchanters
+    if (isAlly && (champ.role === "Support" || champ.roles?.includes("Support"))) {
+      const priorityTanks = ["thresh", "braum", "nautilus", "leona", "rell"];
+      const priorityEnchanters = ["karma", "lulu", "nami", "janna"];
+
+      if (priorityTanks.includes(champ.id)) {
+        comfort = Math.min(100, comfort + 35);
+      } else if (priorityEnchanters.includes(champ.id)) {
+        comfort = Math.min(100, comfort + 15);
+      }
     }
 
     // 2. Meta score
@@ -256,7 +268,7 @@ export class CompetitiveBrain {
   /**
    * Recommends picking options for our team
    */
-  private recommendPicks(state: LiveDraftState, activeStep: DraftPhaseStep): BrainRecommendation[] {
+  private recommendPicks(state: LiveDraftState, activeStep: DraftPhaseStep, userRole: "fer" | "ralph" | null = null): BrainRecommendation[] {
     const isAlly = activeStep.team === state.side;
     
     // Only recommend ADC/Support roles since we are locked in those roles
@@ -283,7 +295,7 @@ export class CompetitiveBrain {
     const availableCandidates = candidates.filter(c => !pickedBannedIds.has(c.id));
 
     const recommendations: BrainRecommendation[] = availableCandidates.map(champ => {
-      const scores = this.scoreChampion(champ, state, activeStep);
+      const scores = this.scoreChampion(champ, state, activeStep, userRole);
       
       // Calculate total score
       const totalScore = Math.round(
@@ -453,7 +465,7 @@ export class CompetitiveBrain {
     // Recommendations
     const recommendations = currentStep.type === "ban" 
       ? this.recommendBans(state, currentStep)
-      : this.recommendPicks(state, currentStep);
+      : this.recommendPicks(state, currentStep, userRole);
 
     // Resolve compositions
     const allyPicks = state.side === "blue" ? state.bluePicks : state.redPicks;

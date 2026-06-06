@@ -1,0 +1,188 @@
+// filepath: src/components/draft/live-gameplan-timeline.tsx
+"use client";
+
+import { useState, useEffect } from "react";
+import { setups } from "@/data/setups";
+import { CheckSquare, Square, ChevronDown, ChevronUp, Clock, HelpCircle } from "lucide-react";
+import type { SetupCheckpoint } from "@/lib/types";
+
+interface LiveGameplanTimelineProps {
+  duoId: string;
+  userRole: "fer" | "ralph" | null;
+}
+
+export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTimelineProps) {
+  const setup = setups.find((s) => s.duoId === duoId);
+  const [completedActions, setCompletedActions] = useState<Record<string, boolean>>({});
+  const [expandedCheckpoints, setExpandedCheckpoints] = useState<Record<number, boolean>>({
+    0: true, // Expand primer item por defecto
+  });
+
+  // Reset checklist al cambiar de duo
+  useEffect(() => {
+    setCompletedActions({});
+    setExpandedCheckpoints({ 0: true });
+  }, [duoId]);
+
+  if (!setup) {
+    return (
+      <div className="border border-[#c8aa6e]/30 bg-[#eadecd]/20 p-4 rounded text-center text-xs text-[#785a28] font-bold">
+        Línea de tiempo no configurada para este dúo. Consulta la sección de Dúos Maestros.
+      </div>
+    );
+  }
+
+  const toggleAction = (checkpointIdx: number, actionIdx: number) => {
+    const key = `${checkpointIdx}-${actionIdx}`;
+    setCompletedActions((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const toggleExpand = (index: number) => {
+    setExpandedCheckpoints((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  // Filtrar acciones específicas según el rol seleccionado para destacar
+  const highlightAction = (actionText: string): boolean => {
+    if (!userRole) return false;
+    const lower = actionText.toLowerCase();
+    if (userRole === "fer" && (lower.includes("ashe") || lower.includes("varus") || lower.includes("tirador") || lower.includes("adc") || lower.includes("last hit") || lower.includes("farm"))) {
+      return true;
+    }
+    if (userRole === "ralph" && (lower.includes("karma") || lower.includes("nami") || lower.includes("nautilus") || lower.includes("soporte") || lower.includes("support") || lower.includes("ward") || lower.includes("visión") || lower.includes("peel") || lower.includes("escudo"))) {
+      return true;
+    }
+    return false;
+  };
+
+  return (
+    <div className="border border-[#c8aa6e]/30 bg-[#0a1428]/95 p-4 rounded shadow-lg text-[#f0e6d3] flex flex-col gap-4">
+      <div className="flex items-center justify-between border-b border-[#c8aa6e]/30 pb-2">
+        <div className="flex items-center gap-2">
+          <Clock className="w-4 h-4 text-[#c8aa6e]" />
+          <h4 className="font-serif font-black text-xs uppercase tracking-widest text-[#c8aa6e]">
+            Setup En Vivo Minuto a Minuto
+          </h4>
+        </div>
+        {userRole && (
+          <span className="text-[9px] uppercase bg-[#c8aa6e]/10 border border-[#c8aa6e]/30 px-2 py-0.5 rounded text-[#c8aa6e] font-mono font-bold">
+            Foco: {userRole === "fer" ? "FER (ADC)" : "RALPH (SOPORTE)"}
+          </span>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
+        {setup.checkpoints.map((cp, cpIdx) => {
+          const isExpanded = !!expandedCheckpoints[cpIdx];
+
+          // Cuenta de acciones completadas en este checkpoint
+          const totalActions = cp.actions.length;
+          const completedCount = cp.actions.filter((_, aIdx) => !!completedActions[`${cpIdx}-${aIdx}`]).length;
+          const isCpFinished = totalActions > 0 && completedCount === totalActions;
+
+          return (
+            <div
+              key={cpIdx}
+              className={`border rounded-sm transition-colors duration-200 ${
+                isCpFinished
+                  ? "border-emerald-600/40 bg-emerald-950/10"
+                  : isExpanded
+                  ? "border-[#c8aa6e]/30 bg-[#1e232a]/40"
+                  : "border-[#eadecd]/10 bg-transparent hover:bg-[#1e232a]/20"
+              }`}
+            >
+              {/* Header colapsable */}
+              <button
+                onClick={() => toggleExpand(cpIdx)}
+                className="w-full flex items-center justify-between p-3 text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <span className={`text-xs font-serif font-black px-2 py-0.5 rounded-sm shrink-0 ${
+                    isCpFinished ? "bg-emerald-600 text-[#0a1428]" : "bg-[#c8aa6e] text-[#0a1428]"
+                  }`}>
+                    {cp.time}
+                  </span>
+                  <span className={`text-xs md:text-sm font-bold truncate ${isCpFinished ? "line-through opacity-60 text-emerald-500" : ""}`}>
+                    {cp.title}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0 ml-2">
+                  {totalActions > 0 && (
+                    <span className="text-[10px] font-mono text-[#5e6b77]">
+                      {completedCount}/{totalActions}
+                    </span>
+                  )}
+                  {isExpanded ? <ChevronUp className="w-4 h-4 text-[#c8aa6e]" /> : <ChevronDown className="w-4 h-4 text-[#c8aa6e]" />}
+                </div>
+              </button>
+
+              {/* Contenido expandido */}
+              {isExpanded && (
+                <div className="px-3 pb-3 pt-1 border-t border-[#eadecd]/10 flex flex-col gap-2.5 animate-fadeIn">
+                  {/* Acciones */}
+                  <div className="flex flex-col gap-2">
+                    {cp.actions.map((act, actIdx) => {
+                      const isActionDone = !!completedActions[`${cpIdx}-${actIdx}`];
+                      const isHighlighted = highlightAction(act);
+
+                      return (
+                        <button
+                          key={actIdx}
+                          onClick={() => toggleAction(cpIdx, actIdx)}
+                          className={`flex items-start gap-2.5 text-xs text-left w-full transition-all group ${
+                            isActionDone ? "opacity-45" : ""
+                          }`}
+                        >
+                          <span className="shrink-0 mt-0.5 text-[#c8aa6e] group-hover:scale-110 transition-transform">
+                            {isActionDone ? (
+                              <CheckSquare className="w-3.5 h-3.5 text-emerald-500" />
+                            ) : (
+                              <Square className="w-3.5 h-3.5 text-[#5e6b77]" />
+                            )}
+                          </span>
+                          <span className={`leading-relaxed ${
+                            isActionDone ? "line-through" : isHighlighted ? "text-[#f0e6d3] font-bold border-l-2 border-[#c8aa6e] pl-1.5" : "text-[#a0a8b0]"
+                          }`}>
+                            {act}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Decision Tree / Condición */}
+                  {cp.decision && (
+                    <div className="mt-2 p-2.5 border border-amber-800/25 bg-amber-950/10 rounded-sm flex flex-col gap-1.5">
+                      <div className="flex items-center gap-1.5 text-amber-500">
+                        <HelpCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span className="text-[10px] uppercase tracking-wider font-extrabold">
+                          Árbol de Decisión Rápido
+                        </span>
+                      </div>
+                      <p className="text-[11px] font-bold text-[#f0e6d3]">
+                        {cp.decision.condition}
+                      </p>
+                      <div className="grid grid-cols-1 gap-1 pl-1 text-[10px] leading-relaxed">
+                        <p>
+                          <span className="text-emerald-500 font-bold">✓ Sí:</span> {cp.decision.ifTrue}
+                        </p>
+                        <p>
+                          <span className="text-rose-500 font-bold">✗ No:</span> {cp.decision.ifFalse}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

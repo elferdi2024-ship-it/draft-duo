@@ -8,6 +8,7 @@ import { ownChampions } from "@/data/champions";
 import { duos } from "@/data/duos";
 import { useDraftStore } from "@/store/draft-store";
 import ChampionAvatar from "@/components/champion-avatar";
+import TeemoCoach from "@/components/teemo-coach";
 import { Sparkles, Trophy, Compass, Heart, Shield, User, ShieldAlert, Award } from "lucide-react";
 
 export default function Home() {
@@ -140,12 +141,17 @@ export default function Home() {
             Competitive Botlane Draft Intelligence • Patch 26.11
           </p>
 
-          {/* Personalized welcome quote */}
-          <p className="max-w-3xl text-sm md:text-lg text-[#a0a8b0] mt-6 leading-relaxed italic font-medium">
-            {userRole === "fer"
-              ? "\"Fer, tu rol es dictar el ritmo de la oleada y asegurar el daño core. El pokeo perpendicular de Ashe y la letalidad de Varus son tus herramientas. Posicionamiento impecable = Victoria.\""
-              : "\"Ralph, tu rol es gobernar el mapa desde la niebla profunda. Wards en el pixel bush, linternas salvavidas y desenganches perfectos son tus armas. La supervivencia de Fer es tu prioridad.\""}
-          </p>
+          {/* Teemo Coach Presenter on Welcome Screen */}
+          <div className="mt-4 scale-95">
+            <TeemoCoach
+              isTalking={true}
+              message={
+                userRole === "fer"
+                  ? "Fer, tu rol es dictar el ritmo de la oleada y asegurar el daño core. ¡Ashe y Varus son tus herramientas clave!"
+                  : "Ralph, tu rol es gobernar el mapa desde la niebla profunda. ¡La supervivencia de Fer es tu prioridad!"
+              }
+            />
+          </div>
 
           <div className="flex flex-wrap gap-6 justify-center mt-10">
             <Link

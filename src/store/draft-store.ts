@@ -171,11 +171,9 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
   },
 
   reset: () => {
-    const { side, myPickSlots } = get();
     set({
       ...initialDraftState,
-      side,
-      myPickSlots,
+      side: null, // Permite reconfigurar el lado y el orden de picks al reiniciar
     });
     get().recalculateBrain();
   },

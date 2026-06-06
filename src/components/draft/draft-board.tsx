@@ -31,7 +31,7 @@ export default function DraftBoard() {
 
   const [version, setVersion] = useState("15.11.1");
   const [selectedSide, setSelectedSide] = useState<"blue" | "red">("blue");
-  const [slotsConfig, setSlotsConfig] = useState<[number, number]>([3, 4]); // Default to Pick 4 & 5
+  const [selectedSlots, setSelectedSlots] = useState<number[]>([3, 4]); // Por defecto Picks 4 y 5 (índices 3 y 4)
   const [mobileSubTab, setMobileSubTab] = useState<"picks" | "grid">("grid");
 
   useEffect(() => {
@@ -55,8 +55,22 @@ export default function DraftBoard() {
     return undefined;
   };
 
+  const handleSlotClick = (slotIndex: number) => {
+    setSelectedSlots((prev) => {
+      if (prev.includes(slotIndex)) {
+        return prev.filter((s) => s !== slotIndex);
+      }
+      if (prev.length < 2) {
+        return [...prev, slotIndex].sort((a, b) => a - b);
+      }
+      // Si ya hay 2, sacamos el primero seleccionado y agregamos el nuevo, luego ordenamos
+      return [prev[1], slotIndex].sort((a, b) => a - b);
+    });
+  };
+
   const handleStartDraft = () => {
-    initDraft(selectedSide, slotsConfig);
+    if (selectedSlots.length !== 2) return;
+    initDraft(selectedSide, [selectedSlots[0], selectedSlots[1]]);
   };
 
   // If side is null, show setup/configuration screen
@@ -112,39 +126,52 @@ export default function DraftBoard() {
           {/* Posiciones de Pick selector */}
           <div className="flex flex-col gap-2">
             <label className="text-xs uppercase font-extrabold tracking-wider text-[#785a28]">
-              2. Tus Posiciones de Pick (ADC + Soporte)
+              2. Tus Posiciones de Pick (Selecciona exactamente 2)
             </label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="grid grid-cols-5 gap-2">
               {[
-                { label: "Picks 1 + 2", slots: [0, 1] as [number, number] },
-                { label: "Picks 2 + 3", slots: [1, 2] as [number, number] },
-                { label: "Picks 3 + 4", slots: [2, 3] as [number, number] },
-                { label: "Picks 4 + 5", slots: [3, 4] as [number, number] },
+                { label: "Pick 1", index: 0 },
+                { label: "Pick 2", index: 1 },
+                { label: "Pick 3", index: 2 },
+                { label: "Pick 4", index: 3 },
+                { label: "Pick 5", index: 4 },
               ].map((opt) => {
-                const isSelected = slotsConfig[0] === opt.slots[0] && slotsConfig[1] === opt.slots[1];
+                const isSelected = selectedSlots.includes(opt.index);
+                const orderLabel = isSelected
+                  ? selectedSlots.indexOf(opt.index) === 0
+                    ? " (ADC)"
+                    : " (SUP)"
+                  : "";
+
                 return (
                   <button
                     key={opt.label}
-                    onClick={() => setSlotsConfig(opt.slots)}
-                    className={`py-3.5 border rounded text-xs font-bold transition-all ${
+                    onClick={() => handleSlotClick(opt.index)}
+                    className={`py-3.5 border rounded text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 ${
                       isSelected
-                        ? "bg-[#0a1428] border-[#c8aa6e] text-[#f0e6d3] shadow-md"
+                        ? "bg-[#0a1428] border-[#c8aa6e] text-[#f0e6d3] shadow-md scale-[1.02]"
                         : "bg-[#eadecd]/60 border-[#d8ccb4] text-[#785a28] hover:bg-[#e7dbbf]"
                     }`}
                   >
-                    {opt.label}
+                    <span>{opt.label}</span>
+                    {isSelected && (
+                      <span className="text-[8px] uppercase text-[#c8aa6e] font-black tracking-wide">
+                        {orderLabel}
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
             <p className="text-[10px] text-[#5e6b77] italic mt-1 leading-normal">
-              Marca las posiciones exactas donde tu ADC y Soporte serán seleccionados en la fase de picks real. El Competitive Brain te dirá cuándo te toca elegir.
+              Selecciona dos picks del 1 al 5 en el orden en que los harás en la sala. El de menor número será tu ADC y el mayor tu Soporte.
             </p>
           </div>
 
           <button
             onClick={handleStartDraft}
-            className="w-full py-3.5 mt-4 lol-button lol-button-active font-serif text-sm tracking-widest uppercase transition-all shadow-md"
+            disabled={selectedSlots.length !== 2}
+            className="w-full py-3.5 mt-4 lol-button lol-button-active font-serif text-sm tracking-widest uppercase transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             Iniciar Simulación
           </button>

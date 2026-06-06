@@ -7,6 +7,9 @@ import Link from "next/link";
 import { duos } from "@/data/duos";
 import { useDraftStore } from "@/store/draft-store";
 import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
+import ChampionMatchupEvaluator from "./champion-matchup-evaluator";
+import LiveGameplanTimeline from "./live-gameplan-timeline";
+import TeemoCoach from "../teemo-coach";
 import { 
   Heart, 
   RotateCcw, 
@@ -55,6 +58,7 @@ export default function BrainPanel() {
     redPicks,
     myPickSlots,
     isComplete,
+    userRole,
   } = useDraftStore();
   const [version, setVersion] = useState("15.11.1");
 
@@ -107,6 +111,47 @@ export default function BrainPanel() {
     }
   };
 
+  const currentStep = currentStepIndex < 10 ? { team: side === "blue" ? "blue" : "red", type: "pick" } : null; 
+  const activeStepDetails = currentStepIndex < 20 ? (typeof window !== 'undefined' ? require("@/lib/types").DRAFT_ORDER[currentStepIndex] : null) : null;
+  
+  const picksList = side === "blue" ? bluePicks : redPicks;
+  const isCurrentSlotADC = activeStepDetails && myPickSlots.includes(activeStepDetails.index) && 
+    (!picksList[myPickSlots[0]] && activeStepDetails.index === myPickSlots[0] 
+      ? true 
+      : activeStepDetails.index === myPickSlots[1]);
+
+  let teemoMessage = "¡Un scout siempre va un paso adelante!";
+  let isTalking = false;
+
+  if (phase === "complete") {
+    isTalking = true;
+    if (matchingDuo) {
+      teemoMessage = `¡Dúo ${matchingDuo.name} asegurado! Ralph inicia el engage y Fer asegura el daño crítico. ¡A las armas!`;
+    } else {
+      teemoMessage = "¡Atención! Este combo no está sincronizado en los dúos clínicos de confort. ¡Juega con cautela!";
+    }
+  } else if (isMyTurn) {
+    isTalking = true;
+    if (actionType === "ban") {
+      teemoMessage = "¡Turno de BAN! Bloqueemos a Senna para evitar su dictadura, o Caitlyn para neutralizar su rango.";
+    } else {
+      if (isCurrentSlotADC) {
+        teemoMessage = "¡Pick de ADC activo! Fer, prioriza a Ashe (poke/utilidad) o Varus (asalto/letalidad).";
+      } else {
+        teemoMessage = "¡Pick de SOPORTE activo! Ralph, prioriza tanques: Nautilus, Thresh o Braum; o enchanters de confort.";
+      }
+    }
+  } else {
+    isTalking = false;
+    teemoMessage = "El enemigo está pensando... Vigilando el mapa desde el arbusto con sigilo.";
+  }
+
+  // Alerta de prioridad si hay avisos
+  if (warnings.length > 0 && !warnings[0].includes("despejada") && !warnings[0].includes("Fer: Línea") && !warnings[0].includes("Ralph: Línea")) {
+    isTalking = true;
+    teemoMessage = `¡Alerta! ${warnings[0]}`;
+  }
+
   return (
     <div className="lol-panel flex flex-col w-full h-full bg-[#fcf9f2] border border-[#c8aa6e] shadow-md">
       {/* Header Panel */}
@@ -139,42 +184,68 @@ export default function BrainPanel() {
 
       {/* Main Content Scrollable */}
       <div className="flex-1 overflow-y-auto p-5 md:p-6 flex flex-col gap-5 max-h-[650px] md:max-h-[960px]">
+        {/* Teemo Coach Presenter */}
+        <TeemoCoach isTalking={isTalking} message={teemoMessage} />
         {/* Evaluation of final draft synergy */}
         {phase === "complete" && (
           <div className="flex flex-col gap-4">
             {matchingDuo ? (
-              <div className="p-5 border-2 border-[#c8aa6e] bg-[#0a1428] rounded shadow-[0_4px_12px_rgba(200,170,110,0.2)] flex flex-col gap-3">
-                <div className="flex items-center gap-2 border-b border-[#c8aa6e]/40 pb-2 text-[#f0e6d3]">
-                  <Trophy className="w-5 h-5 text-amber-500 animate-pulse" />
-                  <h4 className="font-serif font-black text-sm uppercase tracking-widest text-[#c8aa6e]">
-                    Sinergia Clínica Detectada
-                  </h4>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <span className="font-serif font-black text-lg md:text-xl text-[#f0e6d3] uppercase">
-                    {matchingDuo.name}
-                  </span>
-                  <span className="text-[10px] md:text-xs text-amber-500 uppercase tracking-widest font-black">
-                    Pilar: {matchingDuo.pillar}
-                  </span>
-                </div>
-                <p className="text-xs md:text-sm text-[#a0a8b0] italic leading-relaxed">
-                  "{matchingDuo.philosophy}"
-                </p>
-                <div className="mt-1 flex flex-wrap gap-1.5">
-                  {matchingDuo.tags.map(tag => (
-                    <span key={tag} className="text-[9px] font-black uppercase text-[#0a1428] bg-[#c8aa6e] px-2 py-0.5 rounded-sm">
-                      {tag}
+              <>
+                <div className="p-5 border-2 border-[#c8aa6e] bg-[#0a1428] rounded shadow-[0_4px_12px_rgba(200,170,110,0.2)] flex flex-col gap-3">
+                  <div className="flex items-center gap-2 border-b border-[#c8aa6e]/40 pb-2 text-[#f0e6d3]">
+                    <Trophy className="w-5 h-5 text-amber-500 animate-pulse" />
+                    <h4 className="font-serif font-black text-sm uppercase tracking-widest text-[#c8aa6e]">
+                      Sinergia Clínica Detectada
+                    </h4>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="font-serif font-black text-lg md:text-xl text-[#f0e6d3] uppercase">
+                      {matchingDuo.name}
                     </span>
-                  ))}
+                    <span className="text-[10px] md:text-xs text-amber-500 uppercase tracking-widest font-black">
+                      Pilar: {matchingDuo.pillar}
+                    </span>
+                  </div>
+                  <p className="text-xs md:text-sm text-[#a0a8b0] italic leading-relaxed">
+                    "{matchingDuo.philosophy}"
+                  </p>
+                  <div className="mt-1 flex flex-wrap gap-1.5">
+                    {matchingDuo.tags.map(tag => (
+                      <span key={tag} className="text-[9px] font-black uppercase text-[#0a1428] bg-[#c8aa6e] px-2 py-0.5 rounded-sm">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <Link
+                    href={`/duos/${matchingDuo.id}`}
+                    className="mt-2 w-full py-2.5 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3]/20 rounded-sm font-serif font-black text-[10px] tracking-widest text-center uppercase transition-all shadow cursor-pointer"
+                  >
+                    Abrir Guía Completa →
+                  </Link>
                 </div>
-                <Link
-                  href={`/duos/${matchingDuo.id}`}
-                  className="mt-2 w-full py-2.5 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3]/20 rounded-sm font-serif font-black text-[10px] tracking-widest text-center uppercase transition-all shadow cursor-pointer"
-                >
-                  Abrir Guía Minuto a Minuto →
-                </Link>
-              </div>
+
+                {/* Evaluador de Matchup y Timeline interactivo de Setup por minutos */}
+                <ChampionMatchupEvaluator
+                  allyDuo={matchingDuo}
+                  enemyDuo={{
+                    adcId: (side === "blue" ? redPicks : bluePicks).find(id => {
+                      if (!id) return false;
+                      const c = allChampions.find(champ => champ.id === id);
+                      return c?.role === "ADC" || c?.roles?.includes("ADC");
+                    }) || null,
+                    supId: (side === "blue" ? redPicks : bluePicks).find(id => {
+                      if (!id) return false;
+                      const c = allChampions.find(champ => champ.id === id);
+                      return c?.role === "Support" || c?.roles?.includes("Support");
+                    }) || null,
+                  }}
+                />
+
+                <LiveGameplanTimeline
+                  duoId={matchingDuo.id}
+                  userRole={userRole}
+                />
+              </>
             ) : (
               <div className="p-5 border border-dashed border-[#c8aa6e]/40 bg-[#eadecd]/20 rounded flex flex-col gap-2.5 text-center">
                 <ShieldAlert className="w-8 h-8 text-[#785a28] mx-auto opacity-75 animate-bounce" />

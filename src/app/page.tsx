@@ -46,20 +46,24 @@ export default function Home() {
           <p className="text-xs text-[#c8aa6e] uppercase tracking-widest font-black mt-2">
             Competitive League Draft Intelligence • Patch 26.11
           </p>
-        </div>
-
-        <div className="w-full flex flex-col md:flex-row gap-6 items-stretch justify-center max-w-3xl">
+        </div>        <div className="w-full flex flex-col md:flex-row gap-6 items-stretch justify-center max-w-3xl">
           {/* Card Fer (ADC) */}
           <button
             onClick={() => setUserRole("fer")}
             aria-label="Ingresar como ADC (Fer)"
             className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#0097e6] hover:shadow-[0_0_24px_rgba(0,151,230,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
           >
-            <div className="flex flex-col gap-3">
-              <div className="w-10 h-10 rounded bg-[#c8aa6e]/10 border border-[var(--border-dark)] flex items-center justify-center text-[#c8aa6e] group-hover:bg-[#0097e6]/15 group-hover:text-[#0097e6] group-hover:border-[#0097e6] transition-all">
-                <FlameIcon className="w-5 h-5" />
+            <div className="flex flex-col gap-4">
+              <div className="relative w-16 h-16 rounded border border-[#785a28]/60 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#0a1428] flex items-center justify-center shadow-md group-hover:border-[#0097e6] group-hover:shadow-[0_0_15px_rgba(0,151,230,0.3)] transition-all duration-300">
+                <Image
+                  src="/icon-adc.png"
+                  alt="ADC Icon"
+                  width={52}
+                  height={52}
+                  className="object-contain transition-transform duration-300 group-hover:scale-110"
+                />
               </div>
-              <h2 className="font-serif text-2xl font-black tracking-wider text-[#f0e6d3]">
+              <h2 className="font-serif text-2xl font-black tracking-wider text-[#f0e6d3] mt-2">
                 FER (ADC)
               </h2>
               <p className="text-xs text-[#8a9dae] leading-relaxed">
@@ -74,18 +78,23 @@ export default function Home() {
             </div>
           </button>
 
-
           {/* Card Ralph (Support) */}
           <button
             onClick={() => setUserRole("ralph")}
             aria-label="Ingresar como Soporte (Ralph)"
             className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#00c8c8] hover:shadow-[0_0_24px_rgba(0,200,200,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
           >
-            <div className="flex flex-col gap-3">
-              <div className="w-10 h-10 rounded bg-emerald-500/10 border border-emerald-500/60 flex items-center justify-center text-[#00c8c8] group-hover:bg-[#00c8c8]/15 group-hover:text-[#00c8c8] group-hover:border-[#00c8c8] transition-all">
-                <ShieldIcon className="w-5 h-5" />
+            <div className="flex flex-col gap-4">
+              <div className="relative w-16 h-16 rounded border border-[#785a28]/60 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#0a1428] flex items-center justify-center shadow-md group-hover:border-[#00c8c8] group-hover:shadow-[0_0_15px_rgba(0,200,200,0.3)] transition-all duration-300">
+                <Image
+                  src="/icon-support.png"
+                  alt="Support Icon"
+                  width={52}
+                  height={52}
+                  className="object-contain transition-transform duration-300 group-hover:scale-110"
+                />
               </div>
-              <h2 className="font-serif text-2xl font-black tracking-wider text-[#f0e6d3]">
+              <h2 className="font-serif text-2xl font-black tracking-wider text-[#f0e6d3] mt-2">
                 RALPH (SUP)
               </h2>
               <p className="text-xs text-[#8a9dae] leading-relaxed">
@@ -99,7 +108,6 @@ export default function Home() {
               <span className="text-[#c8aa6e] font-bold text-xs select-none">→</span>
             </div>
           </button>
-
         </div>
       </div>
     );

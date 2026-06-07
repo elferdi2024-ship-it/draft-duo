@@ -60,16 +60,15 @@ export default function TeemoCoach({ isTalking = false, message }: TeemoCoachPro
 
   const getTeemoAvatar = () => {
     const text = dialogText.toLowerCase();
+    let base = "/teemo-default.png";
     if (text.includes("vista") || text.includes("descansar") || text.includes("estira") || text.includes("pausa") || text.includes("salud") || text.includes("ojo") || text.includes("parpadea")) {
-      return "/teemo-rest.png";
+      base = "/teemo-rest.png";
+    } else if (text.includes("alerta") || text.includes("peligro") || text.includes("atención") || text.includes("cuidado") || text.includes("bloque")) {
+      base = "/teemo-alert.png";
+    } else if (isTalking) {
+      base = "/teemo-talking.png";
     }
-    if (text.includes("alerta") || text.includes("peligro") || text.includes("atención") || text.includes("cuidado") || text.includes("bloque")) {
-      return "/teemo-alert.png";
-    }
-    if (isTalking) {
-      return "/teemo-talking.png";
-    }
-    return "/teemo-default.png";
+    return `${base}?v=2`;
   };
 
   return (

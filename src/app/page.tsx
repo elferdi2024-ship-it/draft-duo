@@ -43,7 +43,7 @@ export default function Home() {
           <h1 className="font-serif text-4xl md:text-5xl font-black tracking-widest text-[#0f1923] uppercase shimmer-text">
             DUO DRAFT
           </h1>
-          <p className="text-xs text-[#785a28] uppercase tracking-widest font-black mt-2">
+          <p className="text-xs text-[#c8aa6e] uppercase tracking-widest font-black mt-2">
             Competitive League Draft Intelligence • Patch 26.11
           </p>
         </div>
@@ -52,6 +52,7 @@ export default function Home() {
           {/* Card Fer (ADC) */}
           <button
             onClick={() => setUserRole("fer")}
+            aria-label="Ingresar como ADC (Fer)"
             className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#0097e6] hover:shadow-[0_0_24px_rgba(0,151,230,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
           >
             <div className="flex flex-col gap-3">
@@ -77,6 +78,7 @@ export default function Home() {
           {/* Card Ralph (Support) */}
           <button
             onClick={() => setUserRole("ralph")}
+            aria-label="Ingresar como Soporte (Ralph)"
             className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#00c8c8] hover:shadow-[0_0_24px_rgba(0,200,200,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
           >
             <div className="flex flex-col gap-3">

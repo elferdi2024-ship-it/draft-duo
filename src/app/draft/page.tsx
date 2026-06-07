@@ -13,7 +13,7 @@ export default function DraftPage() {
         <h1 className="font-serif text-4xl md:text-5xl font-black tracking-widest uppercase text-[#0f1923] shimmer-text-dark">
           Simulador de Draft en Vivo
         </h1>
-        <p className="text-xs md:text-sm text-[#785a28] uppercase font-black tracking-widest mt-2">
+        <p className="text-xs md:text-sm text-[#c8aa6e] uppercase font-black tracking-widest mt-2">
           Liga de Leyendas • Parche 26.11 (Season 16 — Demacia)
         </p>
       </div>

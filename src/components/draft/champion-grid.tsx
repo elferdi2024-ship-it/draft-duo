@@ -33,7 +33,17 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
     redBans,
     bluePicks,
     redPicks,
+    selectedBanSlot,
+    setSelectedDetailChampId,
   } = useDraftStore();
+
+  const handleChampClick = (champId: string) => {
+    if (selectedBanSlot) {
+      onSelectChampion(champId); // Lock immediately for bans
+    } else {
+      setSelectedDetailChampId(champId); // Open drawer for picks
+    }
+  };
 
   const [ddragonVersion, setDdragonVersion] = useState("15.11.1");
 
@@ -127,8 +137,9 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
               return (
                 <button
                   key={champ.id}
-                  onClick={() => !isUnavailable && !disabled && onSelectChampion(champ.id)}
+                  onClick={() => !isUnavailable && !disabled && handleChampClick(champ.id)}
                   disabled={isUnavailable || disabled}
+                  aria-label={`${champ.name}, ${champ.role}, ${champ.isOwnPool ? "piscina de confort" : ""}`}
                   className={`group relative aspect-square border transition-all flex flex-col items-center justify-center p-1 bg-[#0a1428] ${
                     isUnavailable
                       ? "opacity-25 cursor-not-allowed border-transparent bg-[#010a13]"

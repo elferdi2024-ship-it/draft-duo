@@ -27,6 +27,7 @@ interface DraftStore {
   selectedBanSlot: { team: "blue" | "red"; index: number } | null;
   isBridgeConnected: boolean;
   bridgeSocket: any;
+  selectedDetailChampId: string | null;
 
   // Actions
   loadChampions: () => Promise<void>;
@@ -38,6 +39,7 @@ interface DraftStore {
   setRoleFilter: (role: string) => void;
   setUserRole: (role: UserRole | null) => void;
   setSelectedBanSlot: (slot: { team: "blue" | "red"; index: number } | null) => void;
+  setSelectedDetailChampId: (id: string | null) => void;
   autoFillBans: () => void;
   recalculateBrain: () => void;
   connectBridge: () => void;
@@ -61,6 +63,7 @@ const initialDraftState = {
   selectedBanSlot: null,
   isBridgeConnected: false,
   bridgeSocket: null,
+  selectedDetailChampId: null,
 };
 
 export const useDraftStore = create<DraftStore>((set, get) => ({
@@ -204,6 +207,10 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
 
   setSelectedBanSlot: (slot) => {
     set({ selectedBanSlot: slot });
+  },
+
+  setSelectedDetailChampId: (id) => {
+    set({ selectedDetailChampId: id });
   },
 
   autoFillBans: () => {

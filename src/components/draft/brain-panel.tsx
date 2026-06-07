@@ -10,6 +10,7 @@ import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
 import ChampionMatchupEvaluator from "./champion-matchup-evaluator";
 import LiveGameplanTimeline from "./live-gameplan-timeline";
 import TeemoCoach from "../teemo-coach";
+import VisualHealthPanel from "../visual-health-panel";
 import { CompetitiveBrain } from "@/lib/draft-engine";
 import { 
   Heart, 
@@ -63,6 +64,7 @@ export default function BrainPanel() {
     myPickSlots,
     isComplete,
     userRole,
+    setSelectedDetailChampId,
   } = useDraftStore();
   const [version, setVersion] = useState("15.11.1");
 
@@ -187,14 +189,16 @@ export default function BrainPanel() {
           <button
             onClick={undo}
             disabled={currentStepIndex === 0}
-            className="p-2 rounded border border-[#c8aa6e]/30 bg-[#1e232a] text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#0a1428] disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+            className="p-2 rounded border border-[#c8aa6e]/30 bg-[#1e232a] text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#0a1428] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
             title="Deshacer último pick/ban"
+            aria-label="Deshacer último pick o ban"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={reset}
             className="px-3.5 py-1.5 text-xs font-bold tracking-widest uppercase border border-red-800/40 bg-red-950/20 text-[#ff4655] hover:bg-[#ff4655] hover:text-[#010a13] transition-all rounded-sm cursor-pointer"
+            aria-label="Reiniciar simulador de draft"
           >
             Reiniciar
           </button>
@@ -411,9 +415,9 @@ export default function BrainPanel() {
                 />
               </>
             ) : (
-              <div className="p-5 border border-dashed border-[#c8aa6e]/40 bg-[#1e232a]/60 rounded flex flex-col gap-2.5 text-center">
-                <ShieldAlert className="w-8 h-8 text-[#785a28] mx-auto opacity-75 animate-bounce" />
-                <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-[#785a28]">
+              <div className="p-5 border border-dashed border-[#c8aa6e]/40 bg-[#1e232a]/60 rounded flex flex-col gap-2.5 text-center shadow-md">
+                <ShieldAlert className="w-8 h-8 text-[#c8aa6e] mx-auto opacity-90 animate-bounce" />
+                <h4 className="font-serif font-bold text-xs uppercase tracking-widest text-[#c8aa6e]">
                   Combo No Sincronizado
                 </h4>
                 <p className="text-xs text-[#8a9dae] leading-relaxed">
@@ -430,10 +434,10 @@ export default function BrainPanel() {
             className={`p-4 rounded border text-xs md:text-sm font-bold flex items-center gap-3 ${
               isMyTurn
                 ? "bg-[#00c8c8]/10 border-[#00c8c8] text-[#f0e6d3]"
-                : "bg-[#1e232a]/60 border-[#785a28]/40 text-[#8a9dae]"
+                : "bg-[#1e232a]/60 border-[#785a28]/45 text-[#8a9dae]"
             }`}
           >
-            <Compass className={`w-5 h-5 shrink-0 ${isMyTurn ? "text-[#00c8c8] animate-spin" : "text-[#785a28]"}`} />
+            <Compass className={`w-5 h-5 shrink-0 ${isMyTurn ? "text-[#00c8c8] animate-spin" : "text-[#c8aa6e]"}`} />
             {isMyTurn 
               ? `Es tu turno para: ${actionType === "ban" ? "BANEAR" : "ELEGIR CAMPEÓN"}`
               : "Esperando selección del rival..."}
@@ -461,8 +465,13 @@ export default function BrainPanel() {
                   >
                     {/* Top Row: Champ Info & Score */}
                     <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <div className="relative w-12 h-12 rounded border border-[#c8aa6e] overflow-hidden shrink-0">
+                      <button
+                        onClick={() => setSelectedDetailChampId(rec.championId)}
+                        className="flex items-center gap-3 text-left hover:opacity-85 transition-opacity cursor-pointer group/recHeader"
+                        title={`Haz clic para ver detalles y sinergias de ${rec.championName}`}
+                        aria-label={`Ver detalles de ${rec.championName}`}
+                      >
+                        <div className="relative w-12 h-12 rounded border border-[#c8aa6e] overflow-hidden shrink-0 group-hover/recHeader:border-[#00c8c8] transition-colors">
                           <Image
                             src={iconUrl}
                             alt={rec.championName}
@@ -472,14 +481,14 @@ export default function BrainPanel() {
                           />
                         </div>
                         <div className="flex flex-col gap-0.5">
-                          <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3]">
+                          <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] group-hover/recHeader:text-[#c8aa6e] transition-colors">
                             {rec.championName}
                           </span>
                           <span className={`inline-block text-[9px] md:text-xs font-black uppercase px-2 py-0.5 rounded self-start ${getBadgeStyle(rec.tag)}`}>
                             {rec.tag.replace("_", " ")}
                           </span>
                         </div>
-                      </div>
+                      </button>
 
                       {/* Add/Select trigger inside Brain Panel */}
                       <div className="flex items-center gap-2">
@@ -708,6 +717,11 @@ export default function BrainPanel() {
                 {enemyComp.weaknesses.join(" ")}
               </p>
             )}
+          </div>
+          
+          {/* Módulo de Salud Visual y Ergonomía */}
+          <div className="mt-4 border-t border-[#c8aa6e]/20 pt-4">
+            <VisualHealthPanel />
           </div>
         </div>
       </div>

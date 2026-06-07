@@ -25,7 +25,7 @@ export default function PickSlot({
   myRoleName,
   team,
 }: PickSlotProps) {
-  const { userRole } = useDraftStore();
+  const { userRole, setSelectedDetailChampId } = useDraftStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -34,14 +34,19 @@ export default function PickSlot({
   const splashUrl = champion ? getChampionSplashUrl(champion.ddragonKey, 0) : null;
 
   return (
-    <div
-      className={`relative w-full h-[110px] md:h-[136px] border transition-all duration-300 overflow-hidden flex items-center ${
+    <button
+      onClick={() => champion && setSelectedDetailChampId(champion.id)}
+      disabled={!champion}
+      className={`relative w-full h-[110px] md:h-[136px] border transition-all duration-300 overflow-hidden flex items-center text-left ${
+        champion ? "cursor-pointer hover:border-[#c8aa6e]" : "cursor-default"
+      } ${
         isActive
           ? "lol-slot-active bg-[#0a1428]/60 border-[#00c8c8] shadow-[0_0_16px_rgba(0,200,200,0.2)]"
           : isOurs
-          ? "border-[#c8aa6e]/60 bg-[#091420]/70 shadow-[inset_0_0_20px_rgba(200,170,110,0.15)] hover:shadow-[inset_0_0_20px_rgba(200,170,110,0.25)] hover:border-[#c8aa6e]"
+          ? "border-[#c8aa6e]/60 bg-[#091420]/70 shadow-[inset_0_0_20px_rgba(200,170,110,0.15)] hover:shadow-[inset_0_0_20px_rgba(200,170,110,0.25)]"
           : "border-[#785a28]/30 bg-[#1e232a]/30"
       }`}
+      aria-label={champion ? `${roleLabel}: ${champion.name}. Haz clic para ver detalles.` : `${roleLabel} vacío`}
     >
       {/* Background Splash Art */}
       {splashUrl && (
@@ -118,6 +123,6 @@ export default function PickSlot({
       {isOurs && (
         <div className="absolute inset-0.5 border border-[#c8aa6e]/25 pointer-events-none z-30" />
       )}
-    </div>
+    </button>
   );
 }

@@ -238,3 +238,78 @@ body {
 .diagonal-shimmer:hover::after {
   transform: translate(50%, 50%) rotate(45deg);
 }
+
+/* Accessibility & High Contrast overrides (WCAG AA Compliance) */
+.text-high-contrast-bronze {
+  color: #c8aa6e !important;
+}
+
+/* Reduced Motion Mode */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-delay: -1ms !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    background-attachment: initial !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+  }
+  
+  .shimmer-text, .shimmer-text-light {
+    background: none !important;
+    -webkit-text-fill-color: initial !important;
+    color: var(--gold) !important;
+    animation: none !important;
+  }
+  
+  .lol-card-active, .lol-slot-active {
+    animation: none !important;
+    border-color: var(--gold) !important;
+  }
+  
+  .lol-button {
+    transition: none !important;
+  }
+  
+  .lol-button:hover:not(:disabled) {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Manual reduced motion flag applied to root html tag */
+.reduced-motion *, 
+.reduced-motion *::before, 
+.reduced-motion *::after {
+  animation-delay: -1ms !important;
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  background-attachment: initial !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+.reduced-motion .shimmer-text, 
+.reduced-motion .shimmer-text-light {
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  color: var(--gold) !important;
+  animation: none !important;
+}
+
+.reduced-motion .lol-card-active, 
+.reduced-motion .lol-slot-active {
+  animation: none !important;
+  border-color: var(--gold) !important;
+}
+
+.reduced-motion .lol-button {
+  transition: none !important;
+}
+
+.reduced-motion .lol-button:hover:not(:disabled) {
+  transform: none !important;
+  box-shadow: none !important;
+}

@@ -638,13 +638,12 @@ export class CompetitiveBrain {
       }
     }
 
-    // Dynamic win probability estimation (iTero)
+    // Dynamic win probability estimation (iTero Advanced Engine)
     let winProb = 50;
     
     // Add logic based on comfort and counters
     const myPicks = state.side === "blue" ? state.bluePicks : state.redPicks;
     let comfortCount = 0;
-    let counterCount = 0;
 
     myPicks.forEach(id => {
       if (id) {
@@ -653,22 +652,64 @@ export class CompetitiveBrain {
       }
     });
 
-    winProb += comfortCount * 4;
+    winProb += comfortCount * 3.5;
 
     // Direct bots synergies checks
     const adcId = myPicks[state.myPickSlots[0]];
     const supId = myPicks[state.myPickSlots[1]];
     if (adcId && supId) {
-      const foundDuo = duos.some(d => (d.adcId === adcId && d.supId === supId) || (d.adcId === supId && d.supId === adcId));
-      if (foundDuo) winProb += 10;
+      const foundDuo = duos.find(d => (d.adcId === adcId && d.supId === supId) || (d.adcId === supId && d.supId === adcId));
+      if (foundDuo) {
+        winProb += foundDuo.tier === "S+" ? 12 : 9;
+        // Special Thresh synergies boost (Jinx, Kai'Sa, Ezreal, Varus)
+        if (supId === "thresh" && ["jinx", "kaisa", "ezreal", "varus", "caitlyn"].includes(adcId)) {
+          winProb += 4.5; // High coordinate play bonus
+        }
+      }
+    }
+
+    // Damage balance (AD/AP blend)
+    if (allyComp && allyComp.adPercentage !== undefined && allyComp.apPercentage !== undefined) {
+      const ad = allyComp.adPercentage;
+      const ap = allyComp.apPercentage;
+      if (ad >= 90 || ap >= 90) {
+        winProb -= 6.5; // Single damage type penalty
+      } else if (ad >= 35 && ad <= 65) {
+        winProb += 3.5; // Perfect hybrid balance bonus
+      }
+    }
+
+    // Enemy matchup counters
+    if (enemyPickedIds.length > 0 && myPicks.filter(Boolean).length > 0) {
+      let countersMatched = 0;
+      myPicks.filter(Boolean).forEach(myId => {
+        const myChamp = this.getChampionById(myId!);
+        if (myChamp) {
+          enemyPickedIds.forEach(enemyId => {
+            if (myChamp.counters?.includes(enemyId) || (enemyId === "caitlyn" && myId === "ashe")) {
+              countersMatched++;
+            }
+          });
+        }
+      });
+      winProb += countersMatched * 3.0;
+    }
+
+    // Anti-dive check
+    if (enemyComp?.type === "dive" && allyComp?.type === "protect") {
+      winProb += 5.0; // Protect beats dive in competitive draft
+    } else if (enemyComp?.type === "poke" && allyComp?.type === "dive") {
+      winProb += 4.0; // Dive beats poke
+    } else if (enemyComp?.type === "protect" && allyComp?.type === "poke") {
+      winProb -= 4.0; // Protect mitigates poke
     }
 
     // Deduct on active warnings
     if (warnings.length > 0 && !warnings[0].includes("despejada") && !warnings[0].includes("Línea despejada")) {
-      winProb -= warnings.length * 4;
+      winProb -= warnings.length * 3.5;
     }
 
-    winProb = Math.max(15, Math.min(88, winProb));
+    winProb = Math.round(Math.max(12, Math.min(94, winProb)));
 
     return {
       isMyTurn,

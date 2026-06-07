@@ -1,15 +1,28 @@
 // filepath: src/components/draft/draft-page-client.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DraftBoard from "./draft-board";
 import BrainPanel from "./brain-panel";
+import { useDraftStore } from "@/store/draft-store";
+import ChampionDetailDrawer from "./champion-detail-drawer";
+import { getLatestVersion } from "@/lib/ddragon";
+import { AnimatePresence } from "framer-motion";
 
 export default function DraftPageClient() {
   const [activeTab, setActiveTab] = useState<"draft" | "brain">("draft");
+  const [version, setVersion] = useState("15.11.1");
+  const { selectedDetailChampId, setSelectedDetailChampId, allChampions, brainAnalysis, setChampion } = useDraftStore();
+
+  useEffect(() => {
+    getLatestVersion().then(setVersion);
+  }, []);
+
+  const selectedChampData = allChampions.find(c => c.id === selectedDetailChampId) || null;
+  const isMyTurn = brainAnalysis ? brainAnalysis.isMyTurn : false;
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 relative">
       {/* Mobile Tab Switcher */}
       <div className="flex xl:hidden border border-[#785a28] bg-[#091420] rounded p-1 gap-1 shadow-sm">
         <button
@@ -46,6 +59,19 @@ export default function DraftPageClient() {
           <BrainPanel />
         </div>
       </div>
+
+      {/* Champion Info Slide-in Drawer */}
+      <AnimatePresence>
+        {selectedChampData && (
+          <ChampionDetailDrawer
+            champion={selectedChampData}
+            onClose={() => setSelectedDetailChampId(null)}
+            onSelect={setChampion}
+            isMyTurn={isMyTurn}
+            version={version}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

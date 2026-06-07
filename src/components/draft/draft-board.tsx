@@ -214,6 +214,7 @@ export default function DraftBoard() {
                       : "border-[#785a28]/40 hover:border-[#c8aa6e]"
                   }`}
                   title="Haz clic para seleccionar o cambiar este ban"
+                  aria-label={champ ? `Baneo Azul ${index + 1}: ${champ.name}` : `Ranura de baneo Azul ${index + 1} vacía. Haz clic para asignar baneo.`}
                 >
                   {champ ? (
                     <Image
@@ -247,6 +248,7 @@ export default function DraftBoard() {
                 : "bg-rose-950/20 border-rose-600 text-rose-500 hover:bg-rose-600 hover:text-white animate-pulse"
             }`}
             title={isBridgeConnected ? "Sincronización activa. Haz clic para desconectar." : "Sincronización inactiva. Haz clic para conectar tu cliente de LoL en vivo."}
+            aria-label={isBridgeConnected ? "Sincronización de cliente LCU activa. Haz clic para desconectar." : "Sincronización de cliente LCU inactiva. Haz clic para conectar cliente de League."}
           >
             {isBridgeConnected ? "🟢 LCU Sincronizado" : "🔴 Conectar Cliente"}
           </button>
@@ -269,6 +271,7 @@ export default function DraftBoard() {
                       : "border-[#785a28]/40 hover:border-[#c8aa6e]"
                   }`}
                   title="Haz clic para seleccionar o cambiar este ban"
+                  aria-label={champ ? `Baneo Rojo ${index + 1}: ${champ.name}` : `Ranura de baneo Rojo ${index + 1} vacía. Haz clic para asignar baneo.`}
                 >
                   {champ ? (
                     <Image

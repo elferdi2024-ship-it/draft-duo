@@ -209,7 +209,7 @@ export default function BrainPanel() {
       <div className="flex-1 overflow-y-auto p-5 md:p-6 lg:p-3.5 flex flex-col gap-5 lg:gap-3.5 max-h-[650px] md:max-h-[960px] lg:max-h-none lg:min-h-0">
         
         {/* iTero Win Rate Delta Simulator */}
-        <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2 relative overflow-hidden">
+        <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2 relative overflow-hidden shrink-0">
           <div className="flex justify-between items-center">
             <span className="text-[10px] uppercase tracking-widest font-black text-[#c8aa6e] flex items-center gap-1.5">
               <Activity className="w-3.5 h-3.5 text-[#00c8c8]" />
@@ -241,7 +241,7 @@ export default function BrainPanel() {
 
         {/* Evaluation of final draft synergy */}
         {phase === "complete" && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 shrink-0">
             {matchingDuo ? (
               <>
                 <div className="p-5 border-2 border-[#c8aa6e] bg-[#0a1428] rounded shadow-[0_4px_12px_rgba(200,170,110,0.25)] flex flex-col gap-3">
@@ -431,7 +431,7 @@ export default function BrainPanel() {
         {/* Active turn indicator banner */}
         {phase !== "complete" && (
           <div 
-            className={`p-4 rounded border text-xs md:text-sm font-bold flex items-center gap-3 ${
+            className={`p-4 rounded border text-xs md:text-sm font-bold flex items-center gap-3 shrink-0 ${
               isMyTurn
                 ? "bg-[#00c8c8]/10 border-[#00c8c8] text-[#f0e6d3]"
                 : "bg-[#1e232a]/60 border-[#785a28]/45 text-[#8a9dae]"
@@ -445,7 +445,7 @@ export default function BrainPanel() {
         )}
 
         {/* Brain Recommendations */}
-        <div>
+        <div className="shrink-0">
           <h3 className="lol-title text-xs md:text-sm font-black text-[#c8aa6e] tracking-widest uppercase mb-3">
             {actionType === "ban" ? "Baneos Recomendados" : "Mejores Picks de Confort"}
           </h3>
@@ -539,7 +539,7 @@ export default function BrainPanel() {
 
         {/* Warnings / Hazards Alerts */}
         {warnings.length > 0 && (
-          <div className="p-4 border border-[#ff4655]/25 bg-[#ff4655]/5 flex gap-3">
+          <div className="p-4 border border-[#ff4655]/25 bg-[#ff4655]/5 flex gap-3 shrink-0">
             <AlertTriangle className="w-5 h-5 text-[#ff4655] shrink-0" />
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] md:text-xs uppercase tracking-wider font-extrabold text-[#ff4655]">
@@ -556,7 +556,7 @@ export default function BrainPanel() {
 
         {/* Win Conditions */}
         {winConditions.length > 0 && (
-          <div className="p-4 border border-[#00c8c8]/25 bg-[#00c8c8]/5 flex gap-3">
+          <div className="p-4 border border-[#00c8c8]/25 bg-[#00c8c8]/5 flex gap-3 shrink-0">
             <CheckCircle className="w-5 h-5 text-[#00c8c8] shrink-0" />
             <div className="flex flex-col gap-1.5">
               <span className="text-[10px] md:text-xs uppercase tracking-wider font-extrabold text-[#00c8c8]">
@@ -572,7 +572,7 @@ export default function BrainPanel() {
         )}
 
         {/* Comp Type Analysis (iTero AP/AD Damage Balance and Scaling Indicators) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 border-t border-[#c8aa6e]/20 pt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 border-t border-[#c8aa6e]/20 pt-4 shrink-0">
           {/* Ally Comp */}
           <div className="v-stack gap-3 border border-[#785a28]/30 bg-[#1e232a]/30 p-4 rounded-sm">
             <div className="flex flex-col gap-0.5">

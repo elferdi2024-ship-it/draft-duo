@@ -74,7 +74,7 @@ export default function TeemoCoach({ isTalking = false, message }: TeemoCoachPro
 
   return (
     <div 
-      className="flex flex-col items-center justify-center p-4 bg-transparent select-none relative max-w-sm mx-auto"
+      className="flex flex-col items-center justify-center p-4 bg-transparent select-none relative max-w-sm mx-auto shrink-0"
       role="complementary"
       aria-label="Teemo Coach - Consejero de Draft y Salud"
     >

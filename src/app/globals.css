@@ -45,9 +45,9 @@ body {
   font-family: var(--font-sans);
   /* Épicos gradientes mágicos Hextech en el fondo */
   background-image: 
-    radial-gradient(circle at 50% -20%, rgba(3, 151, 171, 0.15) 0%, transparent 55rem),
-    radial-gradient(circle at 10% 80%, rgba(200, 170, 110, 0.05) 0%, transparent 45rem),
-    radial-gradient(circle at 90% 80%, rgba(3, 151, 171, 0.05) 0%, transparent 45rem);
+    radial-gradient(circle at 50% -10%, rgba(0, 151, 230, 0.22) 0%, transparent 60rem),
+    radial-gradient(circle at 10% 80%, rgba(200, 170, 110, 0.08) 0%, transparent 50rem),
+    radial-gradient(circle at 90% 80%, rgba(0, 200, 200, 0.06) 0%, transparent 50rem);
 }
 
 /* Scrollbar Customización Hextech */
@@ -98,55 +98,59 @@ body {
 
 /* Custom premium components */
 .shimmer-text {
-  background: linear-gradient(90deg, #785a28 25%, #c8aa6e 50%, #785a28 75%);
+  background: linear-gradient(90deg, #785a28 0%, #ebd6b3 30%, #c8aa6e 50%, #ebd6b3 70%, #785a28 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer 4s linear infinite;
+  animation: shimmer 5s linear infinite;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
 .shimmer-text-light {
-  background: linear-gradient(90deg, #c8aa6e 25%, #f0e6d3 50%, #c8aa6e 75%);
+  background: linear-gradient(90deg, #c8aa6e 0%, #ffffff 30%, #f0e6d3 50%, #ffffff 70%, #c8aa6e 100%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer 4s linear infinite;
+  animation: shimmer 5s linear infinite;
+  text-shadow: 0 2px 12px rgba(200, 170, 110, 0.2);
 }
 
 .lol-panel {
   border-width: 1px;
   border-style: solid;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65), inset 0 0 16px rgba(200, 170, 110, 0.03);
   border-radius: 2px;
 }
 :where(.lol-panel) {
-  background-color: var(--panel);
-  border-color: var(--border-dark);
+  background: linear-gradient(180deg, #091420 0%, #050d17 100%);
+  border-color: rgba(120, 90, 40, 0.6);
 }
 
 .lol-panel-dark {
-  background: #091420;
-  border: 1px solid var(--border-dark);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  background: linear-gradient(180deg, #050c14 0%, #02070d 100%);
+  border: 1px solid rgba(200, 170, 110, 0.25);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), inset 0 0 24px rgba(0, 151, 230, 0.04);
   border-radius: 2px;
   color: #f0e6d3;
 }
 
 .lol-panel-interactive {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .lol-panel-interactive:hover {
-  transform: translateY(-3px);
-  border-color: var(--border);
-  box-shadow: 0 12px 30px rgba(200, 170, 110, 0.12);
-  background-color: #0c1829;
+  transform: translateY(-2px);
+  border-color: rgba(200, 170, 110, 0.85);
+  box-shadow: 
+    0 16px 36px rgba(0, 0, 0, 0.6), 
+    0 0 20px rgba(200, 170, 110, 0.15);
+  background: linear-gradient(180deg, #0b1a29 0%, #07121f 100%);
 }
 
 .lol-border-fancy {
   position: relative;
-  border: 1px solid var(--border-dark);
+  border: 1px solid rgba(200, 170, 110, 0.3);
   padding: 8px;
-  background: var(--panel);
+  background: linear-gradient(180deg, #091420 0%, #040c14 100%);
 }
 .lol-border-fancy::before {
   content: '';
@@ -155,7 +159,7 @@ body {
   left: 2px;
   right: 2px;
   bottom: 2px;
-  border: 1px solid rgba(200, 170, 110, 0.2);
+  border: 1px solid rgba(200, 170, 110, 0.15);
   pointer-events: none;
 }
 
@@ -173,24 +177,26 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #1e2830 0%, #0a1428 100%);
-  border: 1px solid var(--border-dark);
-  color: var(--border);
+  background: linear-gradient(180deg, #121c24 0%, #08101a 100%);
+  border: 1px solid rgba(200, 170, 110, 0.4);
+  color: #c8aa6e;
   padding: 0.55rem 1.35rem;
   font-size: 0.85rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   border-radius: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 .lol-button:hover:not(:disabled) {
-  background: linear-gradient(180deg, #c8aa6e 0%, #785a28 100%);
+  background: linear-gradient(180deg, #ebd6b3 0%, #c8aa6e 100%);
   color: #010a13;
-  border-color: #f0e6d3;
-  box-shadow: 0 0 16px rgba(200, 170, 110, 0.5);
+  border-color: #ffffff;
+  box-shadow: 
+    0 0 20px rgba(200, 170, 110, 0.4), 
+    inset 0 0 8px rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
 }
 .lol-button:disabled {
@@ -201,10 +207,12 @@ body {
 }
 
 .lol-button-active {
-  background: linear-gradient(180deg, #c8aa6e 0%, #785a28 100%);
+  background: linear-gradient(180deg, #ebd6b3 0%, #c8aa6e 100%);
   color: #010a13;
-  border-color: #f0e6d3;
-  box-shadow: 0 0 12px rgba(200, 170, 110, 0.3);
+  border-color: #ffffff;
+  box-shadow: 
+    0 0 20px rgba(200, 170, 110, 0.4), 
+    inset 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
 .lol-title {

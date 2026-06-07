@@ -22,9 +22,9 @@ export default function DraftPageClient() {
   const isMyTurn = brainAnalysis ? brainAnalysis.isMyTurn : false;
 
   return (
-    <div className="flex flex-col gap-5 relative xl:flex-1 xl:min-h-0 xl:overflow-hidden">
+    <div className="flex flex-col gap-4 relative lg:flex-1 lg:min-h-0 lg:overflow-hidden">
       {/* Mobile Tab Switcher */}
-      <div className="flex xl:hidden border border-[#785a28] bg-[#091420] rounded p-1 gap-1 shadow-sm">
+      <div className="flex lg:hidden border border-[#785a28] bg-[#091420] rounded p-1 gap-1 shadow-sm">
         <button
           onClick={() => setActiveTab("draft")}
           className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-sm transition-all text-center cursor-pointer ${
@@ -48,14 +48,14 @@ export default function DraftPageClient() {
       </div>
 
       {/* Interactive layout grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-stretch xl:flex-1 xl:min-h-0 xl:overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch lg:flex-1 lg:min-h-0 lg:overflow-hidden">
         {/* Main interactive draft board */}
-        <div className={activeTab === "draft" ? "block xl:block xl:col-span-8 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden" : "hidden xl:block xl:col-span-8 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden"}>
+        <div className={activeTab === "draft" ? "block lg:block lg:col-span-8 lg:h-full lg:min-h-0 lg:flex lg:flex-col lg:overflow-hidden" : "hidden lg:block lg:col-span-8 lg:h-full lg:min-h-0 lg:flex lg:flex-col lg:overflow-hidden"}>
           <DraftBoard />
         </div>
 
         {/* Real-time assistant AI sidebar */}
-        <div className={activeTab === "brain" ? "block xl:block xl:col-span-4 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden" : "hidden xl:block xl:col-span-4 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden"}>
+        <div className={activeTab === "brain" ? "block lg:block lg:col-span-4 lg:h-full lg:min-h-0 lg:flex lg:flex-col lg:overflow-hidden" : "hidden lg:block lg:col-span-4 lg:h-full lg:min-h-0 lg:flex lg:flex-col lg:overflow-hidden"}>
           <BrainPanel />
         </div>
       </div>

@@ -8,14 +8,14 @@ export const metadata = {
 
 export default function DraftPage() {
   return (
-    <div className="w-full max-w-[1720px] mx-auto px-4 md:px-10 py-6 xl:py-3 flex flex-col gap-6 xl:gap-3 xl:h-[calc(100vh-112px)] xl:overflow-hidden">
+    <div className="w-full max-w-[1720px] mx-auto px-4 md:px-10 py-4 lg:py-2 flex flex-col gap-4 lg:gap-2.5 lg:h-[calc(100vh-100px)] lg:overflow-hidden">
       {/* Page Title & Subtitle */}
-      <div className="shrink-0">
-        <h1 className="font-serif text-4xl md:text-5xl xl:text-3xl font-black tracking-widest uppercase text-[#0f1923] shimmer-text-dark">
-          Simulador de Draft en Vivo
+      <div className="shrink-0 flex flex-col md:flex-row md:items-baseline justify-between border-b border-[#785a28]/30 pb-2">
+        <h1 className="font-serif text-3xl md:text-4xl lg:text-2xl font-black tracking-widest uppercase text-[#0f1923] shimmer-text-dark">
+          Simulador de Draft
         </h1>
-        <p className="text-xs md:text-sm xl:text-[10px] text-[#c8aa6e] uppercase font-black tracking-widest mt-2">
-          Liga de Leyendas • Parche 26.11 (Season 16 — Demacia)
+        <p className="text-xs md:text-sm lg:text-[10px] text-[#c8aa6e] uppercase font-black tracking-widest mt-1">
+          Liga de Leyendas • Parche 26.11 (Season 16)
         </p>
       </div>
 

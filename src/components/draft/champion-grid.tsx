@@ -86,9 +86,9 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
     });
 
   return (
-    <div className="flex flex-col gap-5 xl:gap-3 bg-[#091420] border border-[#785a28] p-6 xl:p-4 shadow-md w-full h-full flex-1 xl:min-h-0 xl:overflow-hidden">
+    <div className="flex flex-col gap-4 lg:gap-2.5 bg-[#091420] border border-[#785a28] p-4 lg:p-3 shadow-md w-full h-full flex-1 lg:min-h-0 lg:overflow-hidden">
       {/* Header filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 xl:gap-2">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 lg:gap-2">
         {/* Search Input */}
         <div className="relative w-full md:w-72 min-w-[220px]">
           <Search className="absolute left-3 top-3 w-4 h-4 text-[#8a9dae]/70" />
@@ -123,13 +123,13 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
       </div>
 
       {/* Grid Container */}
-      <div className="flex-1 overflow-y-auto max-h-[480px] md:max-h-[710px] xl:max-h-none xl:min-h-0 border border-[#785a28]/40 bg-[#010a13] p-2.5">
+      <div className="flex-1 overflow-y-auto max-h-[480px] md:max-h-[710px] lg:max-h-none lg:min-h-0 border border-[#785a28]/40 bg-[#010a13] p-2">
         {filteredChampions.length === 0 ? (
           <div className="text-center text-xs text-[#8a9dae] py-12">
             No se encontraron campeones coincidentes.
           </div>
         ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2.5">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2">
             {filteredChampions.map((champ) => {
               const isUnavailable = pickedBannedIds.has(champ.id);
               const iconUrl = getChampionIconUrl(ddragonVersion, champ.ddragonKey);

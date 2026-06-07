@@ -191,15 +191,15 @@ export default function DraftBoard() {
   const step = currentStepIndex < DRAFT_ORDER.length ? DRAFT_ORDER[currentStepIndex] : null;
 
   return (
-    <div className="flex flex-col gap-5 md:gap-6 w-full h-full text-[#f0e6d3]">
+    <div className="flex flex-col gap-5 md:gap-6 xl:gap-3 w-full h-full text-[#f0e6d3] xl:min-h-0 xl:overflow-hidden">
       {/* Draft Header: Ban display */}
-      <div className="lol-panel p-5 md:p-6 flex flex-col md:flex-row items-center justify-between gap-5 bg-[#091420] border border-[#785a28]/60 shadow-xl">
+      <div className="lol-panel p-5 md:p-6 xl:p-3 flex flex-col md:flex-row items-center justify-between gap-5 xl:gap-3 bg-[#091420] border border-[#785a28]/60 shadow-xl shrink-0">
         {/* Blue Bans (5 slots) */}
         <div className="flex items-center gap-3.5 flex-1 w-full justify-between md:justify-start">
-          <span className="text-xs md:text-sm uppercase font-extrabold text-[#00c8c8] tracking-widest w-20 shrink-0">
+          <span className="text-xs md:text-sm xl:text-[11px] uppercase font-extrabold text-[#00c8c8] tracking-widest w-20 xl:w-16 shrink-0">
             Bans Azul
           </span>
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 xl:gap-1">
             {blueBans.map((id, index) => {
               const champ = getChampionById(id);
               const isSelected = selectedBanSlot?.team === "blue" && selectedBanSlot?.index === index;
@@ -208,7 +208,7 @@ export default function DraftBoard() {
                 <button
                   key={index}
                   onClick={() => setSelectedBanSlot({ team: "blue", index })}
-                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] border rounded bg-[#1e232a]/60 relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] xl:w-[38px] xl:h-[38px] border rounded bg-[#1e232a]/60 relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
                     isSelected 
                       ? "lol-slot-active border-[#00c8c8] ring-2 ring-[#00c8c8]/40 animate-pulse" 
                       : "border-[#785a28]/40 hover:border-[#c8aa6e]"
@@ -225,7 +225,7 @@ export default function DraftBoard() {
                       sizes="50px"
                     />
                   ) : (
-                    <span className="text-xs md:text-sm text-[#c8aa6e] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm xl:text-xs text-[#c8aa6e] font-bold">{index + 1}</span>
                   )}
                 </button>
               );
@@ -234,15 +234,15 @@ export default function DraftBoard() {
         </div>
 
         {/* Phase Indicator & LCU Sincronización */}
-        <div className="flex flex-col items-center gap-2 shrink-0">
-          <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-7 py-3 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[200px]">
-            <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
+        <div className="flex flex-col items-center gap-2 xl:gap-1 shrink-0">
+          <div className="text-center shrink-0 flex items-center justify-center bg-[#0a1428] px-7 py-3 xl:py-1.5 xl:px-4 border-2 border-[#c8aa6e] shadow-md rounded-sm min-w-[200px] xl:min-w-[160px]">
+            <span className="font-serif font-black text-sm md:text-base xl:text-xs text-[#f0e6d3] tracking-widest uppercase shimmer-text-light">
               {step ? step.label : "Fase Completada"}
             </span>
           </div>
           <button
             onClick={isBridgeConnected ? disconnectBridge : connectBridge}
-            className={`px-3 py-1 border rounded-sm text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${
+            className={`px-3 py-1 xl:py-0.5 xl:px-2 border rounded-sm text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer ${
               isBridgeConnected
                 ? "bg-emerald-950/20 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white"
                 : "bg-rose-950/20 border-rose-600 text-rose-500 hover:bg-rose-600 hover:text-white animate-pulse"
@@ -256,7 +256,7 @@ export default function DraftBoard() {
 
         {/* Red Bans (5 slots) */}
         <div className="flex items-center gap-3.5 flex-1 w-full justify-between md:justify-end">
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5 xl:gap-1">
             {redBans.map((id, index) => {
               const champ = getChampionById(id);
               const isSelected = selectedBanSlot?.team === "red" && selectedBanSlot?.index === index;
@@ -265,7 +265,7 @@ export default function DraftBoard() {
                 <button
                   key={index}
                   onClick={() => setSelectedBanSlot({ team: "red", index })}
-                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] border rounded bg-[#1e232a]/60 relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-[40px] h-[40px] md:w-[50px] md:h-[50px] xl:w-[38px] xl:h-[38px] border rounded bg-[#1e232a]/60 relative overflow-hidden flex items-center justify-center transition-all cursor-pointer ${
                     isSelected 
                       ? "lol-slot-active border-[#00c8c8] ring-2 ring-[#00c8c8]/40 animate-pulse" 
                       : "border-[#785a28]/40 hover:border-[#c8aa6e]"
@@ -282,26 +282,26 @@ export default function DraftBoard() {
                       sizes="50px"
                     />
                   ) : (
-                    <span className="text-xs md:text-sm text-[#c8aa6e] font-bold">{index + 1}</span>
+                    <span className="text-xs md:text-sm xl:text-xs text-[#c8aa6e] font-bold">{index + 1}</span>
                   )}
                 </button>
               );
             })}
           </div>
-          <span className="text-xs md:text-sm uppercase font-extrabold text-[#ff4655] tracking-widest w-20 text-right shrink-0">
+          <span className="text-xs md:text-sm xl:text-[11px] uppercase font-extrabold text-[#ff4655] tracking-widest w-20 xl:w-16 text-right shrink-0">
             Bans Rojo
           </span>
         </div>
       </div>
 
       {/* Ban Instructions & AutoFill */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#0a1428]/60 border border-[#c8aa6e]/30 px-5 py-3 rounded-sm">
-        <span className="text-xs text-[#c8aa6e] font-bold leading-normal text-center sm:text-left">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 xl:gap-2 bg-[#0a1428]/60 border border-[#c8aa6e]/30 px-5 py-3 xl:py-1.5 rounded-sm shrink-0">
+        <span className="text-xs xl:text-[10px] text-[#c8aa6e] font-bold leading-normal text-center sm:text-left">
           💡 <span className="underline">Bans Simultáneos</span>: Haz clic en cualquiera de las 10 ranuras numeradas arriba, luego selecciona un campeón del grid para banearlo.
         </span>
         <button
           onClick={autoFillBans}
-          className="px-4 py-2 border border-[#c8aa6e] bg-[#0a1428] text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#010a13] text-xs font-black uppercase tracking-widest transition-all rounded shadow-sm shrink-0 cursor-pointer"
+          className="px-4 py-2 xl:py-1 xl:px-3 border border-[#c8aa6e] bg-[#0a1428] text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#010a13] text-xs xl:text-[10px] font-black uppercase tracking-widest transition-all rounded shadow-sm shrink-0 cursor-pointer"
         >
           Auto-rellenar Bans de Confort
         </button>
@@ -332,16 +332,16 @@ export default function DraftBoard() {
       </div>
 
       {/* Board Layout: Side picks + Grid */}
-      <div className={`grid gap-6 md:gap-8 items-stretch ${
+      <div className={`grid gap-6 md:gap-8 xl:gap-4 items-stretch xl:flex-1 xl:min-h-0 xl:overflow-hidden ${
         mobileSubTab === "picks" ? "grid-cols-2 lg:grid-cols-12" : "grid-cols-1 lg:grid-cols-12"
       }`}>
         {/* Left Side (Blue picks) */}
         <div className={
           mobileSubTab === "picks" 
             ? "col-span-1 lg:col-span-3 flex flex-col gap-4" 
-            : "hidden lg:flex lg:col-span-3 flex-col gap-4"
+            : "hidden lg:flex lg:col-span-3 flex-col gap-4 xl:gap-1.5 xl:h-full xl:min-h-0 shrink-0"
         }>
-          <div className="bg-[#00c8c8]/10 border border-[#00c8c8]/30 text-[#00c8c8] text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
+          <div className="bg-[#00c8c8]/10 border border-[#00c8c8]/30 text-[#00c8c8] text-xs xl:text-[10px] uppercase tracking-widest font-black py-3 xl:py-1.5 px-4 rounded-sm text-center shadow-sm shrink-0">
             Equipo Azul
           </div>
           {bluePicks.map((id, index) => {
@@ -369,7 +369,7 @@ export default function DraftBoard() {
         <div className={
           mobileSubTab === "grid" 
             ? "col-span-1 lg:col-span-6 flex flex-col w-full h-full" 
-            : "hidden lg:flex lg:col-span-6 flex-col w-full h-full"
+            : "hidden lg:flex lg:col-span-6 flex-col w-full h-full xl:min-h-0"
         }>
           <ChampionGrid
             onSelectChampion={setChampion}
@@ -381,9 +381,9 @@ export default function DraftBoard() {
         <div className={
           mobileSubTab === "picks" 
             ? "col-span-1 lg:col-span-3 flex flex-col gap-4" 
-            : "hidden lg:flex lg:col-span-3 flex-col gap-4"
+            : "hidden lg:flex lg:col-span-3 flex-col gap-4 xl:gap-1.5 xl:h-full xl:min-h-0 shrink-0"
         }>
-          <div className="bg-[#ff4655]/10 border border-[#ff4655]/30 text-[#ff4655] text-xs md:text-sm uppercase tracking-widest font-black py-3 px-4 rounded-sm text-center shadow-sm">
+          <div className="bg-[#ff4655]/10 border border-[#ff4655]/30 text-[#ff4655] text-xs xl:text-[10px] uppercase tracking-widest font-black py-3 xl:py-1.5 px-4 rounded-sm text-center shadow-sm shrink-0">
             Equipo Rojo
           </div>
           {redPicks.map((id, index) => {

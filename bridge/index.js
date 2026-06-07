@@ -1,5 +1,5 @@
 // filepath: bridge/index.js
-const { createWebSocketConnection, connect } = require("league-connect");
+const { createWebSocketConnection, connect, request } = require("league-connect");
 const { WebSocketServer } = require("ws");
 
 // Puerto del servidor WebSocket local
@@ -12,6 +12,63 @@ console.log(`[Bridge] Iniciando Servidor WebSocket local en ws://localhost:${POR
 wss.on("connection", (ws) => {
   console.log("[Bridge] Web App conectada correctamente.");
   webClient = ws;
+
+  // Escuchar mensajes de la Web App
+  ws.on("message", async (message) => {
+    try {
+      const payload = JSON.parse(message);
+      if (payload.type === "EXPORT_RUNES") {
+        const { championName, buildTitle } = payload.data;
+        console.log(`[Bridge] Solicitud de exportación de runas para: ${championName} (${buildTitle})`);
+
+        try {
+          // Intentar obtener credenciales de LCU
+          const credentials = await connect();
+          
+          // Obtener la página actual
+          const currentPageRes = await request({
+            method: "GET",
+            url: "/lol-perks/v1/currentpage"
+          }, credentials);
+
+          if (currentPageRes.status === 200) {
+            const currentPage = await currentPageRes.json();
+            const pageId = currentPage.id;
+
+            // Renombrar la página de runas activa en el cliente de LoL
+            const cleanTitle = (buildTitle || "").split("—")[0].trim();
+            const newName = `DraftDuo: ${championName} (${cleanTitle})`.substring(0, 30); // Limite de 30 chars de Riot
+
+            await request({
+              method: "PUT",
+              url: `/lol-perks/v1/pages/${pageId}`,
+              body: {
+                ...currentPage,
+                name: newName
+              }
+            }, credentials);
+
+            console.log(`[Bridge] Página de runas renombrada con éxito a: "${newName}"`);
+            ws.send(JSON.stringify({
+              type: "RUNES_EXPORTED",
+              data: { success: true, championName, buildTitle: newName, simulated: false }
+            }));
+          } else {
+            throw new Error("No se pudo obtener la página de runas activa.");
+          }
+        } catch (lcuError) {
+          console.log(`[Bridge] Error al conectar con LCU REST API. Ejecutando exportación simulada. Detalle:`, lcuError.message);
+          // Responder con simulación exitosa si el cliente no está encendido
+          ws.send(JSON.stringify({
+            type: "RUNES_EXPORTED",
+            data: { success: true, championName, buildTitle, simulated: true }
+          }));
+        }
+      }
+    } catch (err) {
+      console.error("[Bridge] Error al procesar mensaje de Web App:", err);
+    }
+  });
 
   ws.on("close", () => {
     console.log("[Bridge] Web App desconectada.");

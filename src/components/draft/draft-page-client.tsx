@@ -22,7 +22,7 @@ export default function DraftPageClient() {
   const isMyTurn = brainAnalysis ? brainAnalysis.isMyTurn : false;
 
   return (
-    <div className="flex flex-col gap-5 relative">
+    <div className="flex flex-col gap-5 relative xl:flex-1 xl:min-h-0 xl:overflow-hidden">
       {/* Mobile Tab Switcher */}
       <div className="flex xl:hidden border border-[#785a28] bg-[#091420] rounded p-1 gap-1 shadow-sm">
         <button
@@ -48,14 +48,14 @@ export default function DraftPageClient() {
       </div>
 
       {/* Interactive layout grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-stretch xl:flex-1 xl:min-h-0 xl:overflow-hidden">
         {/* Main interactive draft board */}
-        <div className={activeTab === "draft" ? "block xl:block xl:col-span-8" : "hidden xl:block xl:col-span-8"}>
+        <div className={activeTab === "draft" ? "block xl:block xl:col-span-8 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden" : "hidden xl:block xl:col-span-8 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden"}>
           <DraftBoard />
         </div>
 
         {/* Real-time assistant AI sidebar */}
-        <div className={activeTab === "brain" ? "block xl:block xl:col-span-4" : "hidden xl:block xl:col-span-4"}>
+        <div className={activeTab === "brain" ? "block xl:block xl:col-span-4 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden" : "hidden xl:block xl:col-span-4 xl:h-full xl:min-h-0 xl:flex xl:flex-col xl:overflow-hidden"}>
           <BrainPanel />
         </div>
       </div>

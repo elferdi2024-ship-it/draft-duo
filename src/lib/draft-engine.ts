@@ -221,16 +221,20 @@ export class CompetitiveBrain {
                                      (champ.id === "kaisa" && allyChamp.id === "thresh") ||
                                      (champ.id === "thresh" && allyChamp.id === "kaisa") ||
                                      (champ.id === "ashe" && allyChamp.id === "braum") ||
-                                     (champ.id === "braum" && allyChamp.id === "ashe");
+                                     (champ.id === "braum" && allyChamp.id === "ashe") ||
+                                     (champ.id === "jinx" && allyChamp.id === "lulu") ||
+                                     (champ.id === "lulu" && allyChamp.id === "jinx") ||
+                                     (champ.id === "lucian" && allyChamp.id === "nami") ||
+                                     (champ.id === "nami" && allyChamp.id === "lucian");
 
           if (hasExplicitSynergy) {
-            bestSynergy = Math.max(bestSynergy, 85);
+            bestSynergy = Math.max(bestSynergy, 90);
           } else {
             // General class overlap
             const bothPoke = (champ.tags?.includes("Poke") || false) && (allyChamp.tags?.includes("Poke") || false);
             const bothDive = (champ.tags?.includes("Dive") || false) && (allyChamp.tags?.includes("Dive") || false);
             if (bothPoke || bothDive) {
-              bestSynergy = Math.max(bestSynergy, 70);
+              bestSynergy = Math.max(bestSynergy, 75);
             }
           }
         }
@@ -262,18 +266,18 @@ export class CompetitiveBrain {
                                (champ.id === "lulu" && (enemyChamp.id === "rengar" || enemyChamp.id === "malphite" || enemyChamp.id === "nautilus"));
 
         if (enemyThreatToUs) {
-          singleCounter = 30; // High threat
+          singleCounter = 25; // Challenger: High threat is heavily penalized
         } else if (weCounterEnemy) {
-          singleCounter = 95; // We counter them
+          singleCounter = 98; // High counter weight
         } else {
           // General lane dynamics
           const isPokeVsAllIn = champ.tags?.includes("Poke") && enemyChamp.tags?.includes("Dive");
           const isAllInVsPoke = champ.tags?.includes("Dive") && enemyChamp.tags?.includes("Poke");
           
           if (isAllInVsPoke) {
-            singleCounter = 80; // Dive counters poke in lane
+            singleCounter = 85; // Dive counters poke in lane
           } else if (isPokeVsAllIn) {
-            singleCounter = 40; // Poke suffers vs hard engage all-in
+            singleCounter = 35; // Poke suffers vs hard engage all-in
           }
         }
         counterSum += singleCounter;
@@ -286,20 +290,20 @@ export class CompetitiveBrain {
         if (enemyComp.type === "dive") {
           // Boost peelers/disengage against dive
           if (champ.role === "Support" && (champ.tags?.includes("Peel") || ["lulu", "renata", "braum"].includes(champ.id))) {
-            counter = Math.min(100, counter + 20);
+            counter = Math.min(100, counter + 25);
           }
           // Boost safe ADCs against dive
           if (champ.id === "ezreal") {
-            counter = Math.min(100, counter + 15);
+            counter = Math.min(100, counter + 20);
           }
           // Penalize immobile ADCs against dive
           if (champ.role === "ADC" && ["jinx", "ashe"].includes(champ.id)) {
-            counter = Math.max(0, counter - 15);
+            counter = Math.max(0, counter - 20);
           }
         } else if (enemyComp.type === "poke") {
           // Boost engage/dive supports to lock down poke
-          if (champ.role === "Support" && (champ.tags?.includes("Engage") || ["nautilus", "pyke", "thresh"].includes(champ.id))) {
-            counter = Math.min(100, counter + 20);
+          if (champ.role === "Support" && (champ.tags?.includes("Engage") || ["nautilus", "pyke", "thresh", "leona"].includes(champ.id))) {
+            counter = Math.min(100, counter + 25);
           }
           // Boost healers/sustain to survive poke
           if (champ.id === "nami") {
@@ -308,13 +312,19 @@ export class CompetitiveBrain {
         } else if (enemyComp.type === "scaling") {
           // Boost early game aggressive lane bullies to shut down scaling
           if (champ.id === "lucian" || champ.id === "tristana" || champ.id === "caitlyn") {
-            counter = Math.min(100, counter + 15);
+            counter = Math.min(100, counter + 20);
           }
         }
       }
     }
 
-    // 5. Comp Score (Cohesion)
+    // Red Side last pick counter boost (Challenger priority)
+    const isRedSideLastPick = state.side === "red" && activeStep.index === 4;
+    if (isAlly && isRedSideLastPick && counter > 70) {
+      counter = Math.min(100, counter + 20); // Reward selecting a counter-pick as last pick
+    }
+
+    // 5. Comp Score (Cohesion and Damage profiles balance)
     let comp = 50;
     if (validAllyPicks.length > 0) {
       const allyAnalysis = this.analyzeComp(myTeamPicks);
@@ -327,7 +337,24 @@ export class CompetitiveBrain {
           (allyType === "scaling" && champ.tags?.includes("Scaling")) ||
           (allyType === "protect" && champ.tags?.includes("Peel"));
         
-        comp = matchesIdentity ? 90 : 60;
+        comp = matchesIdentity ? 90 : 65;
+
+        // Damage type balance modifier (Challenger Coach level)
+        if (allyAnalysis.adPercentage !== undefined && allyAnalysis.adPercentage >= 80) {
+          // Team is full AD so far. AP candidates get a massive boost
+          const isAPDamage = ["karma", "lux", "nami", "renata", "lulu", "janna", "kaisa", "kogmaw"].includes(champ.id);
+          if (isAPDamage) {
+            comp = Math.min(100, comp + 25);
+          } else if (champ.role === "Support") {
+            comp = Math.max(10, comp - 20); // Penalize double-down on physical support if team has no AP
+          }
+        }
+
+        // CC check
+        const teamHasTank = validAllyPicks.some(c => c.tags?.includes("Tank") || ["nautilus", "braum", "leona", "rell"].includes(c.id));
+        if (!teamHasTank && ["nautilus", "braum", "leona", "rell"].includes(champ.id) && champ.role === "Support") {
+          comp = Math.min(100, comp + 25); // Team needs a frontliner, reward picking one
+        }
       }
     }
 
@@ -390,29 +417,29 @@ export class CompetitiveBrain {
 
       // Contextual reasoning based on plan macro details
       if (champ.id === "ashe") {
-        reasoning += " Aporta presión de oleadas, visión perpendicular (E) e iniciaciones con R.";
+        reasoning += " Nivel Challenger: Aporta presión constante de oleadas mediante W, revela la ruta del jungla enemigo con E (Halcón) de manera perpendicular, y habilita iniciaciones limpias con R (Flecha de Cristal) para transicionar a objetivos de río.";
       } else if (champ.id === "varus") {
-        reasoning += " Da asedio devastador y kill-potential en arbustos ciegos con Q de letalidad.";
+        reasoning += " Nivel Challenger: Habilita composiciones de asedio lineal y poke letal. Utiliza la Q cargada con builds de letalidad desde la niebla para ablandar frontlines. Su R (Cadena de Corrupción) actúa como denegador de engage.";
       } else if (champ.id === "jhin") {
-        reasoning += " Ofrece control de visión y picks seguros desde la niebla (W + R).";
+        reasoning += " Nivel Challenger: Ofrece control de visión y picks seguros desde la niebla (W + R). Controla cuellos de botella con cepos (E) y ejecuta objetivos a distancia extrema.";
       } else if (champ.id === "tristana") {
-        reasoning += " Gran presión de demolición de placas y capacidad de dive seguro.";
+        reasoning += " Nivel Challenger: Opresión mediante empuje de oleada, demolición de placas con E, y gran seguridad con su salto W. Ideal para dives y forzar bola de nieve rápida.";
       } else if (champ.id === "jinx") {
-        reasoning += " Hypercarry de escalado monstruoso con resets limpios en peleas tardías.";
+        reasoning += " Nivel Challenger: El hypercarry late game supremo. Limpia peleas grupales mediante su pasiva de resets rápidos. Requiere protección pero ofrece el DPS más alto del draft.";
       } else if (champ.id === "karma") {
-        reasoning += " Tu enchanter de poke prioritario, acelerador de rotaciones con R-E.";
+        reasoning += " Nivel Challenger: Enchanter dominante de poke y aceleración macro. Acelera rotaciones a dragones con R-E y desgasta al oponente bajo torre con R-Q constante.";
       } else if (champ.id === "nautilus") {
-        reasoning += " Control total de línea con engage duro e iniciación perfecta de dives.";
+        reasoning += " Nivel Challenger: Iniciador por excelencia y facilitador de dives rápidos. Ralph, inmoviliza al carry rival con Q y pasiva, bloqueando su escape en nivel 2 y 6.";
       } else if (champ.id === "pyke") {
-        reasoning += " Generador de bola de nieve en la niebla y ejecutor clave con R.";
+        reasoning += " Nivel Challenger: Generador de snowball ciego. Ralph, limpia centinelas rivales y usa R en ejecuciones para compartir el oro de las escaramuzas.";
       } else if (champ.id === "renata") {
-        reasoning += " Salvavidas con W y desarmador masivo de composiciones agresivas con R.";
+        reasoning += " Nivel Challenger: Especialista anti-dive. La W (Rescate Financiero) salva al carry en trades al límite, y la R (Hostilidad Creciente) desmantela composiciones enemigas de autoataque.";
       } else if (champ.id === "lulu") {
-        reasoning += " Peel inigualable para blindar a tu tirador contra asesinos y diveadores.";
+        reasoning += " Nivel Challenger: La protectora definitiva contra asesinos. Usa Polymorph (W) reactivamente en la entrada del rival para anular su ráfaga de daño e inmovilizarlos.";
       } else if (champ.id === "thresh") {
-        reasoning += " Salvación de carries inmovilizados con linterna (W) y control versátil (Q + E).";
+        reasoning += " Nivel Challenger: Soporte de utilidad versátil. La linterna (W) rescata a Fer de sobreextensiones y el Flay (E) cancela saltos de campeones enemigos de engage directo.";
       } else if (champ.id === "braum") {
-        reasoning += " Baluarte defensivo ideal para detener proyectiles pesados y proteger con escudo (E).";
+        reasoning += " Nivel Challenger: Pared infranqueable contra asedios. Detiene proyectiles clave (como definitivas) con la E, aportando aturdimiento glacial masivo mediante autoataques cruzados.";
       }
 
       return {
@@ -527,6 +554,13 @@ export class CompetitiveBrain {
         winProb += 15;
         if (matchingDuo.tier === "S+" || matchingDuo.tier === "S") winProb += 8;
       }
+      
+      // Damage type check
+      if (allyComp && allyComp.adPercentage !== undefined) {
+        if (allyComp.adPercentage >= 90) winProb -= 8;
+        else if (allyComp.adPercentage >= 40 && allyComp.adPercentage <= 70) winProb += 4;
+      }
+
       winProb = Math.max(15, Math.min(88, winProb));
 
       return {
@@ -565,6 +599,7 @@ export class CompetitiveBrain {
     const enemyPickedIds = enemyPicks.filter(Boolean) as string[];
     const allyPickedIds = allyPicks.filter(Boolean) as string[];
 
+    // Challenger Coach Logic: Warnings & Strategic Directives
     if (enemyPickedIds.includes("caitlyn") && !allyPickedIds.includes("ashe")) {
       if (userRole === "fer") {
         warnings.push("¡Fer, peligro! El rival eligió Caitlyn. Evita tiradores de corto rango. Considera Ashe o Varus para pelear su rango.");
@@ -590,6 +625,21 @@ export class CompetitiveBrain {
         warnings.push("¡Ralph, amenaza de dive detectada! Prioriza Renata Glasc, Lulu o Braum para dar peel instantáneo a Fer.");
       } else {
         warnings.push("Amenaza de DIVE o hard engage detectada. Prioriza Renata Glasc o Lulu en support para peel.");
+      }
+    }
+
+    // Challenger Comp Checks (Warnings)
+    if (allyPickedIds.length > 0) {
+      // Full AD Check
+      if (allyComp && allyComp.adPercentage !== undefined && allyComp.adPercentage >= 90) {
+        warnings.push("⚠️ COACH CHALLENGER: Composición 100% AD detectada. Ralph, prioriza supports de daño mágico (Karma, Lux) para forzar al rival a comprar resistencia mágica.");
+      }
+      
+      // No Frontline Check
+      const hasTank = allyPickedIds.map(id => this.getChampionById(id)).some(c => c?.tags?.includes("Tank") || ["nautilus", "braum", "leona", "rell"].includes(c?.id || ""));
+      const isSupportSlotNotPicked = !allyPicks[state.myPickSlots[1]];
+      if (!hasTank && isSupportSlotNotPicked && currentStep.type === "pick") {
+        warnings.push("⚠️ COACH CHALLENGER: Composición sin línea frontal (no frontline). Ralph, prioriza tanques iniciadores o protectores (Nautilus, Braum) para asegurar control.");
       }
     }
 
@@ -636,6 +686,19 @@ export class CompetitiveBrain {
         winConditions.push("Farmear eficientemente y mantener el control de visión en arbustos de línea.");
         winConditions.push("Wardear pixel bush 45s antes de dragones y trackea al jungla rival.");
       }
+    }
+
+    // Challenger Level 2 Warning
+    if (enemyPickedIds.includes("lucian") || enemyPickedIds.includes("tristana")) {
+      const enemyHasAggressiveSup = enemyPickedIds.some(id => ["nami", "nautilus", "leona", "pyke"].includes(id));
+      if (enemyHasAggressiveSup) {
+        winConditions.push("⚠️ TÁCTICA CHALLENGER: El rival tiene un spike de nivel 2 extremadamente agresivo. Cedan la prioridad inicial, absorban oleada bajo torre y eviten muertes.");
+      }
+    }
+
+    // Visión perpendicular instruction
+    if (enemyPickedIds.some(id => ["rengar", "viego", "pyke", "nocturne"].includes(id))) {
+      winConditions.push("👁️ CHALLENGER VISION: Colocar wards perpendiculares en la entrada del río a los 2:45 para rastrear flanqueos invisibles o veloces del jungla rival.");
     }
 
     // Dynamic win probability estimation (iTero Advanced Engine)

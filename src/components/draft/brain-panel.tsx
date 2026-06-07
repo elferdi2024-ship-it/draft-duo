@@ -206,7 +206,7 @@ export default function BrainPanel() {
       </div>
 
       {/* Main Content Scrollable */}
-      <div className="flex-1 overflow-y-auto p-5 md:p-6 flex flex-col gap-5 max-h-[650px] md:max-h-[960px]">
+      <div className="flex-1 overflow-y-auto p-5 md:p-6 xl:p-4 flex flex-col gap-5 xl:gap-4 max-h-[650px] md:max-h-[960px] xl:max-h-none xl:min-h-0">
         
         {/* iTero Win Rate Delta Simulator */}
         <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2 relative overflow-hidden">

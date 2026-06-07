@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: 'Cinzel', Georgia, serif;
-  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Marcellus', Georgia, serif;
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, sans-serif;
   --color-lol-bg: #010a13;
   --color-lol-panel: #091420;
   --color-lol-panel-dark: #0a1428;
@@ -20,7 +20,7 @@
   --border: #c8aa6e;       /* Hextech Gold */
   --border-dark: #785a28;  /* Deep Bronze/Brown */
   --text: #f0e6d3;         /* Hextech Pale Gold Text */
-  --text-muted: #8a9dae;   /* LoL Slate / Blue-gray text */
+  --text-muted: #b2c3d2;   /* Higher contrast LoL Slate / Blue-gray text */
   --gold: #c8aa6e;
   --blue: #0a1428;
   --cyan: #0097e6;         /* Magic Hextech Blue */

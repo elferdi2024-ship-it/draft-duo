@@ -229,7 +229,7 @@ export default function BrainPanel() {
               style={{ width: `${winProbability}%` }}
             />
           </div>
-          <div className="flex justify-between text-[8px] text-[#8a9dae] uppercase font-bold px-0.5">
+          <div className="flex justify-between text-[9.5px] text-[#b2c3d2] uppercase font-bold px-0.5">
             <span>Derrota (15%)</span>
             <span>Estable (50%)</span>
             <span>Ventaja (88%)</span>
@@ -259,7 +259,7 @@ export default function BrainPanel() {
                       Pilar: {matchingDuo.pillar}
                     </span>
                   </div>
-                  <p className="text-xs md:text-sm text-[#a0a8b0] italic leading-relaxed">
+                  <p className="text-xs md:text-sm text-[#ebd6b3] italic leading-relaxed">
                     "{matchingDuo.philosophy}"
                   </p>
 
@@ -291,7 +291,7 @@ export default function BrainPanel() {
                           <span className="text-[8px] uppercase tracking-wider font-bold text-[#c8aa6e]">
                             Veredicto de Línea 2v2
                           </span>
-                          <p className="text-[11px] text-[#a0a8b0] leading-relaxed">
+                          <p className="text-[11px] text-[#b2c3d2] leading-relaxed">
                             {matchingDuo.coachVerdict}
                           </p>
                         </div>
@@ -324,7 +324,7 @@ export default function BrainPanel() {
                           <span className="text-[8px] uppercase tracking-wider font-bold text-[#ff4655]">
                             Conducta del Tanque / Absorción
                           </span>
-                          <p className="text-[11px] text-[#a0a8b0] leading-relaxed">
+                          <p className="text-[11px] text-[#b2c3d2] leading-relaxed">
                             🛡️ {matchingDuo.tankMacroDirective}
                           </p>
                         </div>
@@ -508,7 +508,7 @@ export default function BrainPanel() {
                             <span className="text-sm md:text-base font-serif font-black text-[#c8aa6e] block">
                               {rec.totalScore}%
                             </span>
-                            <span className="text-[8px] md:text-[9px] text-[#8a9dae] uppercase font-bold tracking-wider block mt-0.5">
+                            <span className="text-[8px] md:text-[9px] text-[#b2c3d2] uppercase font-bold tracking-wider block mt-0.5">
                               Match Score
                             </span>
                           </div>
@@ -517,7 +517,7 @@ export default function BrainPanel() {
                     </div>
 
                     {/* Explanatory description */}
-                    <p className="text-xs md:text-sm text-[#8a9dae] italic leading-relaxed pl-1 font-medium">
+                    <p className="text-xs md:text-sm text-[#ebd6b3] italic leading-relaxed pl-1 font-medium">
                       "{rec.reasoning}"
                     </p>
 

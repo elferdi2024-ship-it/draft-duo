@@ -85,7 +85,7 @@ export default function PickSlot({
               {champion.name}
             </span>
           ) : (
-            <span className="font-sans font-extrabold text-xs lg:text-[10px] tracking-widest text-[#8a9dae]/50 uppercase animate-pulse">
+            <span className="font-sans font-extrabold text-xs lg:text-[10px] tracking-widest text-[#b2c3d2]/85 uppercase animate-pulse">
               Seleccionando
             </span>
           )}

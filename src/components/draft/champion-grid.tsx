@@ -98,7 +98,7 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             disabled={disabled}
-            className="w-full bg-[#0a1428] border border-[#785a28]/60 rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#f0e6d3] placeholder-[#8a9dae]/50 focus:outline-none focus:ring-1 focus:ring-[#00c8c8] focus:border-[#00c8c8]"
+            className="w-full bg-[#0a1428] border border-[#785a28]/60 rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#f0e6d3] placeholder-[#b2c3d2]/75 focus:outline-none focus:ring-1 focus:ring-[#00c8c8] focus:border-[#00c8c8]"
           />
         </div>
 
@@ -113,7 +113,7 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
               className={`px-4 py-2 rounded text-xs md:text-sm font-extrabold uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                 activeRoleFilter === role.value
                   ? "bg-[#c8aa6e] text-[#0a1428] border border-[#f0e6d3]"
-                  : "bg-[#1e232a] text-[#8a9dae] border border-[#785a28]/40 hover:bg-[#0a1428]"
+                  : "bg-[#1e232a] text-[#b2c3d2] border border-[#785a28]/40 hover:bg-[#0a1428] hover:text-[#f0e6d3]"
               }`}
             >
               {role.label}

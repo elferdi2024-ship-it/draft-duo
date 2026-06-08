@@ -65,6 +65,7 @@ export default function BrainPanel() {
     isComplete,
     userRole,
     setSelectedDetailChampId,
+    draftState,
   } = useDraftStore();
   const [version, setVersion] = useState("15.11.1");
 
@@ -205,6 +206,47 @@ export default function BrainPanel() {
       {/* Main Content Scrollable */}
       <div className="flex-1 overflow-y-auto p-5 md:p-6 lg:p-3.5 flex flex-col gap-5 lg:gap-3.5 max-h-[650px] md:max-h-[960px] lg:max-h-none lg:min-h-0">
         
+        {/* ALPHA DRAFT WIN CONDITION BANNER */}
+        {brainAnalysis.winConditionType && brainAnalysis.winConditionText && (
+          <div className={`p-4 border-2 rounded shadow-md flex items-start gap-2.5 transition-all duration-300 shrink-0 ${
+            brainAnalysis.winConditionType === "EARLY_DOMINANCE"
+              ? "border-amber-500 bg-amber-950/20 text-[#ebd6b3] shadow-[0_0_12px_rgba(245,158,11,0.15)]"
+              : brainAnalysis.winConditionType === "MACRO_CONTROL"
+              ? "border-[#00c8c8] bg-[#00c8c8]/5 text-[#f0e6d3] shadow-[0_0_12px_rgba(0,200,200,0.15)]"
+              : "border-cyan-500 bg-cyan-950/15 text-cyan-100 shadow-[0_0_12px_rgba(6,182,212,0.15)]"
+          }`}>
+            <span className="text-base select-none mt-0.5">🎯</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[9px] uppercase tracking-widest font-black text-[#c8aa6e]">
+                Estrategia Dominante de Teemo
+              </span>
+              <p className="text-xs font-semibold leading-relaxed">
+                {brainAnalysis.winConditionText}
+              </p>
+              {brainAnalysis.macroImpactWarning && (
+                <span className="text-[10px] text-amber-500 font-bold mt-1 block">
+                  ⚠️ {brainAnalysis.macroImpactWarning}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 🍄 La Trampa de Teemo (Weak Link Alert) */}
+        {brainAnalysis.gankVulnerability !== undefined && brainAnalysis.gankVulnerability > 10.0 && (
+          <div className="p-4 border-2 border-red-500 bg-red-950/20 text-[#ff4655] rounded shadow-[0_0_16px_rgba(239,68,68,0.2)] flex items-start gap-3 animate-pulse shrink-0">
+            <span className="text-lg select-none mt-0.5">🍄</span>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest font-black text-red-400">
+                💣 TRAMPA DETECTADA POR TEEMO
+              </span>
+              <p className="text-xs font-semibold leading-relaxed mt-1 text-red-200">
+                ¡Vulnerabilidad crítica a Ganks! El índice Vg ({brainAnalysis.gankVulnerability}) es extremadamente alto debido al combo actual. Considera un tirador más elusivo (como Ezreal) o un soporte con fuerte control defensivo (como Braum o Renata).
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ALPHA DRAFT ADVANCED METRICS PANEL */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 shrink-0">
           {/* iTero Win Probability */}
@@ -527,7 +569,7 @@ export default function BrainPanel() {
                 {!isComplete ? "Ninguna recomendación disponible." : "Draft finalizado."}
               </div>
             ) : (
-              recommendations.map((rec) => {
+              recommendations.map((rec, idx) => {
                 const iconUrl = getChampionIconUrl(version, rec.ddragonKey);
 
                 return (
@@ -556,9 +598,16 @@ export default function BrainPanel() {
                           <span className="font-serif font-black text-sm md:text-base text-[#f0e6d3] group-hover/recHeader:text-[#c8aa6e] transition-colors">
                             {rec.championName}
                           </span>
-                          <span className={`inline-block text-[9px] md:text-xs font-black uppercase px-2 py-0.5 rounded self-start ${getBadgeStyle(rec.tag)}`}>
-                            {rec.tag.replace("_", " ")}
-                          </span>
+                          <div className="flex flex-wrap gap-1.5 mt-0.5">
+                            <span className={`inline-block text-[9px] md:text-xs font-black uppercase px-2 py-0.5 rounded self-start ${getBadgeStyle(rec.tag)}`}>
+                              {rec.tag.replace("_", " ")}
+                            </span>
+                            {rec.hasAffinityBonus && (
+                              <span className="inline-block text-[9px] md:text-xs font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-[#0a1428] border border-[#f0e6d3] shadow-md flex items-center gap-0.5" title="Afinidad histórica favorable (+15 Comfort)">
+                                🎯 Afinidad
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </button>
 
@@ -592,6 +641,97 @@ export default function BrainPanel() {
                     <p className="text-xs md:text-sm text-[#ebd6b3] italic leading-relaxed pl-1 font-medium">
                       "{rec.reasoning}"
                     </p>
+
+                    {/* ALPHA-DRAFT FIX: Badges visuales de scoring dinámico y restricciones */}
+                    {(() => {
+                      const champData = allChampions.find(c => c.id === rec.championId);
+                      const isSup = champData?.role === "Support" || champData?.roles?.includes("Support") || champData?.role?.includes("Support");
+                      const isPureEnchanter = isSup && (champData?.role === "Enchanter Support" || ["lulu", "yuumi", "soraka", "nami", "sona"].includes(rec.championId));
+                      const isTankSupport = isSup && (champData?.role === "Tank Support" || ["thresh", "braum", "nautilus", "leona", "rell", "alistar"].includes(rec.championId));
+                      const isMageSupport = isSup && (champData?.role === "Mage Support" || ["brand", "xerath", "lux", "velkoz", "zyra", "hwei", "morgana"].includes(rec.championId));
+                      const isAdc = champData?.role === "ADC" || champData?.roles?.includes("ADC");
+                      const isOwnAdc = isAdc && champData?.isOwnPool;
+
+                      const badges = [];
+
+                      const isAlly = activeStepDetails ? (activeStepDetails.team === side) : true;
+
+                      if (isPureEnchanter) {
+                        badges.push(
+                          <span key="enchanter-pen" className="text-[9px] bg-red-950/50 text-[#ff4655] border border-red-800/40 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                            ⚠️ -50 Penalización Enchanter
+                          </span>
+                        );
+                      }
+                      if (isAlly && isSup && isTankSupport) {
+                        badges.push(
+                          <span key="tank-bonus" className="text-[9px] bg-emerald-950/50 text-[#00c8c8] border border-[#00c8c8]/40 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                            🛡️ +35 Bonificación Tanque
+                          </span>
+                        );
+                      }
+                      if (isAlly && isSup && isMageSupport) {
+                        badges.push(
+                          <span key="mage-bonus" className="text-[9px] bg-indigo-950/50 text-indigo-400 border border-indigo-500/40 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                            🔮 +15 Bonificación Mago
+                          </span>
+                        );
+                      }
+                      if (isAdc && !isOwnAdc) {
+                        badges.push(
+                          <span key="adc-pen" className="text-[9px] bg-red-950/50 text-[#ff4655] border border-red-800/40 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                            🚫 -80 Fuera de Confort
+                          </span>
+                        );
+                      }
+                      if (draftState && draftState.isLastPick && isAlly) {
+                        badges.push(
+                          <span key="last-pick-counter" className="text-[9px] bg-amber-950/50 text-amber-500 border border-amber-500/40 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider animate-pulse">
+                            🔥 Last Pick: Peso Counter 50%
+                          </span>
+                        );
+                      }
+                      if (draftState && draftState.isEnemyBotLaneClosed && rec.cfrRegret === 0.05) {
+                        badges.push(
+                          <span key="cfr-collapsed" className="text-[9px] bg-violet-950/50 text-violet-400 border border-violet-500/40 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                            ⚠️ CFR Colapsado: Bot Lane Cerrada
+                          </span>
+                        );
+                      }
+
+                      if (badges.length === 0) return null;
+                      return (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {badges}
+                        </div>
+                      );
+                    })()}
+
+                    {/* Citas Contextuales de Teemo para el Pick Prioritario */}
+                    {idx === 0 && (
+                      <div className="mt-2.5 p-2.5 border-l-2 border-[#00c8c8] bg-[#00c8c8]/5 text-xs text-[#ebd6b3] italic leading-normal flex items-start gap-2 rounded-r-sm">
+                        <span className="text-[10px] uppercase font-black tracking-wider text-[#00c8c8] not-italic shrink-0">
+                          Coach Teemo:
+                        </span>
+                        <span>
+                          {(() => {
+                            const isSup = rec.tag.includes("BAN") ? false : (allChampions.find(c => c.id === rec.championId)?.role === "Support" || allChampions.find(c => c.id === rec.championId)?.roles?.includes("Support"));
+                            if (draftState?.isLastPick) {
+                              return "«Ellos mostraron sus cartas. Aplastémoslos con el counter perfecto.»";
+                            }
+                            if (isSup) {
+                              const isTank = ["thresh", "braum", "nautilus", "leona", "rell", "alistar"].includes(rec.championId);
+                              if (isTank) {
+                                return "«La visión lo es todo. Asegura el control con iniciación.»";
+                              } else {
+                                return "«Demasiado dulce. No dependas de otros, toma el control.»";
+                              }
+                            }
+                            return "«Un dardo en el momento justo y ganamos la línea.»";
+                          })()}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Score breakdown if picking */}
                     {actionType === "pick" && (

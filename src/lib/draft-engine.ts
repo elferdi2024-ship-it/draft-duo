@@ -250,6 +250,14 @@ export function getChampionDamageProfile(id: string, tags: string[] = []): { ad:
   return { ad: 100, ap: 0, tr: 0 };
 }
 
+const PLAYER_STATS_WINRATE: Record<string, number> = {
+  varus: 0.58,
+  ezreal: 0.52,
+  ashe: 0.57,
+  karma: 0.59,
+  nautilus: 0.56,
+};
+
 export class CompetitiveBrain {
   private allChampions: ChampionData[];
 
@@ -259,6 +267,89 @@ export class CompetitiveBrain {
 
   private getChampionById(id: string): ChampionData | undefined {
     return this.allChampions.find(c => c.id === id);
+  }
+
+  // ALPHA-DRAFT FIX: Player-Champion Latent Affinity Bonus
+  public calculatePlayerAffinity(championId: string): { bonus: number; hasBonus: boolean } {
+    const winRate = PLAYER_STATS_WINRATE[championId.toLowerCase()];
+    if (winRate && winRate > 0.55) {
+      return { bonus: 15, hasBonus: true };
+    }
+    return { bonus: 0, hasBonus: false };
+  }
+
+  // ALPHA-DRAFT FIX: Macro-Impact Bonus
+  public calculateMacroImpact(adcId: string | null, supportId: string | null): { bonus: number; warning: string | null } {
+    if (!adcId && !supportId) return { bonus: 0, warning: null };
+    
+    let combinedPush = 5.0;
+    if (adcId && supportId) {
+      const adcPush = getChampionWavePush(adcId, this.getChampionById(adcId)?.tags);
+      const supPush = getChampionWavePush(supportId, this.getChampionById(supportId)?.tags);
+      combinedPush = (adcPush + supPush) / 2;
+    } else if (adcId) {
+      combinedPush = getChampionWavePush(adcId, this.getChampionById(adcId)?.tags);
+    } else if (supportId) {
+      combinedPush = getChampionWavePush(supportId, this.getChampionById(supportId)?.tags);
+    }
+
+    if (combinedPush > 7.0) {
+      return { bonus: 10, warning: "Presión constante de oleada. Libera presión de Jungla para invadir o tomar objetivos." };
+    }
+
+    const isAdcPassive = adcId && ["jinx", "kogmaw", "vayne", "aphelios"].includes(adcId.toLowerCase());
+    const isSupPassive = supportId && ["lulu", "yuumi", "soraka", "sona"].includes(supportId.toLowerCase());
+    if (isAdcPassive && isSupPassive) {
+      return { bonus: 0, warning: "Composición de escalado pasivo. Requiere protección temprana del Jungla hasta los 15 min." };
+    }
+
+    return { bonus: 0, warning: null };
+  }
+
+  // ALPHA-DRAFT FIX: determineWinCondition
+  public determineWinCondition(allyPicks: (string | null)[], enemyPicks: (string | null)[]): { type: 'EARLY_DOMINANCE' | 'MACRO_CONTROL' | 'LATE_GAME_INSURANCE'; text: string } {
+    const validAllyChamps = allyPicks
+      .filter((id): id is string => !!id)
+      .map(id => this.getChampionById(id))
+      .filter((c): c is ChampionData => !!c);
+
+    let earlyAggroCount = 0;
+    let wavePushSum = 0;
+    let lateHypercarryCount = 0;
+
+    validAllyChamps.forEach(champ => {
+      const id = champ.id.toLowerCase();
+      const tags = champ.tags || [];
+      
+      const isEarly = ["lucian", "tristana", "leesin", "elise", "nautilus", "pyke", "leona", "rell", "alistar", "renata", "nami"].includes(id) || tags.includes("Assassin");
+      if (isEarly) earlyAggroCount++;
+
+      wavePushSum += getChampionWavePush(id, tags);
+
+      const isLate = ["jinx", "vayne", "kogmaw", "smolder", "twitch", "zeri", "aphelios", "kassadin", "kayle", "veigar", "vladimir"].includes(id);
+      if (isLate) lateHypercarryCount++;
+    });
+
+    const averagePush = validAllyChamps.length > 0 ? wavePushSum / validAllyChamps.length : 5.0;
+
+    if (earlyAggroCount >= 2) {
+      return {
+        type: 'EARLY_DOMINANCE',
+        text: "EARLY DOMINANCE: Dominio temprano y bola de nieve. Forzar jugadas agresivas, buscar prioridad nivel 2 e invadir activamente."
+      };
+    }
+
+    if (averagePush > 6.8) {
+      return {
+        type: 'MACRO_CONTROL',
+        text: "MACRO CONTROL: Presión constante y control del mapa. Crashear oleadas para asediar placas y liberar al jungla para objetivos de río."
+      };
+    }
+
+    return {
+      type: 'LATE_GAME_INSURANCE',
+      text: "LATE GAME INSURANCE: Seguro de juego tardío. Evitar riesgos innecesarios, farmear pacientemente y escalar para peleas grupales definitivas."
+    };
   }
 
   /**
@@ -813,6 +904,37 @@ export class CompetitiveBrain {
     const recommendations: BrainRecommendation[] = availableCandidates.map(champ => {
       const scores = this.scoreChampion(champ, state, activeStep, userRole);
       
+      // ALPHA-DRAFT FIX: Player-Champion Latent Affinity Bonus
+      const affinity = this.calculatePlayerAffinity(champ.id);
+      if (affinity.hasBonus) {
+        scores.comfort = Math.min(100, scores.comfort + affinity.bonus);
+      }
+
+      // ALPHA-DRAFT FIX: Macro-Impact Bonus
+      let macroBonus = 0;
+      if (targetRole === "Support") {
+        const myAdcId = allyPickedIds.find(id => {
+          const c = this.getChampionById(id);
+          return c?.role === "ADC" || c?.roles?.includes("ADC");
+        }) || null;
+        if (myAdcId) {
+          const macro = this.calculateMacroImpact(myAdcId, champ.id);
+          macroBonus = macro.bonus;
+        }
+      } else if (targetRole === "ADC") {
+        const mySupId = allyPickedIds.find(id => {
+          const c = this.getChampionById(id);
+          return c?.role === "Support" || c?.roles?.includes("Support") || c?.role?.includes("Support");
+        }) || null;
+        if (mySupId) {
+          const macro = this.calculateMacroImpact(champ.id, mySupId);
+          macroBonus = macro.bonus;
+        }
+      }
+      if (macroBonus > 0) {
+        scores.comp = Math.min(100, scores.comp + macroBonus);
+      }
+
       // Calculate total score using dynamic weights
       let totalScore = Math.round(
         scores.comfort * weights.comfort +
@@ -902,7 +1024,8 @@ export class CompetitiveBrain {
         reasoning,
         tag,
         cfrRegret,
-        gankVulnerability: gankV
+        gankVulnerability: gankV,
+        hasAffinityBonus: affinity.hasBonus
       };
     });
 
@@ -986,6 +1109,12 @@ export class CompetitiveBrain {
     const allyComp = this.analyzeComp(allyPicks);
     const enemyComp = this.analyzeComp(enemyPicks);
     
+    // ALPHA-DRAFT FIX: Determine win condition and macro impact indicators
+    const winCondInfo = this.determineWinCondition(allyPicks, enemyPicks);
+    const myAdcId = allyPicks[state.myPickSlots[0]];
+    const mySupId = allyPicks[state.myPickSlots[1]];
+    const macroImpact = this.calculateMacroImpact(myAdcId, mySupId);
+
     // Default / Complete state
     if (stepIndex >= DRAFT_ORDER.length) {
       // Resolve matching clinical meta duo when complete
@@ -1036,7 +1165,10 @@ export class CompetitiveBrain {
         winProbability: winProb,
         recommendedSummoners: this.computeRecommendedSummoners(adcPickId, supPickId, enemyPicks.filter(Boolean) as string[]),
         gankVulnerability: finalGankV,
-        cfrRegretScore: 0.05
+        cfrRegretScore: 0.05,
+        winConditionType: winCondInfo.type,
+        winConditionText: winCondInfo.text,
+        macroImpactWarning: macroImpact.warning || undefined
       };
     }
 
@@ -1138,7 +1270,7 @@ export class CompetitiveBrain {
       if (userRole === "fer") {
         winConditions.push("Fer: Mantén el farm regular. Mantente seguro usando el halcón de Ashe (E).");
       } else if (userRole === "ralph") {
-        winConditions.push("Ralph: Controla la visión del río y trackea al jungla enemigo para proteger a Fer.");
+        winConditions.push("Ralph: Controls la visión del río y trackea al jungla enemigo para proteger a Fer.");
       } else {
         winConditions.push("Farmear eficientemente y mantener el control de visión en arbustos de línea.");
         winConditions.push("Wardear pixel bush 45s antes de dragones y trackea al jungla rival.");
@@ -1246,7 +1378,10 @@ export class CompetitiveBrain {
       winProbability: winProb,
       recommendedSummoners: this.computeRecommendedSummoners(adcId, supId, enemyPickedIds),
       gankVulnerability: currentGankV,
-      cfrRegretScore: topRecCfr
+      cfrRegretScore: topRecCfr,
+      winConditionType: winCondInfo.type,
+      winConditionText: winCondInfo.text,
+      macroImpactWarning: macroImpact.warning || undefined
     };
   }
 

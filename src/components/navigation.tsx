@@ -18,6 +18,33 @@ export default function Navigation() {
     setMounted(true);
   }, []);
 
+  // ALPHA-DRAFT FIX: Hook de efecto cliente para alternar clases de tema y destello visual en document.body
+  useEffect(() => {
+    if (!mounted) return;
+
+    // Remover clases anteriores
+    document.body.classList.remove(
+      "theme-fer",
+      "theme-ralph",
+      "flash-theme-fer",
+      "flash-theme-ralph"
+    );
+
+    if (userRole === "fer") {
+      document.body.classList.add("theme-fer", "flash-theme-fer");
+      const timer = setTimeout(() => {
+        document.body.classList.remove("flash-theme-fer");
+      }, 800);
+      return () => clearTimeout(timer);
+    } else if (userRole === "ralph") {
+      document.body.classList.add("theme-ralph", "flash-theme-ralph");
+      const timer = setTimeout(() => {
+        document.body.classList.remove("flash-theme-ralph");
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [userRole, mounted]);
+
   const navItems = [
     { href: "/draft", label: "Simulador", icon: Sparkles },
     { href: "/champions", label: "Campeones", icon: User },
@@ -33,10 +60,10 @@ export default function Navigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#0a1428] border-b border-[#c8aa6e] px-4 md:px-8 py-3 flex items-center justify-between shadow-lg">
+    <header className="sticky top-0 z-50 w-full bg-[#0a1428] border-b border-[var(--border)] px-4 md:px-8 py-3 flex items-center justify-between shadow-lg transition-colors duration-500">
       {/* Brand Logo */}
       <Link href="/" className="flex items-center gap-3 group">
-        <div className="relative w-9 h-9 rounded border border-[#c8aa6e]/40 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#12161a] group-hover:scale-105 transition-transform flex items-center justify-center">
+        <div className="relative w-9 h-9 rounded border border-[var(--border)]/40 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#12161a] group-hover:scale-105 transition-transform flex items-center justify-center">
           <Image
             src="/logo-draft.png"
             alt="DUO DRAFT"
@@ -67,11 +94,11 @@ export default function Navigation() {
               href={item.href}
               className={`flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm font-semibold uppercase tracking-wider transition-all duration-200 border-b-2 ${
                 isActive
-                  ? "border-[#c8aa6e] text-[#f0e6d3]"
+                  ? "border-[var(--border)] text-[#f0e6d3]"
                   : "border-transparent text-[#a0a8b0] hover:text-[#f0e6d3] hover:border-transparent"
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[#c8aa6e]" : "text-[#a0a8b0]"}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? "text-[var(--border)]" : "text-[#a0a8b0]"}`} />
               <span className="hidden sm:inline">{item.label}</span>
             </Link>
           );
@@ -83,10 +110,10 @@ export default function Navigation() {
         {mounted && userRole ? (
           <button
             onClick={handleToggleRole}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-[10px] font-bold uppercase tracking-wider transition-all shadow-sm ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded border text-[10px] font-bold uppercase tracking-wider transition-all shadow-sm cursor-pointer duration-300 ${
               userRole === "fer"
-                ? "bg-[#c8aa6e] text-[#0a1428] border-[#f0e6d3] hover:bg-[#785a28] hover:text-[#f0e6d3]"
-                : "bg-[#0397ab] text-white border-[#00a3e0] hover:bg-[#005a82]"
+                ? "bg-[#00c8c8] text-[#0a1428] border-[#00c8c8] hover:bg-[#008c8c] hover:text-white"
+                : "bg-[#c8aa6e] text-[#0a1428] border-[#ebd6b3] hover:bg-[#785a28] hover:text-[#f0e6d3]"
             }`}
             title={`Cambiar a perfil de ${userRole === "fer" ? "Ralph" : "Fer"}`}
           >

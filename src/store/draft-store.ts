@@ -211,7 +211,8 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     } else if (typeof window !== 'undefined') {
       localStorage.removeItem("userRole");
     }
-    set({ userRole: role });
+    const activeRoleFilter = role === "fer" ? "ADC" : role === "ralph" ? "Support" : "All";
+    set({ userRole: role, activeRoleFilter });
     get().recalculateBrain();
   },
 

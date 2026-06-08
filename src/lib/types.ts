@@ -195,6 +195,7 @@ export interface BrainRecommendation {
   tag: 'BEST_PICK' | 'SAFE_PICK' | 'COMFORT_PICK' | 'COUNTER_PICK' | 'PRIORITY_BAN' | 'VALUE_BAN';
   cfrRegret?: number;
   gankVulnerability?: number;
+  hasAffinityBonus?: boolean;
 }
 
 export type CompType = 'dive' | 'poke' | 'scaling' | 'engage' | 'balanced' | 'pick' | 'protect' | 'unknown';
@@ -222,6 +223,9 @@ export interface BrainAnalysis {
   recommendedSummoners?: { adc: string[]; sup: string[]; reason: string };
   gankVulnerability?: number;
   cfrRegretScore?: number;
+  winConditionType?: 'EARLY_DOMINANCE' | 'MACRO_CONTROL' | 'LATE_GAME_INSURANCE';
+  winConditionText?: string;
+  macroImpactWarning?: string;
 }
 
 

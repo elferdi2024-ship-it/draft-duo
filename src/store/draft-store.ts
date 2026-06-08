@@ -28,6 +28,15 @@ interface DraftStore {
   isBridgeConnected: boolean;
   bridgeSocket: any;
   selectedDetailChampId: string | null;
+  draftState: {
+    currentStepIndex: number;
+    macroPhase: string;
+    isOurTurn: boolean;
+    currentActionType: string | null;
+    remainingEnemyPicks: number;
+    isLastPick: boolean;
+    isEnemyBotLaneClosed: boolean;
+  } | null;
 
   // Actions
   loadChampions: () => Promise<void>;
@@ -64,6 +73,7 @@ const initialDraftState = {
   isBridgeConnected: false,
   bridgeSocket: null,
   selectedDetailChampId: null,
+  draftState: null,
 };
 
 export const useDraftStore = create<DraftStore>((set, get) => ({
@@ -223,7 +233,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
   },
 
   recalculateBrain: () => {
-    const { side, currentStepIndex, blueBans, redBans, bluePicks, redPicks, myPickSlots, history, isComplete, allChampions, userRole } = get();
+    const { side, currentStepIndex, blueBans, redBans, bluePicks, redPicks, myPickSlots, history, isComplete, allChampions, userRole, draftState } = get();
 
     // Create current state snapshot matching LiveDraftState
     const stateSnapshot: LiveDraftState = {
@@ -236,6 +246,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
       myPickSlots,
       history: history.map(h => ({ stepIndex: h.stepIndex, championId: h.championId || "" })),
       isComplete,
+      draftState: draftState || undefined
     };
 
     const brain = new CompetitiveBrain(allChampions);
@@ -261,7 +272,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
         try {
           const payload = JSON.parse(event.data);
           if (payload.type === "DRAFT_UPDATE") {
-            const { side, bluePicks, redPicks, blueBans, redBans, currentStepIndex, isComplete } = payload.data;
+            const { side, bluePicks, redPicks, blueBans, redBans, currentStepIndex, isComplete, draftState } = payload.data;
             
             set({
               side,
@@ -271,6 +282,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
               redBans,
               currentStepIndex,
               isComplete,
+              draftState: draftState || null,
             });
 
             get().recalculateBrain();

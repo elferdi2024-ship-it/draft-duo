@@ -31,7 +31,7 @@ export default function Home() {
     return (
       <div className="w-full max-w-4xl mx-auto px-4 py-12 flex flex-col items-center justify-center gap-10 min-h-[80vh]">
         <div className="text-center">
-          <div className="relative w-20 h-20 rounded border-2 border-[#c8aa6e] overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#12161a] mx-auto mb-5 shadow-lg flex items-center justify-center">
+          <div className="relative w-20 h-20 rounded border-2 border-[#c8aa6e] overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#12161a] mx-auto mb-5 shadow-[4px_4px_0px_0px_rgba(200,170,110,0.3)] flex items-center justify-center">
             <Image
               src="/logo-draft.png"
               alt="DUO DRAFT"
@@ -40,21 +40,23 @@ export default function Home() {
               className="object-contain"
             />
           </div>
-          <h1 className="font-serif text-4xl md:text-5xl font-black tracking-widest text-[#0f1923] uppercase shimmer-text">
+          <h1 className="font-serif text-5xl md:text-6xl font-black tracking-tighter text-[#f0e6d3] uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] bg-clip-text bg-gradient-to-b from-[#ffffff] via-[#ebd6b3] to-[#c8aa6e] shimmer-text-light select-none">
             DUO DRAFT
           </h1>
-          <p className="text-xs text-[#c8aa6e] uppercase tracking-widest font-black mt-2">
+          <p className="text-xs text-[#c8aa6e] uppercase tracking-widest font-black mt-3">
             Competitive League Draft Intelligence • Patch 26.11
           </p>
-        </div>        <div className="w-full flex flex-col md:flex-row gap-6 items-stretch justify-center max-w-3xl">
+        </div>
+
+        <div className="w-full flex flex-col md:flex-row gap-6 items-stretch justify-center max-w-3xl">
           {/* Card Fer (ADC) */}
           <button
             onClick={() => setUserRole("fer")}
             aria-label="Ingresar como ADC (Fer)"
-            className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#0097e6] hover:shadow-[0_0_24px_rgba(0,151,230,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
+            className="flex-1 text-left backdrop-filter backdrop-blur-lg bg-gradient-to-br from-[#0c1c30]/40 to-[#030912]/80 border-2 border-[#785a28]/60 hover:border-[#00d2ff] hover:shadow-[6px_6px_0px_0px_rgba(0,210,255,0.25)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-300 p-6 flex flex-col justify-between group cursor-pointer shadow-[4px_4px_0px_0px_rgba(120,90,40,0.2)] rounded-lg"
           >
             <div className="flex flex-col gap-4">
-              <div className="relative w-16 h-16 rounded border border-[#785a28]/60 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#0a1428] flex items-center justify-center shadow-md group-hover:border-[#0097e6] group-hover:shadow-[0_0_15px_rgba(0,151,230,0.3)] transition-all duration-300">
+              <div className="relative w-16 h-16 rounded border-2 border-[#785a28]/60 overflow-hidden bg-[#0a1428] flex items-center justify-center shadow-md group-hover:border-[#00d2ff] group-hover:shadow-[0_0_15px_rgba(0,210,255,0.3)] transition-all duration-300">
                 <Image
                   src="/icon-adc.png"
                   alt="ADC Icon"
@@ -71,7 +73,7 @@ export default function Home() {
               </p>
             </div>
             <div className="mt-8 border-t border-[#c8aa6e]/20 pt-3 flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#c8aa6e] group-hover:text-[#0097e6] transition-colors">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#c8aa6e] group-hover:text-[#00d2ff] transition-colors">
                 Ingresar como ADC
               </span>
               <span className="text-[#c8aa6e] font-bold text-xs select-none">→</span>
@@ -82,10 +84,10 @@ export default function Home() {
           <button
             onClick={() => setUserRole("ralph")}
             aria-label="Ingresar como Soporte (Ralph)"
-            className="flex-1 text-left lol-panel p-6 bg-[var(--panel)] border border-[var(--border-dark)] hover:border-[#00c8c8] hover:shadow-[0_0_24px_rgba(0,200,200,0.25)] hover:-translate-y-1 transition-all duration-350 flex flex-col justify-between group cursor-pointer"
+            className="flex-1 text-left backdrop-filter backdrop-blur-lg bg-gradient-to-br from-[#0c1c30]/40 to-[#030912]/80 border-2 border-[#785a28]/60 hover:border-[#00ffcc] hover:shadow-[6px_6px_0px_0px_rgba(0,255,204,0.2)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-300 p-6 flex flex-col justify-between group cursor-pointer shadow-[4px_4px_0px_0px_rgba(120,90,40,0.2)] rounded-lg"
           >
             <div className="flex flex-col gap-4">
-              <div className="relative w-16 h-16 rounded border border-[#785a28]/60 overflow-hidden bg-gradient-to-b from-[#1e232a] to-[#0a1428] flex items-center justify-center shadow-md group-hover:border-[#00c8c8] group-hover:shadow-[0_0_15px_rgba(0,200,200,0.3)] transition-all duration-300">
+              <div className="relative w-16 h-16 rounded border-2 border-[#785a28]/60 overflow-hidden bg-[#0a1428] flex items-center justify-center shadow-md group-hover:border-[#00ffcc] group-hover:shadow-[0_0_15px_rgba(0,255,204,0.3)] transition-all duration-300">
                 <Image
                   src="/icon-support.png"
                   alt="Support Icon"
@@ -102,7 +104,7 @@ export default function Home() {
               </p>
             </div>
             <div className="mt-8 border-t border-[#c8aa6e]/20 pt-3 flex items-center justify-between">
-              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#c8aa6e] group-hover:text-[#00c8c8] transition-colors">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#c8aa6e] group-hover:text-[#00ffcc] transition-colors">
                 Ingresar como Soporte
               </span>
               <span className="text-[#c8aa6e] font-bold text-xs select-none">→</span>
@@ -115,23 +117,24 @@ export default function Home() {
 
   return (
     <div className="w-full max-w-[1720px] mx-auto px-4 md:px-12 py-8 flex flex-col gap-12">
-      {/* Hero Welcome Banner */}
-      <div className="lol-panel-dark p-8 md:p-16 relative overflow-hidden flex flex-col items-center text-center shadow-lg min-h-[380px] justify-center">
+      {/* Hero Welcome Banner - Glassmorphism & Neo-Brutalisme */}
+      <div className="backdrop-filter backdrop-blur-xl bg-gradient-to-br from-[#0c1c30]/50 to-[#030912]/85 border-2 border-[#c8aa6e]/40 shadow-[8px_8px_0px_0px_rgba(200,170,110,0.15)] hover:shadow-[12px_12px_0px_0px_rgba(0,210,255,0.08)] hover:border-[#00d2ff]/40 rounded-lg p-8 md:p-16 relative overflow-hidden flex flex-col items-center text-center min-h-[380px] justify-center transition-all duration-500 group/hero">
         {/* Background Banner Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/banner.webp"
             alt="Duo Draft Background Banner"
             fill
-            className="object-cover opacity-20 filter brightness-90 select-none pointer-events-none"
+            className="object-cover opacity-20 filter brightness-90 select-none pointer-events-none group-hover/hero:scale-[1.02] transition-transform duration-[4000ms]"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0a1428] via-[#0a1428]/70 to-[#0a1428]/45" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#030c17] via-[#030c17]/65 to-transparent z-10" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_30%,#030c17_90%)] z-10" />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center">
+        <div className="relative z-20 flex flex-col items-center">
           {/* Logo centered */}
-          <div className="relative w-20 h-20 rounded border border-[#c8aa6e]/30 overflow-hidden bg-[#0a1428]/75 mb-5 shadow-lg flex items-center justify-center">
+          <div className="relative w-20 h-20 rounded border-2 border-[#c8aa6e] overflow-hidden bg-[#0a1428]/75 mb-5 shadow-[4px_4px_0px_0px_rgba(200,170,110,0.25)] flex items-center justify-center">
             <Image
               src="/logo-draft.png"
               alt="DUO DRAFT LOGO"
@@ -141,12 +144,12 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex items-center gap-2.5 mb-4 bg-[#c8aa6e]/10 border border-[#c8aa6e]/40 px-4 py-1.5 rounded-sm text-xs text-[#c8aa6e] font-mono backdrop-blur-sm">
+          <div className="flex items-center gap-2 mb-6 bg-gradient-to-r from-[#c8aa6e]/15 to-[#c8aa6e]/5 border-2 border-[#c8aa6e] px-4 py-2 font-mono text-xs text-[#ebd6b3] uppercase tracking-wider shadow-[3px_3px_0px_0px_rgba(200,170,110,0.3)] select-none">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             SESIÓN ACTIVA: {userRole === "fer" ? "FER (ADC)" : "RALPH (SOPORTE)"}
           </div>
 
-          <h1 className="font-serif text-4xl md:text-6xl font-black tracking-widest text-[#f0e6d3] uppercase drop-shadow-md shimmer-text-light">
+          <h1 className="font-serif text-5xl md:text-8xl font-black tracking-tighter text-[#f0e6d3] uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] bg-clip-text bg-gradient-to-b from-[#ffffff] via-[#ebd6b3] to-[#c8aa6e] shimmer-text-light select-none">
             DUO DRAFT
           </h1>
           <p className="text-xs md:text-base text-[#c8aa6e] uppercase tracking-widest font-black mt-3">
@@ -168,14 +171,14 @@ export default function Home() {
           <div className="flex flex-wrap gap-6 justify-center mt-10">
             <Link
               href="/draft"
-              className="px-8 py-4 bg-[#c8aa6e] hover:bg-[#785a28] text-[#0a1428] hover:text-[#f0e6d3] border border-[#f0e6d3] font-serif font-black uppercase text-sm md:text-base tracking-widest rounded-sm transition-all shadow-md flex items-center gap-3 group"
+              className="px-8 py-4 bg-[#c8aa6e] hover:bg-[#ebd6b3] text-[#030c17] font-serif font-black uppercase text-sm md:text-base tracking-widest border-2 border-[#ffffff] shadow-[4px_4px_0px_0px_rgba(255,255,255,0.25)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 flex items-center gap-3 group/btn cursor-pointer"
             >
-              <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              <Sparkles className="w-5 h-5 group-hover/btn:rotate-12 transition-transform" />
               Iniciar Simulador en Vivo
             </Link>
             <button
               onClick={() => setUserRole(null)}
-              className="px-6 py-3 border border-[#c8aa6e]/60 bg-transparent text-[#c8aa6e] hover:bg-[#c8aa6e] hover:text-[#0a1428] font-serif font-black uppercase text-xs md:text-sm tracking-widest rounded-sm transition-all shadow-md cursor-pointer"
+              className="px-6 py-3.5 bg-[#030c17]/40 hover:bg-[#c8aa6e]/15 text-[#ebd6b3] border-2 border-[#c8aa6e]/60 hover:border-[#c8aa6e] font-serif font-black uppercase text-xs md:text-sm tracking-widest shadow-[4px_4px_0px_0px_rgba(200,170,110,0.15)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 cursor-pointer"
             >
               Cambiar de Perfil
             </button>

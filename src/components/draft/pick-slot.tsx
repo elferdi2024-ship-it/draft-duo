@@ -4,8 +4,8 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import type { ChampionData } from "@/lib/types";
-import { getChampionSplashUrl } from "@/lib/ddragon";
-import { User } from "lucide-react";
+import { getChampionSplashUrl, getChampionIconUrl } from "@/lib/ddragon";
+import { User, X, Search } from "lucide-react";
 import { useDraftStore } from "@/store/draft-store";
 
 interface PickSlotProps {
@@ -25,20 +25,106 @@ export default function PickSlot({
   myRoleName,
   team,
 }: PickSlotProps) {
-  const { userRole, setSelectedDetailChampId } = useDraftStore();
+  const { userRole, setSelectedDetailChampId, allChampions, setChampion } = useDraftStore();
   const [mounted, setMounted] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchVal, setSearchVal] = useState("");
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
   const splashUrl = champion ? getChampionSplashUrl(champion.ddragonKey, 0) : null;
+
+  const handleClickSlot = () => {
+    if (champion) {
+      setSelectedDetailChampId(champion.id);
+    } else if (isActive) {
+      setIsSearching(true);
+    }
+  };
+
+  if (isSearching) {
+    // Filtrar campeones según la búsqueda
+    const filteredChamps = allChampions
+      .filter((c) => c.name.toLowerCase().includes(searchVal.toLowerCase()))
+      .slice(0, 6);
+
+    return (
+      <div 
+        className={`relative w-full h-[100px] md:h-[120px] lg:h-auto lg:flex-1 lg:min-h-[52px] border border-[#00c8c8] bg-[#0a1428] shadow-[0_0_16px_rgba(0,200,200,0.2)] flex flex-col justify-center z-50`}
+      >
+        {/* Backdrop invisible para cerrar la búsqueda al hacer clic fuera */}
+        <div className="fixed inset-0 z-40 bg-transparent cursor-default" onClick={() => setIsSearching(false)} />
+
+        <div className="relative w-full px-4 flex items-center gap-2 z-50">
+          <Search className="w-3.5 h-3.5 text-[#00c8c8] shrink-0" />
+          <input
+            type="text"
+            placeholder="Buscar campeón..."
+            value={searchVal}
+            onChange={(e) => setSearchVal(e.target.value)}
+            className="w-full bg-transparent outline-none text-[#f0e6d3] placeholder-[#8a9dae]/50 font-serif uppercase tracking-widest text-xs py-2 border-b border-[#785a28]/45 focus:border-[#00c8c8] transition-colors"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setIsSearching(false);
+            }}
+          />
+          <button 
+            onClick={() => setIsSearching(false)} 
+            className="p-1 text-[#8a9dae] hover:text-[#ff4655] transition-colors cursor-pointer border-none bg-transparent"
+            aria-label="Cerrar búsqueda"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Lista de sugerencias */}
+        <div className="absolute top-full left-0 right-0 bg-[#091420] border-x border-b border-[#785a28] z-50 max-h-[220px] overflow-y-auto shadow-2xl rounded-b-sm flex flex-col divide-y divide-[#785a28]/25">
+          {filteredChamps.length > 0 ? (
+            filteredChamps.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => {
+                  setChampion(c.id);
+                  setIsSearching(false);
+                  setSearchVal("");
+                }}
+                className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-[#1a2233] text-left text-xs uppercase font-serif tracking-wider font-black text-[#f0e6d3] hover:text-[#c8aa6e] transition-all cursor-pointer border-none bg-transparent"
+              >
+                <div className="relative w-6 h-6 rounded border border-[#785a28]/40 overflow-hidden shrink-0">
+                  <Image
+                    src={getChampionIconUrl("15.11.1", c.ddragonKey)}
+                    alt={c.name}
+                    fill
+                    className="object-cover"
+                    sizes="24px"
+                  />
+                </div>
+                <span>{c.name}</span>
+                {c.role && (
+                  <span className="ml-auto text-[8px] px-1.5 py-0.5 bg-[#0a1428] text-[#8a9dae] font-sans rounded border border-[#785a28]/20">
+                    {c.role}
+                  </span>
+                )}
+              </button>
+            ))
+          ) : (
+            <span className="p-3 text-[10px] text-[#8a9dae] text-center italic">
+              Sin coincidencias
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <button
-      onClick={() => champion && setSelectedDetailChampId(champion.id)}
-      disabled={!champion}
+      onClick={handleClickSlot}
+      disabled={!champion && !isActive}
       className={`relative w-full h-[100px] md:h-[120px] lg:h-auto lg:flex-1 lg:min-h-[45px] border transition-all duration-300 overflow-hidden flex items-center text-left ${
-        champion ? "cursor-pointer hover:border-[#c8aa6e]" : "cursor-default"
+        champion || isActive ? "cursor-pointer hover:border-[#c8aa6e]" : "cursor-default"
       } ${
         isActive
           ? "lol-slot-active bg-[#0a1428]/60 border-[#00c8c8] shadow-[0_0_16px_rgba(0,200,200,0.2)]"

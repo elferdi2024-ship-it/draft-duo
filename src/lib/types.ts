@@ -4,7 +4,7 @@
 // Champion Types
 // ============================================
 
-export type ChampionRole = 'ADC' | 'Support' | 'Top' | 'Jungle' | 'Mid';
+export type ChampionRole = 'ADC' | 'Support' | 'Top' | 'Jungle' | 'Mid' | 'Tank Support' | 'Mage Support' | 'Enchanter Support' | 'Pure Enchanter';
 
 export type LearningStatus = 'mastered' | 'learning' | 'backup';
 
@@ -162,6 +162,15 @@ export interface LiveDraftState {
   myPickSlots: [number, number];
   history: { stepIndex: number; championId: string }[];
   isComplete: boolean;
+  draftState?: {
+    currentStepIndex: number;
+    macroPhase: string;
+    isOurTurn: boolean;
+    currentActionType: string | null;
+    remainingEnemyPicks: number;
+    isLastPick: boolean;
+    isEnemyBotLaneClosed: boolean;
+  };
 }
 
 // ============================================
@@ -184,6 +193,8 @@ export interface BrainRecommendation {
   scores: ChampionScore;
   reasoning: string;
   tag: 'BEST_PICK' | 'SAFE_PICK' | 'COMFORT_PICK' | 'COUNTER_PICK' | 'PRIORITY_BAN' | 'VALUE_BAN';
+  cfrRegret?: number;
+  gankVulnerability?: number;
 }
 
 export type CompType = 'dive' | 'poke' | 'scaling' | 'engage' | 'balanced' | 'pick' | 'protect' | 'unknown';
@@ -209,6 +220,8 @@ export interface BrainAnalysis {
   phase: 'ban1' | 'pick1' | 'ban2' | 'pick2' | 'complete';
   winProbability?: number;
   recommendedSummoners?: { adc: string[]; sup: string[]; reason: string };
+  gankVulnerability?: number;
+  cfrRegretScore?: number;
 }
 
 

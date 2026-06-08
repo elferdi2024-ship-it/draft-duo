@@ -129,10 +129,7 @@ export default function BrainPanel() {
   const activeStepDetails = currentStepIndex < 20 ? (typeof window !== 'undefined' ? require("@/lib/types").DRAFT_ORDER[currentStepIndex] : null) : null;
   
   const picksList = side === "blue" ? bluePicks : redPicks;
-  const isCurrentSlotADC = activeStepDetails && myPickSlots.includes(activeStepDetails.index) && 
-    (!picksList[myPickSlots[0]] && activeStepDetails.index === myPickSlots[0] 
-      ? true 
-      : activeStepDetails.index === myPickSlots[1]);
+  const isCurrentSlotADC = activeStepDetails && activeStepDetails.index === myPickSlots[0];
 
   let teemoMessage = "¡Un scout siempre va un paso adelante!";
   let isTalking = false;
@@ -208,32 +205,107 @@ export default function BrainPanel() {
       {/* Main Content Scrollable */}
       <div className="flex-1 overflow-y-auto p-5 md:p-6 lg:p-3.5 flex flex-col gap-5 lg:gap-3.5 max-h-[650px] md:max-h-[960px] lg:max-h-none lg:min-h-0">
         
-        {/* iTero Win Rate Delta Simulator */}
-        <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2 relative overflow-hidden shrink-0">
-          <div className="flex justify-between items-center">
-            <span className="text-[10px] uppercase tracking-widest font-black text-[#c8aa6e] flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5 text-[#00c8c8]" />
-              iTero Win-Probability Delta
-            </span>
-            <span className={`font-serif font-black text-lg md:text-xl ${getWinRateColor(winProbability)}`}>
-              {winProbability}%
-            </span>
+        {/* ALPHA DRAFT ADVANCED METRICS PANEL */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 shrink-0">
+          {/* iTero Win Probability */}
+          <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2.5 relative overflow-hidden">
+            <div className="flex justify-between items-center">
+              <span className="text-[9px] uppercase tracking-widest font-black text-[#c8aa6e] flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-[#00c8c8]" />
+                Win Prob
+              </span>
+              <span className={`font-serif font-black text-base ${getWinRateColor(winProbability)}`}>
+                {winProbability}%
+              </span>
+            </div>
+            <div className="w-full h-2 bg-[#010a13] rounded-full overflow-hidden border border-[#c8aa6e]/10 relative">
+              <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-[#785a28]/40 z-10" />
+              <div 
+                className="h-full bg-gradient-to-r from-[#785a28] via-[#c8aa6e] to-[#00c8c8] transition-all duration-500" 
+                style={{ width: `${winProbability}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[8px] text-[#b2c3d2] uppercase font-bold px-0.5">
+              <span>Derrota</span>
+              <span>50%</span>
+              <span>Ventaja</span>
+            </div>
           </div>
-          
-          {/* Barra de progreso interactiva Hextech */}
-          <div className="w-full h-3 bg-[#010a13] rounded-full overflow-hidden border border-[#c8aa6e]/15 relative">
-            {/* Center line (50%) */}
-            <div className="absolute top-0 bottom-0 left-1/2 w-0.5 bg-[#785a28]/60 z-10" />
-            <div 
-              className="h-full bg-gradient-to-r from-[#785a28] via-[#c8aa6e] to-[#00c8c8] transition-all duration-750" 
-              style={{ width: `${winProbability}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-[9.5px] text-[#b2c3d2] uppercase font-bold px-0.5">
-            <span>Derrota (15%)</span>
-            <span>Estable (50%)</span>
-            <span>Ventaja (88%)</span>
-          </div>
+
+          {/* Gank Vulnerability Index (Vg) */}
+          {(() => {
+            const Vg = brainAnalysis.gankVulnerability ?? 0;
+            const getVgStatus = (v: number) => {
+              if (v === 0) return { label: "N/A", color: "text-[#8a9dae]", barColor: "bg-[#1e232a]" };
+              if (v < 5.0) return { label: "Bajo Riesgo", color: "text-[#00c8c8]", barColor: "bg-[#00c8c8]" };
+              if (v < 9.0) return { label: "Moderado", color: "text-[#c8aa6e]", barColor: "bg-[#c8aa6e]" };
+              return { label: "Crítico", color: "text-[#ff4655]", barColor: "bg-[#ff4655]" };
+            };
+            const status = getVgStatus(Vg);
+            const percentage = Math.min(100, (Vg / 15) * 100);
+
+            return (
+              <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2.5 relative overflow-hidden">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] uppercase tracking-widest font-black text-[#c8aa6e] flex items-center gap-1.5" title="Índice de Vulnerabilidad a Ganks (Vg) = (P_jungla * E_empuje) / (M_adc + C_support)">
+                    <Shield className="w-3.5 h-3.5 text-amber-500" />
+                    Gank Risk (V_g)
+                  </span>
+                  <span className={`font-serif font-black text-base ${status.color}`}>
+                    {Vg > 0 ? `${Vg}/15` : "0.0"}
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-[#010a13] rounded-full overflow-hidden border border-[#c8aa6e]/10 relative">
+                  <div 
+                    className={`h-full ${status.barColor} transition-all duration-500`}
+                    style={{ width: `${Vg > 0 ? percentage : 0}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[8px] text-[#b2c3d2] uppercase font-bold px-0.5">
+                  <span>Seguro</span>
+                  <span className={status.color}>{status.label}</span>
+                  <span>Vulnerable</span>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* CFR Regret Score (Draft Optimalidad) */}
+          {(() => {
+            const CFR = brainAnalysis.cfrRegretScore ?? 0.15;
+            const getCfrStatus = (c: number) => {
+              if (c < 0.15) return { label: "Óptimo", color: "text-[#00c8c8]", barColor: "bg-[#00c8c8]" };
+              if (c < 0.35) return { label: "Viable", color: "text-[#c8aa6e]", barColor: "bg-[#c8aa6e]" };
+              return { label: "Esperar Pick", color: "text-[#ff4655]", barColor: "bg-[#ff4655]" };
+            };
+            const status = getCfrStatus(CFR);
+            const percentage = CFR * 100;
+
+            return (
+              <div className="border border-[#c8aa6e]/20 bg-[#1a2233]/40 p-4 rounded shadow-lg flex flex-col gap-2.5 relative overflow-hidden">
+                <div className="flex justify-between items-center">
+                  <span className="text-[9px] uppercase tracking-widest font-black text-[#c8aa6e] flex items-center gap-1.5" title="Arrepentimiento Contrafactual Esperado (CFR) = Penalización por contra-picks rivales futuros">
+                    <Zap className="w-3.5 h-3.5 text-violet-400" />
+                    CFR Regret
+                  </span>
+                  <span className={`font-serif font-black text-base ${status.color}`}>
+                    {CFR.toFixed(2)}
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-[#010a13] rounded-full overflow-hidden border border-[#c8aa6e]/10 relative">
+                  <div 
+                    className={`h-full ${status.barColor} transition-all duration-500`}
+                    style={{ width: `${percentage}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[8px] text-[#b2c3d2] uppercase font-bold px-0.5">
+                  <span>Bloquear</span>
+                  <span className={status.color}>{status.label}</span>
+                  <span>Riesgo</span>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Teemo Coach Presenter */}
@@ -523,11 +595,17 @@ export default function BrainPanel() {
 
                     {/* Score breakdown if picking */}
                     {actionType === "pick" && (
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2 border-t border-[#c8aa6e]/20 pt-2.5 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <ScoreBar label="Confort" value={rec.scores.comfort} />
-                        <ScoreBar label="Sinergia" value={rec.scores.synergy} />
-                        <ScoreBar label="Counter" value={rec.scores.counter} />
-                        <ScoreBar label="Comp" value={rec.scores.comp} />
+                      <div className="flex flex-col gap-2 mt-2 border-t border-[#c8aa6e]/20 pt-2.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                          <ScoreBar label="Confort" value={rec.scores.comfort} />
+                          <ScoreBar label="Sinergia" value={rec.scores.synergy} />
+                          <ScoreBar label="Counter" value={rec.scores.counter} />
+                          <ScoreBar label="Comp" value={rec.scores.comp} />
+                        </div>
+                        <div className="flex justify-between text-[9px] text-[#b2c3d2] uppercase font-black tracking-wider pt-2 border-t border-[#c8aa6e]/10">
+                          <span>V_g Proyectada: <strong className={rec.gankVulnerability && rec.gankVulnerability >= 9.0 ? "text-[#ff4655]" : rec.gankVulnerability && rec.gankVulnerability >= 5.0 ? "text-[#c8aa6e]" : "text-[#00c8c8]"}>{rec.gankVulnerability !== undefined ? rec.gankVulnerability.toFixed(1) : "0.0"}</strong></span>
+                          <span>CFR Regret: <strong className={rec.cfrRegret && rec.cfrRegret >= 0.35 ? "text-[#ff4655]" : rec.cfrRegret && rec.cfrRegret >= 0.15 ? "text-[#c8aa6e]" : "text-[#00c8c8]"}>{rec.cfrRegret !== undefined ? rec.cfrRegret.toFixed(2) : "0.00"}</strong></span>
+                        </div>
                       </div>
                     )}
                   </div>

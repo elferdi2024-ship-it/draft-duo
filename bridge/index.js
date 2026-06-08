@@ -78,8 +78,8 @@ wss.on("connection", (ws) => {
   });
 });
 
-// Mapeo exhaustivo de IDs numéricos de campeones de Riot a IDs de Draft Duo
-const CHAMPION_MAP = {
+// ALPHA-DRAFT FIX: Mapeo dinámico e inteligente de campeones con respaldo estático completo
+const CHAMPION_MAP_FALLBACK = {
   22: "ashe",
   110: "varus",
   202: "jhin",
@@ -91,7 +91,7 @@ const CHAMPION_MAP = {
   43: "karma",
   111: "nautilus",
   555: "pyke",
-  183: "renata", // Renata Glasc ID oficial 183 o 888 (ej. Renata)
+  183: "renata",
   117: "lulu",
   267: "nami",
   201: "braum",
@@ -118,12 +118,107 @@ const CHAMPION_MAP = {
   157: "yasuo",
   134: "syndra",
   38: "kassadin",
+  121: "ezreal",
 };
 
-// Función para mapear un ID numérico de campeón a string compatible
+// ALPHA-DRAFT FIX: Construir Map en memoria
+const championMap = new Map();
+for (const [key, value] of Object.entries(CHAMPION_MAP_FALLBACK)) {
+  championMap.set(parseInt(key), value);
+}
+
+// ALPHA-DRAFT FIX: Fetch dinámico al iniciar el servidor para actualizar championMap
+async function initializeDynamicChampionMap() {
+  try {
+    console.log("[Bridge] ALPHA-DRAFT FIX: Iniciando sincronización con Riot Data Dragon...");
+    const versionRes = await fetch("https://ddragon.leagueoflegends.com/api/versions.json");
+    if (!versionRes.ok) throw new Error(`HTTP error fetching versions: ${versionRes.status}`);
+    const versions = await versionRes.json();
+    const version = versions[0];
+    console.log(`[Bridge] ALPHA-DRAFT FIX: Versión detectada: ${version}`);
+
+    const championsRes = await fetch(`https://ddragon.leagueoflegends.com/cdn/${version}/data/en_US/champion.json`);
+    if (!championsRes.ok) throw new Error(`HTTP error fetching champions: ${championsRes.status}`);
+    const championsJson = await championsRes.json();
+
+    const championsData = Object.values(championsJson.data);
+    championsData.forEach((champ) => {
+      const numericKey = parseInt(champ.key);
+      const stringId = champ.id.toLowerCase();
+      if (!isNaN(numericKey)) {
+        championMap.set(numericKey, stringId);
+      }
+    });
+    console.log(`[Bridge] ALPHA-DRAFT FIX: Sincronización exitosa. ${championMap.size} campeones cargados dinámicamente.`);
+  } catch (error) {
+    console.error("[Bridge] ALPHA-DRAFT FIX: Error al conectar con Riot Data Dragon. Se utilizará el mapa de respaldo estático. Detalle:", error.message);
+  }
+}
+
+initializeDynamicChampionMap();
+
+// ALPHA-DRAFT FIX: Función mapChampId lee del Map dinámico en memoria
 function mapChampId(id) {
   if (!id || id <= 0) return null;
-  return CHAMPION_MAP[id] || `unmapped-${id}`;
+  const mapped = championMap.get(id);
+  if (mapped) return mapped;
+  return `unknown-${id}`;
+}
+
+// ALPHA-DRAFT FIX: Función avanzada de parsing de estado macro del draft
+function getAdvancedDraftState(session) {
+  const localPlayerCellId = session.localPlayerCellId;
+  const localTeamId = localPlayerCellId < 5 ? 100 : 200;
+  const enemyTeamId = localTeamId === 100 ? 200 : 100;
+
+  let totalPicks = 0, totalBans = 0, remainingEnemyPicks = 0;
+  let isOurTurn = false, currentActionType = null, enemyPicksCompleted = 0;
+
+  if (session.actions && Array.isArray(session.actions)) {
+    for (const phase of session.actions) {
+      if (Array.isArray(phase)) {
+        for (const action of phase) {
+          if (action.type !== 'pick' && action.type !== 'ban') continue;
+          if (action.completed) {
+            if (action.type === 'pick') { 
+              totalPicks++; 
+              if (action.teamId === enemyTeamId) {
+                // Verificar si es pick de botlane
+                const mappedName = mapChampId(action.championId);
+                // Si el campeón mapeado tiene roles botlane o si simplemente es pick completado del enemigo
+                enemyPicksCompleted++; 
+              }
+            }
+            if (action.type === 'ban') totalBans++;
+          }
+          if (action.isInProgress) { 
+            isOurTurn = (action.teamId === localTeamId); 
+            currentActionType = action.type; 
+          }
+          if (!action.completed && !action.isInProgress && action.teamId === enemyTeamId && action.type === 'pick') {
+            remainingEnemyPicks++;
+          }
+        }
+      }
+    }
+  }
+
+  let macroPhase = 'PLANNING';
+  if (totalPicks === 0 && totalBans > 0) macroPhase = 'BAN_PHASE_1';
+  else if (totalPicks > 0 && totalPicks <= 4) macroPhase = 'PICK_PHASE_1';
+  else if (totalPicks > 4 && totalBans > 4) macroPhase = 'BAN_PHASE_2';
+  else if (totalPicks > 4) macroPhase = 'PICK_PHASE_2';
+  if (totalPicks === 10) macroPhase = 'FINISHED';
+
+  return {
+    currentStepIndex: totalPicks + totalBans, 
+    macroPhase, 
+    isOurTurn, 
+    currentActionType,
+    remainingEnemyPicks, 
+    isLastPick: (totalPicks === 9 && isOurTurn),
+    isEnemyBotLaneClosed: (enemyPicksCompleted >= 2)
+  };
 }
 
 async function startLCUListener() {
@@ -175,11 +270,9 @@ async function startLCUListener() {
         while (blueBans.length < 5) blueBans.push(null);
         while (redBans.length < 5) redBans.push(null);
 
-        // 4. Calcular el paso actual del draft de forma aproximada basado en cuántos picks y bans hay
-        let currentStepIndex = 0;
+        // ALPHA-DRAFT FIX: Obtener estado avanzado del draft
+        const draftState = getAdvancedDraftState(data);
         const totalPicksMade = [...bluePicks, ...redPicks].filter(Boolean).length;
-        // Mapeo de paso actual en base a total de picks
-        currentStepIndex = Math.min(9, totalPicksMade);
 
         // 5. Preparar payload de transmisión
         const payload = {
@@ -190,14 +283,15 @@ async function startLCUListener() {
             redPicks,
             blueBans,
             redBans,
-            currentStepIndex,
-            isComplete: totalPicksMade >= 10,
+            currentStepIndex: draftState.currentStepIndex,
+            isComplete: draftState.macroPhase === 'FINISHED' || totalPicksMade >= 10,
+            draftState
           }
         };
 
         // Retransmitir a la Web App si está conectada
         if (webClient && webClient.readyState === 1) {
-          console.log(`[Bridge] Enviando actualización a la Web App (Picks: ${totalPicksMade}/10).`);
+          console.log(`[Bridge] Enviando actualización avanzada a la Web App (Fase: ${draftState.macroPhase}, Turno Propio: ${draftState.isOurTurn}).`);
           webClient.send(JSON.stringify(payload));
         }
 

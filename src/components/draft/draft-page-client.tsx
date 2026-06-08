@@ -12,7 +12,7 @@ import { AnimatePresence } from "framer-motion";
 export default function DraftPageClient() {
   const [activeTab, setActiveTab] = useState<"draft" | "brain">("draft");
   const [version, setVersion] = useState("15.11.1");
-  const { selectedDetailChampId, setSelectedDetailChampId, allChampions, brainAnalysis, setChampion } = useDraftStore();
+  const { selectedDetailChampId, setSelectedDetailChampId, allChampions, brainAnalysis, setChampion, isComplete } = useDraftStore();
 
   useEffect(() => {
     getLatestVersion().then(setVersion);
@@ -67,7 +67,7 @@ export default function DraftPageClient() {
             champion={selectedChampData}
             onClose={() => setSelectedDetailChampId(null)}
             onSelect={setChampion}
-            isMyTurn={isMyTurn}
+            isMyTurn={!isComplete}
             version={version}
           />
         )}

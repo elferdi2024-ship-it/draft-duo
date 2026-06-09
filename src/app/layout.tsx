@@ -1,7 +1,7 @@
-// filepath: src/app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/navigation";
+import ToastContainer from "@/components/toast-container";
 
 export const metadata: Metadata = {
   title: "DUO DRAFT — League Draft Simulator",
@@ -24,6 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main className="flex-1 w-full py-6">
           {children}
         </main>
+        <ToastContainer />
         <script
           dangerouslySetInnerHTML={{
             __html: `

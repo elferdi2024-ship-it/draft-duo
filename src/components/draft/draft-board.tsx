@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useDraftStore } from "@/store/draft-store";
+import { useShallow } from "zustand/react/shallow";
 import { DRAFT_ORDER } from "@/lib/types";
 import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
 import PickSlot from "./pick-slot";
@@ -30,7 +31,26 @@ export default function DraftBoard() {
     isBridgeConnected,
     connectBridge,
     disconnectBridge,
-  } = useDraftStore();
+  } = useDraftStore(useShallow((state) => ({
+    side: state.side,
+    currentStepIndex: state.currentStepIndex,
+    blueBans: state.blueBans,
+    redBans: state.redBans,
+    bluePicks: state.bluePicks,
+    redPicks: state.redPicks,
+    myPickSlots: state.myPickSlots,
+    allChampions: state.allChampions,
+    loadChampions: state.loadChampions,
+    initDraft: state.initDraft,
+    setChampion: state.setChampion,
+    isComplete: state.isComplete,
+    selectedBanSlot: state.selectedBanSlot,
+    setSelectedBanSlot: state.setSelectedBanSlot,
+    autoFillBans: state.autoFillBans,
+    isBridgeConnected: state.isBridgeConnected,
+    connectBridge: state.connectBridge,
+    disconnectBridge: state.disconnectBridge,
+  })));
 
   const [version, setVersion] = useState("15.11.1");
   const [selectedSide, setSelectedSide] = useState<"blue" | "red">("blue");

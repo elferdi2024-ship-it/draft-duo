@@ -6,6 +6,8 @@ import { setups } from "@/data/setups";
 import { staticFallbackChampions } from "@/data/champions";
 import { CheckSquare, Square, ChevronDown, ChevronUp, Clock, HelpCircle } from "lucide-react";
 import type { SetupCheckpoint, SetupTimeline } from "@/lib/types";
+import { useDraftStore } from "@/store/draft-store";
+import { CompetitiveBrain } from "@/lib/draft-engine";
 
 interface LiveGameplanTimelineProps {
   duoId: string;
@@ -17,6 +19,36 @@ export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTi
   const [expandedCheckpoints, setExpandedCheckpoints] = useState<Record<number, boolean>>({
     0: true, // Expand primer item por defecto
   });
+
+  const allChampions = useDraftStore((state) => state.allChampions);
+  const side = useDraftStore((state) => state.side);
+  const bluePicks = useDraftStore((state) => state.bluePicks);
+  const redPicks = useDraftStore((state) => state.redPicks);
+
+  const enemyPicks = (side === "blue" ? redPicks : bluePicks).filter((id): id is string => !!id);
+  const allyPicks = (side === "blue" ? bluePicks : redPicks).filter((id): id is string => !!id);
+
+  // Find ally bot lane picks
+  const allyBotPicks = allyPicks.filter(id => {
+    const c = allChampions.find(champ => champ.id === id);
+    return c && (c.role === "ADC" || c.role === "Support" || c.roles?.includes("ADC") || c.roles?.includes("Support") || c.role.includes("Support"));
+  });
+
+  // Find enemy jungler
+  const enemyJungler = enemyPicks.find(id => {
+    const c = allChampions.find(champ => champ.id === id);
+    return c && (c.role === "Jungle" || c.roles?.includes("Jungle"));
+  });
+
+  const brain = new CompetitiveBrain(allChampions);
+  const prediction = enemyJungler ? brain.predictJungleStart(allyBotPicks, enemyJungler) : null;
+
+  let alertBg = "bg-emerald-950/20 border-emerald-500/30 text-emerald-300";
+  if (prediction && prediction.confidence > 75) {
+    alertBg = "bg-red-950/20 border-red-500/30 text-red-300";
+  } else if (prediction && prediction.confidence > 50) {
+    alertBg = "bg-amber-950/20 border-amber-500/30 text-amber-300";
+  }
 
   // Intentar resolver el setup de la base de datos estática setups.ts
   let activeSetup = setups.find((s) => s.duoId === duoId);
@@ -177,6 +209,12 @@ export default function LiveGameplanTimeline({ duoId, userRole }: LiveGameplanTi
           </span>
         )}
       </div>
+ 
+      {prediction && (
+        <div className={`p-3 border rounded-sm font-bold text-xs flex items-center gap-2 ${alertBg}`}>
+          <span>⚠️ Jungla enemigo {prediction.confidence}% probabilidad de empezar {prediction.side === 'top' ? 'Top' : 'Bottom'} Side</span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
         {activeSetup.checkpoints.map((cp, cpIdx) => {

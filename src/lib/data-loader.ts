@@ -63,6 +63,47 @@ function determineRoles(tags: string[]): ChampionRole[] {
   return Array.from(new Set(roles));
 }
 
+function estimateMetrics(tags: string[] = []): { mobility: number; waveClear: number; engage: number; peel: number } {
+  let mobility = 5.0;
+  let waveClear = 5.0;
+  let engage = 5.0;
+  let peel = 5.0;
+
+  if (tags.includes("Marksman")) {
+    mobility = tags.includes("Assassin") || tags.includes("Fighter") ? 6.5 : 3.0;
+    waveClear = 7.0;
+    engage = 3.0;
+    peel = 2.0;
+  } else if (tags.includes("Tank")) {
+    mobility = 3.5;
+    waveClear = 4.0;
+    engage = 8.5;
+    peel = 7.5;
+  } else if (tags.includes("Mage")) {
+    mobility = 3.0;
+    waveClear = 8.0;
+    engage = 5.0;
+    peel = 4.0;
+  } else if (tags.includes("Assassin")) {
+    mobility = 8.5;
+    waveClear = 6.0;
+    engage = 6.0;
+    peel = 1.5;
+  } else if (tags.includes("Fighter")) {
+    mobility = 5.5;
+    waveClear = 6.0;
+    engage = 6.5;
+    peel = 3.0;
+  } else if (tags.includes("Support")) {
+    mobility = 5.0;
+    waveClear = 4.0;
+    engage = 5.0;
+    peel = 8.0;
+  }
+
+  return { mobility, waveClear, engage, peel };
+}
+
 export async function loadAllChampions(): Promise<ChampionData[]> {
   try {
     const version = await getLatestVersion();
@@ -70,7 +111,10 @@ export async function loadAllChampions(): Promise<ChampionData[]> {
 
     if (!ddragonChamps || ddragonChamps.length === 0) {
       console.warn("Using static fallback champions list due to empty DDragon response");
-      return staticFallbackChampions;
+      return staticFallbackChampions.map(c => ({
+        ...estimateMetrics(c.tags || []),
+        ...c
+      }));
     }
 
     // Merge ddragon data with our rich strategic metadata
@@ -85,10 +129,12 @@ export async function loadAllChampions(): Promise<ChampionData[]> {
 
       const roles = determineRoles(dc.tags || []);
       const primaryRole = own ? own.role : roles[0] || "Mid";
+      const estimated = estimateMetrics(dc.tags || []);
 
       if (own) {
         // ALPHA-DRAFT FIX: Para campeones de confort, priorizar su rol y añadir sus clasificaciones de tags
         return {
+          ...estimated,
           ...own,
           ddragonKey,
           roles: Array.from(new Set([...roles, own.role, ...(own.roles || [])])),
@@ -105,12 +151,16 @@ export async function loadAllChampions(): Promise<ChampionData[]> {
         tier: "B", // Default tier for non-pool
         tags: dc.tags,
         isOwnPool: false,
+        ...estimated,
       };
     });
 
     return mapped;
   } catch (error) {
     console.error("Failed to load champions from DDragon, falling back to static list. Error:", error);
-    return staticFallbackChampions;
+    return staticFallbackChampions.map(c => ({
+      ...estimateMetrics(c.tags || []),
+      ...c
+    }));
   }
 }

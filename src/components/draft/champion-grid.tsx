@@ -1,9 +1,10 @@
 // filepath: src/components/draft/champion-grid.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import Image from "next/image";
 import { useDraftStore } from "@/store/draft-store";
+import { useShallow } from "zustand/react/shallow";
 import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
 import { Search, Heart } from "lucide-react";
 import type { ChampionData } from "@/lib/types";
@@ -22,20 +23,83 @@ const ROLES = [
   { value: "Support", label: "Soporte" },
 ];
 
+interface ChampionCardProps {
+  champ: ChampionData;
+  isUnavailable: boolean;
+  disabled: boolean;
+  ddragonVersion: string;
+  onClick: (champId: string) => void;
+}
+
+const ChampionCard = memo(({ champ, isUnavailable, disabled, ddragonVersion, onClick }: ChampionCardProps) => {
+  const iconUrl = getChampionIconUrl(ddragonVersion, champ.ddragonKey);
+
+  return (
+    <button
+      onClick={() => onClick(champ.id)}
+      disabled={isUnavailable || disabled}
+      aria-label={`${champ.name}, ${champ.role}, ${champ.isOwnPool ? "piscina de confort" : ""}`}
+      className={`group relative aspect-square border transition-all flex flex-col items-center justify-center p-1 bg-[#0a1428] ${
+        isUnavailable
+          ? "opacity-25 cursor-not-allowed border-transparent bg-[#010a13]"
+          : champ.isOwnPool
+          ? "border-[#c8aa6e] hover:border-[#00c8c8] hover:scale-105 shadow-[0_2px_8px_rgba(200,170,110,0.25)]"
+          : "border-[#785a28]/40 hover:border-[#00c8c8] hover:scale-105"
+      }`}
+      title={`${champ.name} (${champ.role})`}
+    >
+      {/* Icon Image */}
+      <div className="relative w-full h-full aspect-square overflow-hidden rounded-sm">
+        <Image
+          src={iconUrl}
+          alt={champ.name}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          sizes="64px"
+        />
+      </div>
+
+      {/* Highlight for Comfort Pool */}
+      {champ.isOwnPool && (
+        <div className="absolute top-1.5 right-1.5 bg-[#0a1428] border border-[#c8aa6e] p-0.5 rounded-full z-10 shadow-md">
+          <Heart className="w-2.5 h-2.5 fill-[#c8aa6e] text-[#c8aa6e]" />
+        </div>
+      )}
+
+      {/* Champion Name Hover Tooltip / Label */}
+      <div className="absolute bottom-0 left-0 right-0 bg-[#0a1428]/95 border-t border-[#c8aa6e]/30 py-0.5 text-[8px] text-[#f0e6d3] font-semibold text-center truncate pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+        {champ.name}
+      </div>
+    </button>
+  );
+});
+
+ChampionCard.displayName = "ChampionCard";
+
 export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGridProps) {
   const {
     allChampions,
     searchQuery,
     activeRoleFilter,
-    setSearchQuery,
-    setRoleFilter,
     blueBans,
     redBans,
     bluePicks,
     redPicks,
     selectedBanSlot,
-    setSelectedDetailChampId,
-  } = useDraftStore();
+  } = useDraftStore(useShallow((state) => ({
+    allChampions: state.allChampions,
+    searchQuery: state.searchQuery,
+    activeRoleFilter: state.activeRoleFilter,
+    blueBans: state.blueBans,
+    redBans: state.redBans,
+    bluePicks: state.bluePicks,
+    redPicks: state.redPicks,
+    selectedBanSlot: state.selectedBanSlot,
+  })));
+
+  const setSearchQuery = useDraftStore((state) => state.setSearchQuery);
+  const setRoleFilter = useDraftStore((state) => state.setRoleFilter);
+  const setSelectedDetailChampId = useDraftStore((state) => state.setSelectedDetailChampId);
 
   const handleChampClick = (champId: string) => {
     if (selectedBanSlot) {
@@ -52,38 +116,42 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
   }, []);
 
   // Set of already chosen champion IDs (picks + bans)
-  const pickedBannedIds = new Set<string>();
-  [...blueBans, ...redBans, ...bluePicks, ...redPicks].forEach(
-    (id) => id && pickedBannedIds.add(id)
-  );
+  const pickedBannedIds = useMemo(() => {
+    const ids = new Set<string>();
+    [...blueBans, ...redBans, ...bluePicks, ...redPicks].forEach(
+      (id) => id && ids.add(id)
+    );
+    return ids;
+  }, [blueBans, redBans, bluePicks, redPicks]);
 
   // Filter and sort champions
-  const filteredChampions = allChampions
-    .filter((champ) => {
-      // Role filter
-      if (activeRoleFilter !== "All") {
-        const matchesMainRole = champ.role === activeRoleFilter;
-        const matchesAltRoles = champ.roles?.includes(activeRoleFilter as any) || false;
-        if (!matchesMainRole && !matchesAltRoles) return false;
-      }
+  const filteredChampions = useMemo(() => {
+    return allChampions
+      .filter((champ) => {
+        // Role filter
+        if (activeRoleFilter !== "All") {
+          const matchesMainRole = champ.role === activeRoleFilter;
+          const matchesAltRoles = champ.roles?.includes(activeRoleFilter as any) || false;
+          if (!matchesMainRole && !matchesAltRoles) return false;
+        }
 
+        // Search filter
+        if (searchQuery.trim()) {
+          const query = searchQuery.toLowerCase();
+          const matchesName = champ.name.toLowerCase().includes(query);
+          const matchesTags = champ.tags?.some((tag) => tag.toLowerCase().includes(query));
+          if (!matchesName && !matchesTags) return false;
+        }
 
-      // Search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesName = champ.name.toLowerCase().includes(query);
-        const matchesTags = champ.tags?.some((tag) => tag.toLowerCase().includes(query));
-        if (!matchesName && !matchesTags) return false;
-      }
-
-      return true;
-    })
-    .sort((a, b) => {
-      // Comfort pool first, then alphabetical
-      if (a.isOwnPool && !b.isOwnPool) return -1;
-      if (!a.isOwnPool && b.isOwnPool) return 1;
-      return a.name.localeCompare(b.name);
-    });
+        return true;
+      })
+      .sort((a, b) => {
+        // Comfort pool first, then alphabetical
+        if (a.isOwnPool && !b.isOwnPool) return -1;
+        if (!a.isOwnPool && b.isOwnPool) return 1;
+        return a.name.localeCompare(b.name);
+      });
+  }, [allChampions, searchQuery, activeRoleFilter]);
 
   return (
     <div className="flex flex-col gap-4 lg:gap-2.5 bg-[#091420] border border-[#785a28] p-4 lg:p-3 shadow-md w-full h-full flex-1 lg:min-h-0 lg:overflow-hidden">
@@ -101,7 +169,6 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
             className="w-full bg-[#0a1428] border border-[#785a28]/60 rounded pl-10 pr-4 py-2.5 text-xs md:text-sm text-[#f0e6d3] placeholder-[#b2c3d2]/75 focus:outline-none focus:ring-1 focus:ring-[#00c8c8] focus:border-[#00c8c8]"
           />
         </div>
-
 
         {/* Role Filters */}
         <div className="flex flex-wrap gap-1.5">
@@ -132,46 +199,16 @@ export default function ChampionGrid({ onSelectChampion, disabled }: ChampionGri
           <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 gap-2">
             {filteredChampions.map((champ) => {
               const isUnavailable = pickedBannedIds.has(champ.id);
-              const iconUrl = getChampionIconUrl(ddragonVersion, champ.ddragonKey);
 
               return (
-                <button
-                  key={champ.id}
-                  onClick={() => !isUnavailable && !disabled && handleChampClick(champ.id)}
-                  disabled={isUnavailable || disabled}
-                  aria-label={`${champ.name}, ${champ.role}, ${champ.isOwnPool ? "piscina de confort" : ""}`}
-                  className={`group relative aspect-square border transition-all flex flex-col items-center justify-center p-1 bg-[#0a1428] ${
-                    isUnavailable
-                      ? "opacity-25 cursor-not-allowed border-transparent bg-[#010a13]"
-                      : champ.isOwnPool
-                      ? "border-[#c8aa6e] hover:border-[#00c8c8] hover:scale-105 shadow-[0_2px_8px_rgba(200,170,110,0.25)]"
-                      : "border-[#785a28]/40 hover:border-[#00c8c8] hover:scale-105"
-                  }`}
-                  title={`${champ.name} (${champ.role})`}
-                >
-                  {/* Icon Image */}
-                  <div className="relative w-full h-full aspect-square overflow-hidden rounded-sm">
-                    <Image
-                      src={iconUrl}
-                      alt={champ.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="64px"
-                    />
-                  </div>
-
-                  {/* Highlight for Comfort Pool */}
-                  {champ.isOwnPool && (
-                    <div className="absolute top-1.5 right-1.5 bg-[#0a1428] border border-[#c8aa6e] p-0.5 rounded-full z-10 shadow-md">
-                      <Heart className="w-2.5 h-2.5 fill-[#c8aa6e] text-[#c8aa6e]" />
-                    </div>
-                  )}
-
-                  {/* Champion Name Hover Tooltip / Label */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-[#0a1428]/95 border-t border-[#c8aa6e]/30 py-0.5 text-[8px] text-[#f0e6d3] font-semibold text-center truncate pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
-                    {champ.name}
-                  </div>
-                </button>
+                <ChampionCard 
+                  key={champ.id} 
+                  champ={champ} 
+                  isUnavailable={isUnavailable} 
+                  disabled={disabled} 
+                  ddragonVersion={ddragonVersion} 
+                  onClick={handleChampClick} 
+                />
               );
             })}
           </div>

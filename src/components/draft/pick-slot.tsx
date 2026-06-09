@@ -7,6 +7,7 @@ import type { ChampionData } from "@/lib/types";
 import { getChampionSplashUrl, getChampionIconUrl } from "@/lib/ddragon";
 import { User, X, Search } from "lucide-react";
 import { useDraftStore } from "@/store/draft-store";
+import { useShallow } from "zustand/react/shallow";
 
 interface PickSlotProps {
   champion: ChampionData | null;
@@ -25,7 +26,14 @@ export default function PickSlot({
   myRoleName,
   team,
 }: PickSlotProps) {
-  const { userRole, setSelectedDetailChampId, allChampions, setChampion } = useDraftStore();
+  const { userRole, setSelectedDetailChampId, allChampions, setChampion } = useDraftStore(
+    useShallow((state) => ({
+      userRole: state.userRole,
+      setSelectedDetailChampId: state.setSelectedDetailChampId,
+      allChampions: state.allChampions,
+      setChampion: state.setChampion,
+    }))
+  );
   const [mounted, setMounted] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchVal, setSearchVal] = useState("");

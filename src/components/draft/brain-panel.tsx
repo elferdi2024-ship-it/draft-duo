@@ -1,11 +1,12 @@
 // filepath: src/components/draft/brain-panel.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { duos } from "@/data/duos";
 import { useDraftStore } from "@/store/draft-store";
+import { useShallow } from "zustand/react/shallow";
 import { getChampionIconUrl, getLatestVersion } from "@/lib/ddragon";
 import ChampionMatchupEvaluator from "./champion-matchup-evaluator";
 import LiveGameplanTimeline from "./live-gameplan-timeline";
@@ -26,7 +27,7 @@ import {
   Flame,
   Shield
 } from "lucide-react";
-import type { BrainRecommendation, ChampionScore } from "@/lib/types";
+import type { BrainRecommendation, ChampionScore, LiveDraftState } from "@/lib/types";
 
 interface ScoreBarProps {
   label: string;
@@ -53,21 +54,54 @@ function ScoreBar({ label, value }: ScoreBarProps) {
 export default function BrainPanel() {
   const { 
     brainAnalysis, 
-    undo, 
-    reset, 
     currentStepIndex, 
     side, 
     allChampions,
-    setChampion,
+    bluePicks,
+    redPicks,
+    blueBans,
+    redBans,
+    myPickSlots,
+    isComplete,
+    userRole,
+    draftState,
+    winProbability,
+  } = useDraftStore(useShallow((state) => ({
+    brainAnalysis: state.brainAnalysis,
+    currentStepIndex: state.currentStepIndex,
+    side: state.side,
+    allChampions: state.allChampions,
+    bluePicks: state.bluePicks,
+    redPicks: state.redPicks,
+    blueBans: state.blueBans,
+    redBans: state.redBans,
+    myPickSlots: state.myPickSlots,
+    isComplete: state.isComplete,
+    userRole: state.userRole,
+    draftState: state.draftState,
+    winProbability: state.winProbability,
+  })));
+
+  const undo = useDraftStore((state) => state.undo);
+  const reset = useDraftStore((state) => state.reset);
+  const setChampion = useDraftStore((state) => state.setChampion);
+  const setSelectedDetailChampId = useDraftStore((state) => state.setSelectedDetailChampId);
+
+  const [version, setVersion] = useState("15.11.1");
+  const brain = useMemo(() => new CompetitiveBrain(allChampions), [allChampions]);
+
+  const stateSnapshot = useMemo<LiveDraftState>(() => ({
+    side,
+    currentStepIndex,
+    blueBans,
+    redBans,
     bluePicks,
     redPicks,
     myPickSlots,
     isComplete,
-    userRole,
-    setSelectedDetailChampId,
-    draftState,
-  } = useDraftStore();
-  const [version, setVersion] = useState("15.11.1");
+    history: [],
+    draftState: draftState || undefined
+  }), [side, currentStepIndex, blueBans, redBans, bluePicks, redPicks, myPickSlots, isComplete, draftState]);
 
   useEffect(() => {
     getLatestVersion().then(setVersion);
@@ -90,9 +124,18 @@ export default function BrainPanel() {
     warnings,
     winConditions,
     phase,
-    winProbability = 50,
     recommendedSummoners
   } = brainAnalysis;
+
+  const deepResponses = useMemo(() => {
+    if (actionType !== "pick" || !recommendations) return {};
+    
+    const result: Record<string, { enemyResponse: string; ourCounterResponse: string; winProbabilityAfter: number }> = {};
+    recommendations.forEach(rec => {
+      result[rec.championId] = brain.simulateDeepResponse(rec.championId, stateSnapshot);
+    });
+    return result;
+  }, [actionType, recommendations, stateSnapshot, brain]);
 
   // Resolve matching clinical meta duo when complete
   const ourPicks = side === "blue" ? bluePicks : redPicks;
@@ -166,9 +209,9 @@ export default function BrainPanel() {
 
   // Color de Win Rate Delta
   const getWinRateColor = (prob: number) => {
-    if (prob >= 60) return "text-[#00c8c8]";
-    if (prob >= 48) return "text-[#c8aa6e]";
-    return "text-[#ff4655]";
+    if (prob > 60) return "text-emerald-400";
+    if (prob >= 40) return "text-amber-400";
+    return "text-rose-500";
   };
 
   return (
@@ -571,6 +614,7 @@ export default function BrainPanel() {
             ) : (
               recommendations.map((rec, idx) => {
                 const iconUrl = getChampionIconUrl(version, rec.ddragonKey);
+                const predictiveWarning = brain.getPredictiveWarning(rec.championId, stateSnapshot);
 
                 return (
                   <div
@@ -641,6 +685,19 @@ export default function BrainPanel() {
                     <p className="text-xs md:text-sm text-[#ebd6b3] italic leading-relaxed pl-1 font-medium">
                       "{rec.reasoning}"
                     </p>
+
+                    {predictiveWarning && (
+                      <div className="mt-2 p-2 bg-amber-950/30 border border-amber-500/20 text-[10px] md:text-xs text-amber-300 font-bold rounded flex items-center gap-1.5 shrink-0">
+                        <span className="shrink-0 select-none">🔮 Predicción:</span>
+                        <span>{predictiveWarning}</span>
+                      </div>
+                    )}
+
+                    {actionType === "pick" && deepResponses[rec.championId] && deepResponses[rec.championId].enemyResponse !== "Desconocido" && (
+                      <div className="mt-2 p-2 bg-[#005a82]/20 border border-[#00c8c8]/30 text-[10px] md:text-xs text-[#80f0ff] font-bold rounded flex items-center gap-1.5 shrink-0">
+                        <span className="shrink-0 select-none">🔮 Si pickeas {rec.championName} &rarr; ellos {deepResponses[rec.championId].enemyResponse} &rarr; tú {deepResponses[rec.championId].ourCounterResponse} (Win Prob: {deepResponses[rec.championId].winProbabilityAfter}%)</span>
+                      </div>
+                    )}
 
                     {/* ALPHA-DRAFT FIX: Badges visuales de scoring dinámico y restricciones */}
                     {(() => {

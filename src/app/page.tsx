@@ -176,6 +176,13 @@ export default function Home() {
               <Sparkles className="w-5 h-5 group-hover/btn:rotate-12 transition-transform" />
               Iniciar Simulador en Vivo
             </Link>
+            <Link
+              href="/analytics"
+              className="px-6 py-3.5 bg-[#030c17]/40 hover:bg-[#c8aa6e]/15 text-[#c8aa6e] border-2 border-[#c8aa6e]/60 hover:border-[#c8aa6e] font-serif font-black uppercase text-xs md:text-sm tracking-widest shadow-[4px_4px_0px_0px_rgba(200,170,110,0.15)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 flex items-center gap-2 cursor-pointer"
+            >
+              <Trophy className="w-4 h-4 text-[#c8aa6e]" />
+              Post-Mortem Analytics
+            </Link>
             <button
               onClick={() => setUserRole(null)}
               className="px-6 py-3.5 bg-[#030c17]/40 hover:bg-[#c8aa6e]/15 text-[#ebd6b3] border-2 border-[#c8aa6e]/60 hover:border-[#c8aa6e] font-serif font-black uppercase text-xs md:text-sm tracking-widest shadow-[4px_4px_0px_0px_rgba(200,170,110,0.15)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-200 cursor-pointer"

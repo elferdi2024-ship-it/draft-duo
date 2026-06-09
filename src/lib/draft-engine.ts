@@ -14,6 +14,8 @@ import type {
 import { DRAFT_ORDER } from "@/lib/types";
 import { ownChampions, staticFallbackChampions } from "@/data/champions";
 import { duos } from "@/data/duos";
+import { matchups } from "@/data/matchups";
+import { getCoachInsight, DRAFT_COMPLETE_INSIGHTS, WARNING_TEMPLATES, WIN_CONDITION_TEMPLATES } from "./coach-teemo-strings";
 
 // Presión del jungla enemigo en early game (0-10)
 const JUNGLER_PRESSURE: Record<string, number> = {
@@ -307,11 +309,56 @@ export class CompetitiveBrain {
   }
 
   // ALPHA-DRAFT FIX: determineWinCondition
-  public determineWinCondition(allyPicks: (string | null)[], enemyPicks: (string | null)[]): { type: 'EARLY_DOMINANCE' | 'MACRO_CONTROL' | 'LATE_GAME_INSURANCE'; text: string } {
+  public determineWinCondition(allyPicks: (string | null)[], enemyPicks: (string | null)[]): { type: 'EARLY_DOMINANCE' | 'MACRO_CONTROL' | 'LATE_GAME_INSURANCE' | 'DIVE_COMP' | 'POKE_MACRO' | 'FRONT_TO_BACK' | 'SPLIT_PUSH'; text: string } {
     const validAllyChamps = allyPicks
       .filter((id): id is string => !!id)
       .map(id => this.getChampionById(id))
       .filter((c): c is ChampionData => !!c);
+
+    if (validAllyChamps.length >= 3) {
+      let diveCount = 0;
+      let pokeCount = 0;
+      let frontCount = 0;
+      let splitCount = 0;
+
+      validAllyChamps.forEach(champ => {
+        const id = champ.id.toLowerCase();
+        const tags = champ.tags || [];
+        const arch = getChampionArchetypes(id, tags);
+
+        if (arch.isDive) diveCount++;
+        if (arch.isPoke) pokeCount++;
+        if (arch.isPeel || ["nautilus", "braum", "leona", "rell", "alistar", "sejuani", "maokai"].includes(id)) frontCount++;
+        if (["jax", "fiora", "vayne", "yasuo", "yone", "aatrox"].includes(id)) splitCount++;
+      });
+
+      const total = validAllyChamps.length;
+
+      if (diveCount / total >= 0.4) {
+        return {
+          type: 'DIVE_COMP',
+          text: "DIVE COMP: Iniciación explosiva y asedio bajo torre. Colapsar en carriles laterales y buscar diveos agresivos en peleas de equipo."
+        };
+      }
+      if (pokeCount / total >= 0.4) {
+        return {
+          type: 'POKE_MACRO',
+          text: "POKE MACRO: Desgaste a distancia y control de asedio. Mantener rango, pokear antes de dragones y denegar iniciaciones directas."
+        };
+      }
+      if (splitCount >= 2) {
+        return {
+          type: 'SPLIT_PUSH',
+          text: "SPLIT PUSH: Presión dividida en carriles laterales. Forzar al enemigo a dividirse mediante duelistas en carriles laterales mientras el resto del equipo retiene."
+        };
+      }
+      if (frontCount >= 2) {
+        return {
+          type: 'FRONT_TO_BACK',
+          text: "FRONT TO BACK: Combate estructurado de primera a segunda línea. Tanques absorben daño y CC en el frente mientras los carries pegan seguros atrás."
+        };
+      }
+    }
 
     let earlyAggroCount = 0;
     let wavePushSum = 0;
@@ -397,7 +444,7 @@ export class CompetitiveBrain {
   public getDynamicWeights(
     enemyPickedIds: string[], 
     allyPickedIds: string[], 
-    draftState?: any
+    draftState?: LiveDraftState["draftState"]
   ): { comfort: number; counter: number; synergy: number; comp: number; meta: number } {
     let comfort = 0.35;
     let counter = 0.25;
@@ -449,7 +496,7 @@ export class CompetitiveBrain {
   }
 
   // ALPHA-DRAFT FIX: CFR probabilístico basado en matriz de respuesta y colapso de espacio de respuestas
-  public calculateCfrRegret(champId: string, state: LiveDraftState, activeStep: DraftPhaseStep, draftState?: any): number {
+  public calculateCfrRegret(champId: string, state: LiveDraftState, activeStep: DraftPhaseStep, draftState?: LiveDraftState["draftState"]): number {
     // REGLA DE ORO: Si el espacio de respuestas de botlane enemiga está cerrado, CFR colapsa a 0.05
     if (draftState && draftState.isEnemyBotLaneClosed === true) {
       return 0.05;
@@ -667,6 +714,11 @@ export class CompetitiveBrain {
     else if (champ.tier === "S") meta = 90;
     else if (champ.tier === "A+") meta = 80;
     else if (champ.tier === "A") meta = 70;
+
+    // Bono de Flex Pick: +10 meta por capacidad de jugar en múltiples roles
+    if (champ.flexRoles && champ.flexRoles.length > 1) {
+      meta = Math.min(100, meta + 10);
+    }
 
     // Resolve current team picks
     const myTeamPicks = state.side === "blue" ? state.bluePicks : state.redPicks;
@@ -973,31 +1025,7 @@ export class CompetitiveBrain {
       }
 
       // Contextual reasoning based on plan macro details
-      if (champ.id === "ashe") {
-        reasoning += " Nivel Challenger: Aporta presión constante de oleadas mediante W, revela la ruta del jungla enemigo con E (Halcón) de manera perpendicular, y habilita iniciaciones limpias con R (Flecha de Cristal) para transicionar a objetivos de río.";
-      } else if (champ.id === "varus") {
-        reasoning += " Nivel Challenger: Habilita composiciones de asedio lineal y poke letal. Utiliza la Q cargada con builds de letalidad desde la niebla para ablandar frontlines. Su R (Cadena de Corrupción) actúa como denegador de engage.";
-      } else if (champ.id === "jhin") {
-        reasoning += " Nivel Challenger: Ofrece control de visión y picks seguros desde la niebla (W + R). Controla cuellos de botella con cepos (E) y ejecuta objetivos a distancia extrema.";
-      } else if (champ.id === "tristana") {
-        reasoning += " Nivel Challenger: Opresión mediante empuje de oleada, demolición de placas con E, y gran seguridad con su salto W. Ideal para dives y forzar bola de nieve rápida.";
-      } else if (champ.id === "jinx") {
-        reasoning += " Nivel Challenger: El hypercarry late game supremo. Limpia peleas grupales mediante su pasiva de resets rápidos. Requiere protección pero ofrece el DPS más alto del draft.";
-      } else if (champ.id === "karma") {
-        reasoning += " Nivel Challenger: Enchanter dominante de poke y aceleración macro. Acelera rotaciones a dragones con R-E y desgasta al oponente bajo torre con R-Q constante.";
-      } else if (champ.id === "nautilus") {
-        reasoning += " Nivel Challenger: Iniciador por excelencia y facilitador de dives rápidos. Ralph, inmoviliza al carry rival con Q y pasiva, bloqueando su escape en nivel 2 y 6.";
-      } else if (champ.id === "pyke") {
-        reasoning += " Nivel Challenger: Generador de snowball ciego. Ralph, limpia centinelas rivales y usa R en ejecuciones para compartir el oro de las escaramuzas.";
-      } else if (champ.id === "renata") {
-        reasoning += " Nivel Challenger: Especialista anti-dive. La W (Rescate Financiero) salva al carry en trades al límite, y la R (Hostilidad Creciente) desmantela composiciones enemigas de autoataque.";
-      } else if (champ.id === "lulu") {
-        reasoning += " Nivel Challenger: La protectora definitiva contra asesinos. Usa Polymorph (W) reactivamente en la entrada del rival para anular su ráfaga de daño e inmovilizarlos.";
-      } else if (champ.id === "thresh") {
-        reasoning += " Nivel Challenger: Soporte de utilidad versátil. La linterna (W) rescata a Fer de sobreextensiones y el Flay (E) cancela saltos de campeones enemigos de engage directo.";
-      } else if (champ.id === "braum") {
-        reasoning += " Nivel Challenger: Pared infranqueable contra asedios. Detiene proyectiles clave (como definitivas) con la E, aportando aturdimiento glacial masivo mediante autoataques cruzados.";
-      }
+      reasoning += getCoachInsight(champ.id);
 
       // Calcular gankVulnerability y cfrRegret para esta recomendación
       const isAlly = activeStep.team === state.side;
@@ -1156,10 +1184,10 @@ export class CompetitiveBrain {
         warnings: [],
         winConditions: [
           userRole === "fer" 
-            ? "Fer: Fase de Draft Completada. Asegura tu farm de late game y mantén el posicionamiento perpendicular."
+            ? DRAFT_COMPLETE_INSIGHTS.fer
             : userRole === "ralph"
-            ? "Ralph: Fase de Draft Completada. Secuestra wards enemigos, mantén visión en río y da peel a Fer."
-            : "Fase de Draft Completada. Ejecuta tu plan macro minuto a minuto."
+            ? DRAFT_COMPLETE_INSIGHTS.ralph
+            : DRAFT_COMPLETE_INSIGHTS.default
         ],
         phase: "complete",
         winProbability: winProb,
@@ -1190,104 +1218,58 @@ export class CompetitiveBrain {
 
     // Challenger Coach Logic: Warnings & Strategic Directives
     if (enemyPickedIds.includes("caitlyn") && !allyPickedIds.includes("ashe")) {
-      if (userRole === "fer") {
-        warnings.push("¡Fer, peligro! El rival eligió Caitlyn. Evita tiradores de corto rango. Considera Ashe o Varus para pelear su rango.");
-      } else if (userRole === "ralph") {
-        warnings.push("¡Ralph, peligro! Caitlyn enemiga revelada. Protege a Fer con escudos (Braum/Karma) y mitiga su poke.");
-      } else {
-        warnings.push("¡Peligro! El rival pickeó Caitlyn. Evita jugar tiradores de corto rango. Considera Ashe + Karma o Varus.");
-      }
+      warnings.push(userRole === "fer" ? WARNING_TEMPLATES.caitlyn.fer : userRole === "ralph" ? WARNING_TEMPLATES.caitlyn.ralph : WARNING_TEMPLATES.caitlyn.default);
     }
     if (enemyPickedIds.includes("senna")) {
-      if (userRole === "fer") {
-        warnings.push("¡Fer, Senna enemiga! Prepárate para castigarla rápido. Dile a Ralph que busque iniciaciones (Lucian/Nami o Tristana/Nautilus).");
-      } else if (userRole === "ralph") {
-        warnings.push("¡Ralph, Senna enemiga! Castiga su fragilidad temprano. Elige Nautilus, Pyke o Thresh para engancharla.");
-      } else {
-        warnings.push("¡Senna revelada! Rompe la dictadura de oleadas con dives pesados de Tristana + Nautilus.");
-      }
+      warnings.push(userRole === "fer" ? WARNING_TEMPLATES.senna.fer : userRole === "ralph" ? WARNING_TEMPLATES.senna.ralph : WARNING_TEMPLATES.senna.default);
     }
     if (enemyPickedIds.some(id => ["nautilus", "leona", "rakan", "rengar", "malphite"].includes(id))) {
-      if (userRole === "fer") {
-        warnings.push("¡Fer, amenaza de dive/engage detectada! Posiciónate atrás, compra Edge of Night y espera el peel de Ralph.");
-      } else if (userRole === "ralph") {
-        warnings.push("¡Ralph, amenaza de dive detectada! Prioriza Renata Glasc, Lulu o Braum para dar peel instantáneo a Fer.");
-      } else {
-        warnings.push("Amenaza de DIVE o hard engage detectada. Prioriza Renata Glasc o Lulu en support para peel.");
-      }
+      warnings.push(userRole === "fer" ? WARNING_TEMPLATES.dive.fer : userRole === "ralph" ? WARNING_TEMPLATES.dive.ralph : WARNING_TEMPLATES.dive.default);
     }
 
     // Challenger Comp Checks (Warnings)
     if (allyPickedIds.length > 0) {
       // Full AD Check
       if (allyComp && allyComp.adPercentage !== undefined && allyComp.adPercentage >= 90) {
-        warnings.push("⚠️ COACH CHALLENGER: Composición 100% AD detectada. Ralph, prioriza supports de daño mágico (Karma, Lux) para forzar al rival a comprar resistencia mágica.");
+        warnings.push(WARNING_TEMPLATES.fullAd);
       }
       
       // No Frontline Check
       const hasTank = allyPickedIds.map(id => this.getChampionById(id)).some(c => c?.tags?.includes("Tank") || ["nautilus", "braum", "leona", "rell"].includes(c?.id || ""));
       const isSupportSlotNotPicked = !allyPicks[state.myPickSlots[1]];
       if (!hasTank && isSupportSlotNotPicked && currentStep.type === "pick") {
-        warnings.push("⚠️ COACH CHALLENGER: Composición sin línea frontal (no frontline). Ralph, prioriza tanques iniciadores o protectores (Nautilus, Braum) para asegurar control.");
+        warnings.push(WARNING_TEMPLATES.noFrontline);
       }
     }
 
     // Default macro guidelines if no warnings
     if (warnings.length === 0) {
-      if (userRole === "fer") {
-        warnings.push("Fer: Línea despejada. Asegura tus tiradores de confort y concéntrate en last hits.");
-      } else if (userRole === "ralph") {
-        warnings.push("Ralph: Línea despejada. Coordina la visión del río y prepara tus supports de confort.");
-      } else {
-        warnings.push("Línea despejada. Sigue el orden de picks y asegura tus campeones de confort.");
-      }
+      warnings.push(userRole === "fer" ? WARNING_TEMPLATES.lineClear.fer : userRole === "ralph" ? WARNING_TEMPLATES.lineClear.ralph : WARNING_TEMPLATES.lineClear.default);
     }
 
     // Dynamic win conditions
     if (allyComp?.type === "poke") {
-      if (userRole === "fer") {
-        winConditions.push("Fer: Desgasta con W de Ashe o Q de Varus desde arbustos sin revelar tu posición.");
-        winConditions.push("Fer: Asegura farm alto (>8 CS/min) y asedia la torre bot con flechas cargadas.");
-      } else if (userRole === "ralph") {
-        winConditions.push("Ralph: Usa R-E de Karma para dar velocidad a Fer y pokear con R-Q.");
-        winConditions.push("Ralph: Asegura el pixel bush 45s antes del spawn de dragones.");
-      } else {
-        winConditions.push("Desgastar con W de Ashe o Q de Varus desde arbustos ciegos antes de dragones.");
-        winConditions.push("Crashear oleadas y golpear placas. Evitar peleas extendidas cara a cara.");
-      }
+      const list = userRole === "fer" ? WIN_CONDITION_TEMPLATES.poke.fer : userRole === "ralph" ? WIN_CONDITION_TEMPLATES.poke.ralph : WIN_CONDITION_TEMPLATES.poke.default;
+      winConditions.push(...list);
     } else if (allyComp?.type === "dive") {
-      if (userRole === "fer") {
-        winConditions.push("Fer: Crashea oleada grande de cañón y salta con Tristana/Lucian cuando Ralph fije al rival.");
-        winConditions.push("Fer: Espera resets de kills en escaramuzas limpias.");
-      } else if (userRole === "ralph") {
-        winConditions.push("Ralph: Nautilus/Thresh inicia con Q o R, fija al carry rival e inicia el dive.");
-        winConditions.push("Ralph: Bloquea proyectiles y all-ins enemigos con tu escudo (Braum).");
-      } else {
-        winConditions.push("Crash de oleada grande con cañón → Dive coordinado bajo torre a nivel 3 o 6.");
-        winConditions.push("Tristana salta tras iniciación del Nautilus. Conseguir resets.");
-      }
+      const list = userRole === "fer" ? WIN_CONDITION_TEMPLATES.dive.fer : userRole === "ralph" ? WIN_CONDITION_TEMPLATES.dive.ralph : WIN_CONDITION_TEMPLATES.dive.default;
+      winConditions.push(...list);
     } else {
-      if (userRole === "fer") {
-        winConditions.push("Fer: Mantén el farm regular. Mantente seguro usando el halcón de Ashe (E).");
-      } else if (userRole === "ralph") {
-        winConditions.push("Ralph: Controls la visión del río y trackea al jungla enemigo para proteger a Fer.");
-      } else {
-        winConditions.push("Farmear eficientemente y mantener el control de visión en arbustos de línea.");
-        winConditions.push("Wardear pixel bush 45s antes de dragones y trackea al jungla rival.");
-      }
+      const list = userRole === "fer" ? WIN_CONDITION_TEMPLATES.default.fer : userRole === "ralph" ? WIN_CONDITION_TEMPLATES.default.ralph : WIN_CONDITION_TEMPLATES.default.default;
+      winConditions.push(...list);
     }
 
     // Challenger Level 2 Warning
     if (enemyPickedIds.includes("lucian") || enemyPickedIds.includes("tristana")) {
       const enemyHasAggressiveSup = enemyPickedIds.some(id => ["nami", "nautilus", "leona", "pyke"].includes(id));
       if (enemyHasAggressiveSup) {
-        winConditions.push("⚠️ TÁCTICA CHALLENGER: El rival tiene un spike de nivel 2 extremadamente agresivo. Cedan la prioridad inicial, absorban oleada bajo torre y eviten muertes.");
+        winConditions.push(WIN_CONDITION_TEMPLATES.level2Spike);
       }
     }
 
     // Visión perpendicular instruction
     if (enemyPickedIds.some(id => ["rengar", "viego", "pyke", "nocturne"].includes(id))) {
-      winConditions.push("👁️ CHALLENGER VISION: Colocar wards perpendiculares en la entrada del río a los 2:45 para rastrear flanqueos invisibles o veloces del jungla rival.");
+      winConditions.push(WIN_CONDITION_TEMPLATES.visionPerpendicular);
     }
 
     // Dynamic win probability estimation (iTero Advanced Engine)
@@ -1672,6 +1654,314 @@ export class CompetitiveBrain {
       tankMacroDirective,
       lanePositioningPattern,
       ccChainSequence
+    };
+  }
+
+  private getSingleChampTotalScore(
+    champId: string, 
+    isAlly: boolean, 
+    allyPicks: string[], 
+    enemyPicks: string[]
+  ): number {
+    const champ = this.getChampionById(champId);
+    if (!champ) return 50;
+
+    const bluePicks = Array(5).fill(null);
+    const redPicks = Array(5).fill(null);
+    allyPicks.forEach((id, idx) => { if (idx < 5) bluePicks[idx] = id; });
+    enemyPicks.forEach((id, idx) => { if (idx < 5) redPicks[idx] = id; });
+
+    const mockState: LiveDraftState = {
+      side: "blue",
+      currentStepIndex: allyPicks.length + enemyPicks.length,
+      bluePicks,
+      redPicks,
+      blueBans: Array(5).fill(null),
+      redBans: Array(5).fill(null),
+      myPickSlots: [3, 4],
+      history: [],
+      isComplete: false,
+    };
+
+    const isSupport = champ.role === "Support" || champ.roles?.includes("Support") || champ.role.includes("Support");
+    const activeStep: DraftPhaseStep = {
+      team: isAlly ? "blue" : "red",
+      type: "pick",
+      index: isSupport ? 4 : 3,
+      label: "Pick"
+    };
+
+    const scores = this.scoreChampion(champ, mockState, activeStep, null);
+    const weights = this.getDynamicWeights(enemyPicks, allyPicks, undefined);
+
+    const totalScore = Math.round(
+      scores.comfort * weights.comfort +
+      scores.counter * weights.counter +
+      scores.synergy * weights.synergy +
+      scores.comp * weights.comp +
+      scores.meta * weights.meta
+    );
+
+    return totalScore;
+  }
+
+  public calculateWinProbability(allyPicks: string[], enemyPicks: string[]): number {
+    const validAlly = allyPicks.filter(Boolean);
+    const validEnemy = enemyPicks.filter(Boolean);
+
+    if (validAlly.length === 0 || validEnemy.length === 0) {
+      return 50;
+    }
+
+    let totalAllyScore = 0;
+    validAlly.forEach(id => {
+      totalAllyScore += this.getSingleChampTotalScore(id, true, validAlly, validEnemy);
+    });
+    const avgAllyScore = totalAllyScore / validAlly.length;
+
+    let totalEnemyScore = 0;
+    validEnemy.forEach(id => {
+      totalEnemyScore += this.getSingleChampTotalScore(id, false, validAlly, validEnemy);
+    });
+    const avgEnemyScore = totalEnemyScore / validEnemy.length;
+
+    const winProb = 50 + (avgAllyScore - avgEnemyScore) * 0.5;
+    return Math.round(Math.min(95, Math.max(5, winProb)));
+  }
+
+  public simulateEnemyResponse(ourPick: string, state: LiveDraftState): { probableResponses: string[], confidence: number } {
+    const countersSet = new Set<string>();
+
+    const champ = this.getChampionById(ourPick);
+    if (champ && champ.counters) {
+      champ.counters.forEach(c => countersSet.add(c.toLowerCase()));
+    }
+
+    matchups.forEach(m => {
+      const ourDuoChamps = m.ourDuo.split("-");
+      const enemyDuoChamps = m.enemyDuo.split("-");
+
+      if (ourDuoChamps.includes(ourPick.toLowerCase())) {
+        enemyDuoChamps.forEach(c => countersSet.add(c.toLowerCase()));
+      }
+    });
+
+    const pickedBanned = new Set<string>();
+    state.blueBans.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+    state.redBans.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+    state.bluePicks.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+    state.redPicks.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+
+    const availableCounters = Array.from(countersSet).filter(c => !pickedBanned.has(c));
+
+    const getTierRank = (tier?: string): number => {
+      if (!tier) return 0;
+      switch (tier.toUpperCase()) {
+        case "S+": return 7;
+        case "S": return 6;
+        case "A+": return 5;
+        case "A": return 4;
+        case "B": return 3;
+        case "C": return 2;
+        case "D": return 1;
+        default: return 0;
+      }
+    };
+
+    const sortedCounters = availableCounters
+      .map(id => this.getChampionById(id))
+      .filter((c): c is ChampionData => !!c)
+      .sort((a, b) => getTierRank(b.tier) - getTierRank(a.tier))
+      .slice(0, 3)
+      .map(c => c.name);
+
+    const confidence = sortedCounters.length > 0 ? Math.round(90 - (3 - sortedCounters.length) * 15) : 0;
+    return {
+      probableResponses: sortedCounters,
+      confidence
+    };
+  }
+
+  public getPredictiveWarning(ourPick: string, state: LiveDraftState): string | null {
+    const { probableResponses } = this.simulateEnemyResponse(ourPick, state);
+    if (probableResponses.length === 0) return null;
+
+    if (probableResponses.length === 1) {
+      return `Si pickeas ${this.getChampionById(ourPick)?.name || ourPick}, prepárate para que ellos respondan con ${probableResponses[0]}.`;
+    }
+    const last = probableResponses[probableResponses.length - 1];
+    const rest = probableResponses.slice(0, -1).join(", ");
+    return `Si pickeas ${this.getChampionById(ourPick)?.name || ourPick}, prepárate para que ellos respondan con ${rest} o ${last}.`;
+  }
+
+  public calculateLaneVulnerability(role: 'top' | 'jungle' | 'mid' | 'bot', championId: string, enemyPicks: string[], state?: LiveDraftState): number {
+    const champ = this.getChampionById(championId);
+    const champMobility = champ ? (champ.mobility ?? 5.0) : 5.0;
+
+    let enemyJunglerPressure = 5.0;
+    const enemyJungler = enemyPicks.find(id => {
+      const c = this.getChampionById(id);
+      return c?.role === "Jungle" || c?.roles?.includes("Jungle");
+    });
+    if (enemyJungler) {
+      enemyJunglerPressure = JUNGLER_PRESSURE[enemyJungler] || JUNGLER_PRESSURE.default || 5.0;
+    }
+
+    let V = 5.0;
+
+    if (role === 'bot') {
+      const enemySupport = enemyPicks.find(id => {
+        const c = this.getChampionById(id);
+        return c?.role === "Support" || c?.roles?.includes("Support") || c?.role?.includes("Support");
+      }) || null;
+      return this.calculateGankVulnerability(championId, enemySupport, enemyPicks);
+    } else if (role === 'top') {
+      let enemyDiveCount = 0;
+      enemyPicks.forEach(id => {
+        const c = this.getChampionById(id);
+        if (c) {
+          const arch = getChampionArchetypes(c.id, c.tags);
+          if (arch.isDive) enemyDiveCount++;
+        }
+      });
+      V = (enemyDiveCount * 3) + (enemyJunglerPressure * 0.5) - (champMobility * 0.8);
+    } else if (role === 'jungle') {
+      const enemyEarlyPressure = enemyJunglerPressure;
+      
+      let allyMidRoam = 5.0;
+      let allySupportRoam = 5.0;
+      
+      if (state) {
+        const side = state.side || 'blue';
+        const allyPicksList = (side === 'blue' ? state.bluePicks : state.redPicks).filter(Boolean) as string[];
+        
+        const allyMid = allyPicksList.find(id => {
+          const c = this.getChampionById(id);
+          return c?.role === "Mid" || c?.roles?.includes("Mid");
+        });
+        const allyMidChamp = allyMid ? this.getChampionById(allyMid) : null;
+        allyMidRoam = allyMidChamp ? (allyMidChamp.engage ?? 5.0) : 5.0;
+
+        const allySupport = allyPicksList.find(id => {
+          const c = this.getChampionById(id);
+          return c?.role === "Support" || c?.roles?.includes("Support");
+        });
+        const allySupportChamp = allySupport ? this.getChampionById(allySupport) : null;
+        allySupportRoam = allySupportChamp ? (allySupportChamp.engage ?? 5.0) : 5.0;
+      }
+      
+      V = (enemyEarlyPressure * 0.7) - (allyMidRoam * 0.5) - (allySupportRoam * 0.3);
+    } else if (role === 'mid') {
+      let enemyBotPush = 5.0;
+      
+      if (state) {
+        const side = state.side || 'blue';
+        const enemyPicksList = (side === 'blue' ? state.redPicks : state.bluePicks).filter(Boolean) as string[];
+        const enemyBotPicks = enemyPicksList.filter(id => {
+          const c = this.getChampionById(id);
+          return c?.role === "ADC" || c?.role === "Support" || c?.roles?.includes("ADC") || c?.roles?.includes("Support");
+        });
+
+        let enemyBotPushSum = 0;
+        enemyBotPicks.forEach(id => {
+          const c = this.getChampionById(id);
+          enemyBotPushSum += c?.waveClear ?? 5.0;
+        });
+        enemyBotPush = enemyBotPicks.length > 0 ? (enemyBotPushSum / enemyBotPicks.length) : 5.0;
+      }
+
+      V = (enemyJunglerPressure * 0.6) + (enemyBotPush * 0.3) - (champMobility * 0.7);
+    }
+
+    return Math.round(Math.min(15.0, Math.max(0.0, V)) * 10) / 10;
+  }
+
+  public predictJungleStart(allyBotPicks: string[], enemyJunglerId: string): { side: 'top' | 'bottom', confidence: number } {
+    const jungler = this.getChampionById(enemyJunglerId);
+    const junglerEarlyPressure = JUNGLER_PRESSURE[enemyJunglerId.toLowerCase()] || JUNGLER_PRESSURE.default || 5.0;
+    const junglerClearSpeed = jungler ? (jungler.waveClear ?? 5.0) : 5.0;
+
+    let allyBotMobilitySum = 0;
+    let allyBotCount = 0;
+
+    allyBotPicks.forEach(id => {
+      const c = this.getChampionById(id);
+      if (c && (c.role === "ADC" || c.role === "Support" || c.roles?.includes("ADC") || c.roles?.includes("Support") || c.role.includes("Support"))) {
+        allyBotMobilitySum += c.mobility ?? 5.0;
+        allyBotCount++;
+      }
+    });
+
+    const allyBotMobility = allyBotCount > 0 ? (allyBotMobilitySum / allyBotCount) : 5.0;
+
+    if (allyBotMobility < 5.0 && junglerEarlyPressure > 7.0) {
+      return { side: 'top', confidence: 85 };
+    }
+    if (junglerClearSpeed > 8.0) {
+      return { side: 'bottom', confidence: 70 };
+    }
+    return { side: 'bottom', confidence: 50 };
+  }
+
+  public simulateDeepResponse(ourPick: string, state: LiveDraftState): { enemyResponse: string, ourCounterResponse: string, winProbabilityAfter: number } {
+    const { probableResponses } = this.simulateEnemyResponse(ourPick, state);
+    
+    if (probableResponses.length === 0) {
+      return {
+        enemyResponse: "Desconocido",
+        ourCounterResponse: "Desconocido",
+        winProbabilityAfter: 50
+      };
+    }
+
+    let bestEnemyResponse = probableResponses[0];
+    let bestOurCounterResponse = "Desconocido";
+    let maxWinProb = -1;
+
+    for (const enemyResName of probableResponses) {
+      const enemyResChamp = this.allChampions.find(c => c.name.toLowerCase() === enemyResName.toLowerCase());
+      if (!enemyResChamp) continue;
+
+      const enemyResId = enemyResChamp.id;
+
+      const pickedBanned = new Set<string>();
+      state.blueBans.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+      state.redBans.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+      state.bluePicks.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+      state.redPicks.forEach(id => id && pickedBanned.add(id.toLowerCase()));
+      pickedBanned.add(ourPick.toLowerCase());
+      pickedBanned.add(enemyResId.toLowerCase());
+
+      const candidates = this.allChampions.filter(c => !pickedBanned.has(c.id));
+
+      let bestCounter = "Desconocido";
+      let localMaxWinProb = -1;
+
+      for (const candidate of candidates) {
+        const allyPicks = (state.side === "blue" ? state.bluePicks : state.redPicks).filter(Boolean) as string[];
+        const enemyPicks = (state.side === "blue" ? state.redPicks : state.bluePicks).filter(Boolean) as string[];
+
+        const nextAllyPicks = [...allyPicks, ourPick, candidate.id];
+        const nextEnemyPicks = [...enemyPicks, enemyResId];
+
+        const winProb = this.calculateWinProbability(nextAllyPicks, nextEnemyPicks);
+        if (winProb > localMaxWinProb) {
+          localMaxWinProb = winProb;
+          bestCounter = candidate.name;
+        }
+      }
+
+      if (localMaxWinProb > maxWinProb) {
+        maxWinProb = localMaxWinProb;
+        bestEnemyResponse = enemyResName;
+        bestOurCounterResponse = bestCounter;
+      }
+    }
+
+    return {
+      enemyResponse: bestEnemyResponse,
+      ourCounterResponse: bestOurCounterResponse,
+      winProbabilityAfter: maxWinProb > 0 ? maxWinProb : 50
     };
   }
 }

@@ -34,3 +34,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# bridge dependencies & output
+/bridge/node_modules/
+/bridge/dist/
+

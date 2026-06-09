@@ -16,6 +16,11 @@ export interface ChampionData {
   ddragonKey: string;
   role: ChampionRole;
   roles?: ChampionRole[];
+  flexRoles?: string[];
+  mobility?: number;
+  waveClear?: number;
+  engage?: number;
+  peel?: number;
   tier?: string;
   tags?: string[];
   philosophy?: string;
@@ -223,7 +228,7 @@ export interface BrainAnalysis {
   recommendedSummoners?: { adc: string[]; sup: string[]; reason: string };
   gankVulnerability?: number;
   cfrRegretScore?: number;
-  winConditionType?: 'EARLY_DOMINANCE' | 'MACRO_CONTROL' | 'LATE_GAME_INSURANCE';
+  winConditionType?: 'EARLY_DOMINANCE' | 'MACRO_CONTROL' | 'LATE_GAME_INSURANCE' | 'DIVE_COMP' | 'POKE_MACRO' | 'FRONT_TO_BACK' | 'SPLIT_PUSH';
   winConditionText?: string;
   macroImpactWarning?: string;
 }

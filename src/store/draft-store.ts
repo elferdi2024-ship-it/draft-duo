@@ -26,8 +26,9 @@ interface DraftStore {
   userRole: UserRole | null;
   selectedBanSlot: { team: "blue" | "red"; index: number } | null;
   isBridgeConnected: boolean;
-  bridgeSocket: any;
+  bridgeSocket: WebSocket | null;
   selectedDetailChampId: string | null;
+  toast: { message: string; type: "success" | "warning" | "error" } | null;
   draftState: {
     currentStepIndex: number;
     macroPhase: string;
@@ -37,6 +38,8 @@ interface DraftStore {
     isLastPick: boolean;
     isEnemyBotLaneClosed: boolean;
   } | null;
+  winProbability: number;
+  hasSavedSnapshot: boolean;
 
   // Actions
   loadChampions: () => Promise<void>;
@@ -53,6 +56,9 @@ interface DraftStore {
   recalculateBrain: () => void;
   connectBridge: () => void;
   disconnectBridge: () => void;
+  exportRunes: (championId: string, buildTitle: string) => void;
+  showToast: (message: string, type: "success" | "warning" | "error") => void;
+  clearToast: () => void;
 }
 
 const initialDraftState = {
@@ -73,7 +79,10 @@ const initialDraftState = {
   isBridgeConnected: false,
   bridgeSocket: null,
   selectedDetailChampId: null,
+  toast: null,
   draftState: null,
+  winProbability: 50,
+  hasSavedSnapshot: false,
 };
 
 export const useDraftStore = create<DraftStore>((set, get) => ({
@@ -101,6 +110,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
       side,
       myPickSlots: mySlots,
       userRole, // Keep userRole intact
+      hasSavedSnapshot: false,
     });
     get().recalculateBrain();
   },
@@ -193,6 +203,7 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     set({
       ...initialDraftState,
       side: null, // Permite reconfigurar el lado y el orden de picks al reiniciar
+      hasSavedSnapshot: false,
     });
     get().recalculateBrain();
   },
@@ -253,7 +264,43 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
     const brain = new CompetitiveBrain(allChampions);
     const analysis = brain.analyze(stateSnapshot, userRole);
 
-    set({ brainAnalysis: analysis });
+    const allyPicks = (side === "blue" ? bluePicks : redPicks).filter((id): id is string => !!id);
+    const enemyPicks = (side === "blue" ? redPicks : bluePicks).filter((id): id is string => !!id);
+    const winProbability = brain.calculateWinProbability(allyPicks, enemyPicks);
+
+    set({ brainAnalysis: analysis, winProbability });
+
+    const isFinished = isComplete || (draftState && draftState.macroPhase === "FINISHED");
+    const hasPicks = allyPicks.length > 0 || enemyPicks.length > 0;
+    const { hasSavedSnapshot } = get();
+
+    if (isFinished && hasPicks && !hasSavedSnapshot) {
+      set({ hasSavedSnapshot: true });
+      const snapshot = {
+        id: `draft_${Date.now()}`,
+        timestamp: Date.now(),
+        allyPicks: allyPicks,
+        enemyPicks: enemyPicks,
+        allyBans: (side === 'blue' ? blueBans : redBans).filter((id): id is string => !!id),
+        enemyBans: (side === 'blue' ? redBans : blueBans).filter((id): id is string => !!id),
+        predictedWinProbability: winProbability,
+        vgScore: analysis.gankVulnerability ?? 5.0,
+        cfrScore: analysis.cfrRegretScore ?? 0.05,
+        winCondition: analysis.winConditionText || "Default win condition",
+      };
+
+      import("@/lib/analytics-db").then(({ saveSnapshot }) => {
+        saveSnapshot(snapshot)
+          .then(() => {
+            console.log("[Store] Draft snapshot saved to IndexedDB.");
+            get().showToast("📊 Draft guardado en el historial de Post-Mortem.", "success");
+          })
+          .catch(err => {
+            console.error("[Store] Error saving draft snapshot:", err);
+            get().showToast("❌ Error al guardar draft en historial.", "error");
+          });
+      });
+    }
   },
 
   connectBridge: () => {
@@ -269,9 +316,41 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
         set({ isBridgeConnected: true });
       };
 
-      socket.onmessage = (event) => {
+      socket.onmessage = (event: MessageEvent<string>) => {
         try {
-          const payload = JSON.parse(event.data);
+          interface DraftUpdateMessage {
+            type: "DRAFT_UPDATE";
+            data: {
+              side: "blue" | "red";
+              bluePicks: (string | null)[];
+              redPicks: (string | null)[];
+              blueBans: (string | null)[];
+              redBans: (string | null)[];
+              currentStepIndex: number;
+              isComplete: boolean;
+              draftState: {
+                currentStepIndex: number;
+                macroPhase: string;
+                isOurTurn: boolean;
+                currentActionType: string | null;
+                remainingEnemyPicks: number;
+                isLastPick: boolean;
+                isEnemyBotLaneClosed: boolean;
+              } | null;
+            };
+          }
+
+          interface RunesExportedMessage {
+            type: "RUNES_EXPORTED";
+            data: {
+              simulated: boolean;
+              championName: string;
+            };
+          }
+
+          type BridgeMessage = DraftUpdateMessage | RunesExportedMessage;
+
+          const payload = JSON.parse(event.data) as BridgeMessage;
           if (payload.type === "DRAFT_UPDATE") {
             const { side, bluePicks, redPicks, blueBans, redBans, currentStepIndex, isComplete, draftState } = payload.data;
             
@@ -287,9 +366,23 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
             });
 
             get().recalculateBrain();
+          } else if (payload.type === "RUNES_EXPORTED") {
+            const { simulated, championName } = payload.data;
+            if (simulated) {
+              get().showToast(
+                `⚠️ Exportación simulada para ${championName}. Inicia League of Legends para configurar las runas en el cliente oficial.`,
+                "warning"
+              );
+            } else {
+              get().showToast(
+                `✅ Runas para ${championName} exportadas exitosamente al cliente de LoL.`,
+                "success"
+              );
+            }
           }
         } catch (err) {
-          console.error("[Store] Error al parsear mensaje de LCU Bridge:", err);
+          const errMsg = err instanceof Error ? err.message : String(err);
+          console.error("[Store] Error al parsear mensaje de LCU Bridge:", errMsg);
         }
       };
 
@@ -304,7 +397,8 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
 
       set({ bridgeSocket: socket });
     } catch (e) {
-      console.error("[Store] Error al conectar con LCU Bridge:", e);
+      const errMsg = e instanceof Error ? e.message : String(e);
+      console.error("[Store] Error al conectar con LCU Bridge:", errMsg);
       set({ isBridgeConnected: false, bridgeSocket: null });
     }
   },
@@ -317,5 +411,38 @@ export const useDraftStore = create<DraftStore>((set, get) => ({
       } catch (e) {}
       set({ bridgeSocket: null, isBridgeConnected: false });
     }
+  },
+
+  exportRunes: (championId: string, buildTitle: string) => {
+    const { bridgeSocket, isBridgeConnected, allChampions } = get();
+    const champ = allChampions.find(c => c.id === championId);
+    const championName = champ ? champ.name : championId;
+
+    if (isBridgeConnected && bridgeSocket && bridgeSocket.readyState === 1) {
+      console.log(`[Store] Enviando EXPORT_RUNES para ${championName} (${buildTitle})`);
+      bridgeSocket.send(JSON.stringify({
+        type: "EXPORT_RUNES",
+        data: { championName, buildTitle }
+      }));
+    } else {
+      get().showToast(
+        `⚠️ Exportación simulada para ${championName}. Inicia League of Legends para configurar las runas en el cliente oficial.`,
+        "warning"
+      );
+    }
+  },
+
+  showToast: (message, type) => {
+    set({ toast: { message, type } });
+    setTimeout(() => {
+      const currentToast = get().toast;
+      if (currentToast && currentToast.message === message) {
+        get().clearToast();
+      }
+    }, 6000);
+  },
+
+  clearToast: () => {
+    set({ toast: null });
   },
 }));

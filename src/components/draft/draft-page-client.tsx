@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import DraftBoard from "./draft-board";
 import BrainPanel from "./brain-panel";
 import { useDraftStore } from "@/store/draft-store";
+import { useShallow } from "zustand/react/shallow";
 import ChampionDetailDrawer from "./champion-detail-drawer";
 import { getLatestVersion } from "@/lib/ddragon";
 import { AnimatePresence } from "framer-motion";
@@ -12,17 +13,60 @@ import { AnimatePresence } from "framer-motion";
 export default function DraftPageClient() {
   const [activeTab, setActiveTab] = useState<"draft" | "brain">("draft");
   const [version, setVersion] = useState("15.11.1");
-  const { selectedDetailChampId, setSelectedDetailChampId, allChampions, brainAnalysis, setChampion, isComplete } = useDraftStore();
+  
+  const { 
+    selectedDetailChampId, 
+    setSelectedDetailChampId, 
+    allChampions, 
+    brainAnalysis, 
+    setChampion, 
+    isComplete,
+    isBridgeConnected,
+    connectBridge,
+    disconnectBridge
+  } = useDraftStore(
+    useShallow((state) => ({
+      selectedDetailChampId: state.selectedDetailChampId,
+      setSelectedDetailChampId: state.setSelectedDetailChampId,
+      allChampions: state.allChampions,
+      brainAnalysis: state.brainAnalysis,
+      setChampion: state.setChampion,
+      isComplete: state.isComplete,
+      isBridgeConnected: state.isBridgeConnected,
+      connectBridge: state.connectBridge,
+      disconnectBridge: state.disconnectBridge,
+    }))
+  );
 
   useEffect(() => {
     getLatestVersion().then(setVersion);
-  }, []);
+    connectBridge();
+    return () => {
+      disconnectBridge();
+    };
+  }, [connectBridge, disconnectBridge]);
 
   const selectedChampData = allChampions.find(c => c.id === selectedDetailChampId) || null;
   const isMyTurn = brainAnalysis ? brainAnalysis.isMyTurn : false;
 
   return (
     <div className="flex flex-col gap-4 relative lg:flex-1 lg:min-h-0 lg:overflow-hidden">
+      {/* LCU Auto-Sync Status Bar */}
+      <div className={`flex items-center justify-between px-4 py-2 border rounded-sm transition-all text-xs font-bold uppercase tracking-wider shadow-md shrink-0 ${
+        isBridgeConnected
+          ? "bg-emerald-950/20 border-emerald-500/40 text-emerald-400"
+          : "bg-rose-950/20 border-rose-500/40 text-rose-400 animate-pulse"
+      }`}>
+        <div className="flex items-center gap-2">
+          <span className={`h-2.5 w-2.5 rounded-full ${isBridgeConnected ? "bg-emerald-500" : "bg-rose-500"}`} />
+          <span>{isBridgeConnected ? "🟢 Sincronizado con LoL Client" : "🔴 Esperando conexión LCU"}</span>
+        </div>
+        {!isBridgeConnected && (
+          <span className="text-[10px] text-rose-400/75 normal-case font-normal hidden sm:inline-block">
+            Inicia el juego y el bridge local para rellenar los datos automáticamente en tiempo real.
+          </span>
+        )}
+      </div>
       {/* Mobile Tab Switcher */}
       <div className="flex lg:hidden border border-[#785a28] bg-[#091420] rounded p-1 gap-1 shadow-sm">
         <button

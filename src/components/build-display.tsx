@@ -3,6 +3,7 @@
 
 import type { BuildData } from "@/lib/types";
 import { BookOpen, Shield, Sword, Award } from "lucide-react";
+import { useDraftStore } from "@/store/draft-store";
 
 interface BuildDisplayProps {
   build: BuildData;
@@ -10,16 +11,26 @@ interface BuildDisplayProps {
 
 export default function BuildDisplay({ build }: BuildDisplayProps) {
   const { runes, items, situationalItems, skillOrder, summonerSpells, notes } = build;
+  const exportRunes = useDraftStore((state) => state.exportRunes);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-[#f0e6d3]">
       {/* Col 1: Runas */}
       <div className="lol-panel p-5 bg-[#091420] border border-[#785a28]/60">
-        <div className="flex items-center gap-2 mb-4 border-b border-[#785a28]/40 pb-2">
-          <Award className="w-5 h-5 text-[#c8aa6e]" />
-          <h3 className="lol-title font-bold text-sm text-[#f0e6d3]">
-            Runas Recomendadas
-          </h3>
+        <div className="flex items-center justify-between gap-2 mb-4 border-b border-[#785a28]/40 pb-2">
+          <div className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-[#c8aa6e]" />
+            <h3 className="lol-title font-bold text-sm text-[#f0e6d3]">
+              Runas Recomendadas
+            </h3>
+          </div>
+          <button
+            onClick={() => exportRunes(build.championId, build.title)}
+            className="px-2.5 py-1 bg-[#0a1428] hover:bg-[#c8aa6e] text-[#c8aa6e] hover:text-[#010a13] border border-[#c8aa6e]/50 hover:border-[#f0e6d3] text-[9px] font-black uppercase tracking-widest transition-all rounded shadow-sm cursor-pointer"
+            title="Exportar runas recomendadas al cliente de LoL"
+          >
+            ✈️ Exportar
+          </button>
         </div>
 
         <div className="flex flex-col gap-4 text-xs">
